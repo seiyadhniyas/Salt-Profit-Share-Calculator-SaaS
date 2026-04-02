@@ -52,7 +52,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
           </label>
 
           <label className="block">
-            <div className="text-sm font-medium text-gray-700 mb-1">Buyer Name</div>
+            <div className="text-sm font-medium text-gray-700 mb-1">Buyer's Name</div>
             <input
               type="text"
               value={inputs.buyerName || ''}
