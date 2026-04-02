@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+
+# Production
+build/
+dist/
+out/
+.next/
+.nuxt/
+.cache/
+.vite/
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
+*~
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+
+# Git
+.git/
+.gitmodules
+
+# Vercel/Netlify
+.vercel/
+.netlify/

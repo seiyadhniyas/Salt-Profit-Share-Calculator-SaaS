@@ -1,0 +1,89 @@
+import React from 'react'
+
+function NumberInput({label, value, onChange, min = 0, step = 'any', name}){
+  return (
+    <label className="block mb-3">
+      <div className="text-sm font-medium text-gray-700 mb-1">{label}</div>
+      <input
+        name={name}
+        type="number"
+        step={step}
+        min={min}
+        value={value}
+        onChange={(e) => onChange(name, e.target.value)}
+        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </label>
+  )
+}
+
+export default function InputSection({inputs, setInput, reset, toggleLoans}){
+  const onChange = (name, val) => {
+    setInput(prev => ({...prev, [name]: val}))
+  }
+
+  return (
+    <div className="bg-white shadow rounded-lg p-5">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold text-gray-800">Input Data</h3>
+        <button 
+          onClick={reset} 
+          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm transition"
+        >
+          🔄 Reset
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Production Details */}
+        <div>
+          <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">📦 Production Details</h4>
+          <NumberInput label="Salt Packed Bags" name="packedBags" value={inputs.packedBags} onChange={onChange} step="1" />
+          <NumberInput label="Deducted Bags" name="deductedBags" value={inputs.deductedBags} onChange={onChange} step="1" />
+          <NumberInput label="Price per Bag (LKR)" name="pricePerBag" value={inputs.pricePerBag} onChange={onChange} />
+        </div>
+
+        {/* Income */}
+        <div>
+          <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 Income</h4>
+          <NumberInput label="Cash Received (LKR)" name="cashReceived" value={inputs.cashReceived} onChange={onChange} />
+          <NumberInput label="Cheque Received (LKR)" name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} />
+        </div>
+
+        {/* Contractor Expenses */}
+        <div>
+          <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">🏭 Contractor Expenses</h4>
+          <NumberInput label="Packing Fee per Bag (LKR)" name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} />
+          <NumberInput label="Plastic Bag Cost (LKR)" name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} />
+          <NumberInput label="Other Expenses (LKR)" name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} />
+        </div>
+      </div>
+
+      {/* Loans Section */}
+      <div className="mt-6 pt-6 border-t">
+        <div className="flex items-center gap-3 mb-4">
+          <input 
+            id="toggleLoans" 
+            type="checkbox" 
+            checked={inputs.bothOwnersHaveLoans} 
+            onChange={(e) => toggleLoans(e.target.checked)} 
+            className="h-4 w-4 text-blue-600 rounded cursor-pointer"
+          />
+          <label htmlFor="toggleLoans" className="font-medium text-gray-700 cursor-pointer">
+            💳 Both owners have loans
+          </label>
+        </div>
+
+        {inputs.bothOwnersHaveLoans && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <NumberInput label="Loan (Inaya) - LKR" name="loanInaya" value={inputs.loanInaya} onChange={onChange} />
+            <NumberInput label="Loan (Shakira) - LKR" name="loanShakira" value={inputs.loanShakira} onChange={onChange} />
+          </div>
+        )}
+        {!inputs.bothOwnersHaveLoans && (
+          <p className="text-sm text-gray-500">Toggle checkbox above to add loans</p>
+        )}
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,105 @@
+// Calculation utilities for Salt Profit Share Calculator
+
+// Format helper: ensures numbers are finite and returns 0 otherwise
+const safeNum = (v) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+// Primary compute function. Takes an inputs object and returns an object
+// with all intermediate and final values. Keeps raw values for
+// highlighting and applies validation rules described in spec.
+export function computeAll(inputs) {
+  // parse inputs safely
+  const packedBags = Math.max(0, Math.floor(safeNum(inputs.packedBags)))
+  const deductedBags = Math.max(0, Math.floor(safeNum(inputs.deductedBags)))
+  const pricePerBag = safeNum(inputs.pricePerBag)
+  const cashReceived = safeNum(inputs.cashReceived)
+  const chequeReceived = safeNum(inputs.chequeReceived)
+  const packingFeePerBag = safeNum(inputs.packingFeePerBag)
+  const bagCostPerUnit = safeNum(inputs.bagCostPerUnit)
+  const otherExpenses = safeNum(inputs.otherExpenses)
+  const loanInaya = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanInaya) : 0
+  const loanShakira = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanShakira) : 0
+
+  // net bags
+  const netBagsRaw = packedBags - deductedBags
+  const netBags = Math.max(0, netBagsRaw)
+
+  // initial price = net_bags * price_per_bag
+  const initialPrice = netBags * pricePerBag
+
+  // grand total received
+  const grandTotalReceived = cashReceived + chequeReceived
+
+  // contractor_total_spent
+  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + otherExpenses
+
+  // contractor_share = (initial_price / 2) + contractor_total_spent
+  const contractorShare = (initialPrice / 2) + contractorTotalSpent
+
+  // owner_pool
+  const ownerPool = grandTotalReceived - contractorShare
+
+  // general_share_per_owner
+  const generalSharePerOwner = ownerPool / 2
+
+  // raw final shares
+  let finalInayaRaw = generalSharePerOwner - loanInaya
+  let finalShakiraRaw = generalSharePerOwner - loanShakira
+
+  // Prevent negative values: if result < 0 -> show 0 (we'll clamp)
+  let finalInaya = Math.max(0, finalInayaRaw)
+  let finalShakira = Math.max(0, finalShakiraRaw)
+
+  // Validation: ensure final_inaya + final_shakira == owner_pool
+  // If mismatch, difference = owner_pool - (final_inaya + final_shakira)
+  // Add difference to person with LOWER loan
+  // Note: use loan values to decide; if equal, give to Inaya.
+  const sumFinals = finalInaya + finalShakira
+  const diff = ownerPool - sumFinals
+
+  if (Math.abs(diff) > 0.0001) {
+    // choose owner with lower loan (smaller number)
+    const aLoan = loanInaya
+    const bLoan = loanShakira
+    if (aLoan <= bLoan) {
+      finalInaya = Math.max(0, finalInaya + diff)
+    } else {
+      finalShakira = Math.max(0, finalShakira + diff)
+    }
+  }
+
+  // Prepare flags for negative/raw highlighting (before clamp)
+  const highlights = {
+    ownerPoolNegative: ownerPool < 0,
+    finalInayaNegative: finalInayaRaw < 0,
+    finalShakiraNegative: finalShakiraRaw < 0,
+  }
+
+  return {
+    packedBags,
+    deductedBags,
+    netBags,
+    initialPrice,
+    cashReceived,
+    chequeReceived,
+    grandTotalReceived,
+    packingFeePerBag,
+    bagCostPerUnit,
+    otherExpenses,
+    contractorTotalSpent,
+    contractorShare,
+    ownerPool,
+    generalSharePerOwner,
+    finalInaya,
+    finalShakira,
+    highlights,
+  }
+}
+
+// currency format LKR 1,000.00
+export function formatLKR(n) {
+  const num = Number(n) || 0
+  return `LKR ${num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+}
