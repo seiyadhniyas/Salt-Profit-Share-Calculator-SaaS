@@ -2,12 +2,23 @@ import React from 'react'
 import { formatLKR } from '../utils/calculations.jsx'
 
 function StatRow({label, value, isNegative}){
+  // split bracketed part to allow responsive stacking
+  const idx = label.indexOf('(')
+  const hasBracket = idx !== -1
+  const main = hasBracket ? label.slice(0, idx).trim() : label
+  const sub = hasBracket ? label.slice(idx).trim() : ''
+
   return (
-    <div className="flex justify-between items-center py-2 px-3 rounded hover:bg-gray-50 transition">
-      <span className="text-sm text-gray-700">{label}</span>
-      <span className={`font-semibold text-right ${isNegative ? 'text-red-600' : 'text-gray-900'}`}>
-        {value}
-      </span>
+    <div className="py-2 px-3 rounded hover:bg-gray-50 transition">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <div>
+          <div className="text-sm text-gray-700">{main}</div>
+          {hasBracket && (
+            <div className="text-xs text-gray-500 mt-1 sm:mt-0">{sub}</div>
+          )}
+        </div>
+        <div className={`mt-2 sm:mt-0 font-semibold ${isNegative ? 'text-red-600' : 'text-gray-900'}`}>{value}</div>
+      </div>
     </div>
   )
 }
@@ -19,7 +30,7 @@ export default function ResultSection({results}){
     <div className="mt-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Detailed Breakdown */}
-        <div className="bg-white shadow rounded-lg p-5">
+        <div className="shadow rounded-lg p-5" style={{ backgroundColor: '#fff0f0' }}>
           <h3 className="text-lg font-bold text-gray-800 mb-4">Calculation Breakdown</h3>
           <div className="space-y-1">
             <StatRow label="Net Bags (Packed - Deducted)" value={results.netBags} isNegative={false} />
@@ -35,10 +46,10 @@ export default function ResultSection({results}){
         </div>
 
         {/* Final Results */}
-        <div className="bg-white shadow rounded-lg p-5">
+        <div className="shadow rounded-lg p-5" style={{ backgroundColor: '#f7fff0' }}>
           <h3 className="text-lg font-bold text-gray-800 mb-4">Final Results</h3>
           <div className="space-y-3">
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="rounded-lg p-4" style={{ backgroundColor: '#b1ecff' }}>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-700">Inaya Final Share</span>
                 {results.loanInaya > 0 && (
@@ -53,7 +64,7 @@ export default function ResultSection({results}){
               )}
             </div>
 
-            <div className="bg-green-50 rounded-lg p-4">
+            <div className="rounded-lg p-4" style={{ backgroundColor: '#bcfaea' }}>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-700">Shakira Final Share</span>
                 {results.loanShakira > 0 && (
@@ -68,7 +79,7 @@ export default function ResultSection({results}){
               )}
             </div>
 
-            <div className="bg-gray-100 rounded-lg p-3 mt-3">
+            <div className="rounded-lg p-3 mt-3" style={{ backgroundColor: '#ffc6b1' }}>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-700">Total Distributed</span>
                 <strong className="text-gray-900">{formatLKR(results.finalInaya + results.finalShakira)}</strong>

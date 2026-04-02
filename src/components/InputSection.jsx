@@ -39,7 +39,7 @@ export default function InputSection({inputs, setInput, reset, toggleLoans}){
   }
 
   return (
-    <div className="bg-white shadow rounded-lg p-5">
+    <div className="bg-yellow-50 shadow rounded-lg p-5">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-gray-800">Input Data</h3>
         <button 
@@ -78,9 +78,9 @@ export default function InputSection({inputs, setInput, reset, toggleLoans}){
           {(inputs.extraExpenses || []).length > 0 && (
             <div className="mt-3 space-y-2">
               {(inputs.extraExpenses || []).map(exp => (
-                <div key={exp.id} className="flex items-center gap-2">
+                <div key={exp.id} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <input className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value)} />
-                  <input type="number" step="any" className="w-28 border border-gray-300 rounded px-2 py-1 text-sm" value={exp.amount} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
+                  <input type="number" step="any" className="w-full sm:w-28 border border-gray-300 rounded px-2 py-1 text-sm" value={exp.amount} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
                   <button type="button" onClick={() => removeExpense(exp.id)} className="text-sm text-red-600">Remove</button>
                 </div>
               ))}

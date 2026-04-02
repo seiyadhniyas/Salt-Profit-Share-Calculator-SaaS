@@ -4,6 +4,7 @@ import ResultSection from './components/ResultSection.jsx'
 import { computeAll, formatLKR } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import { saveReport, saveReportToSupabase } from './api/reports.js'
 
 const STORAGE_KEY = 'salt_profit_share_last'
 
@@ -72,6 +73,29 @@ export default function App(){
     pdf.save('salt-profit-share.pdf')
   }
 
+  const saveCurrentReport = async () => {
+    if (!results) return alert('No results to save')
+    try {
+      const payload = { inputs, results }
+      // try Supabase-backed function first
+      const resp = await saveReportToSupabase(payload).catch(() => null)
+      if (resp && resp.ok) {
+        alert('Report saved to Supabase')
+        return
+      }
+
+      // fallback to local function
+      const resp2 = await saveReport(payload)
+      if (resp2 && resp2.ok) {
+        alert('Report saved (local demo)')
+      } else {
+        alert('Save failed')
+      }
+    } catch (e) {
+      alert('Save error: ' + (e.message || e))
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
       <div ref={rootRef} className="container-max">
@@ -88,7 +112,7 @@ export default function App(){
 
           <div>
             {results ? (
-              <div className="bg-white shadow rounded-lg p-4">
+              <div className="shadow rounded-lg p-4" style={{ backgroundColor: '#f2d3ff' }}>
                 <h3 className="text-lg font-bold text-gray-800 mb-3">Summary</h3>
                 <div className="text-sm space-y-2">
                   <div className="flex justify-between">
@@ -159,9 +183,12 @@ export default function App(){
         )}
 
         {/* Download button at page bottom */}
-        <div className="mt-6">
+        <div className="mt-6 flex justify-center gap-3">
           <button onClick={downloadPDF} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded">
             📥 Download as PDF
+          </button>
+          <button onClick={saveCurrentReport} className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded">
+            💾 Save Report
           </button>
         </div>
       </div>
