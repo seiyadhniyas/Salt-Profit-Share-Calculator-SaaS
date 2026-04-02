@@ -19,6 +19,7 @@ export default function App(){
     packingFeePerBag: 0,
     bagCostPerUnit: 0,
     otherExpenses: 0,
+    otherExpensesReason: '',
     loanInaya: 0,
     loanShakira: 0,
     bothOwnersHaveLoans: false,
@@ -204,6 +205,16 @@ export default function App(){
                 <div className="row"><div className="muted">Net Bags</div><div className="value">{results.netBags}</div></div>
                 <div className="row"><div className="muted">Initial Price</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
                 <div className="row"><div className="muted">Contractor Spent</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div></div>
+                <div className="row"><div className="muted">Other Expenses Reason</div><div className="value">{inputs.otherExpensesReason || '-'}</div></div>
+                {/* list manual extra expenses if any */}
+                {(inputs.extraExpenses || []).length > 0 && (
+                  <div style={{ marginTop: 6 }}>
+                    <div className="muted" style={{ marginBottom: 4 }}>Extra Expenses</div>
+                    {(inputs.extraExpenses || []).map(e => (
+                      <div key={e.id} className="row"><div className="muted">{e.label}</div><div className="value">{formatLKR(e.amount)}</div></div>
+                    ))}
+                  </div>
+                )}
                 <div className="row"><div className="muted">Contractor Share</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
                 <div className="row"><div className="muted">Per Owner Share</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
               </div>

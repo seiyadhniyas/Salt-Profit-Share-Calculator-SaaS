@@ -102,7 +102,18 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">🏭 Contractor Expenses</h4>
             <NumberInput label="Packing Fee per Bag (LKR)" name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} />
             <NumberInput label="Plastic Bag Cost (LKR)" name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} />
-            <NumberInput label="Other Expenses (LKR)" name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} />
+            <NumberInput label="Other Expenses (LKR) (state reason)" name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} />
+            <label className="block mb-3">
+              <div className="text-sm font-medium text-gray-700 mb-1">Other Expenses Reason</div>
+              <input
+                type="text"
+                name="otherExpensesReason"
+                value={inputs.otherExpensesReason || ''}
+                onChange={(e) => onChange('otherExpensesReason', e.target.value)}
+                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                placeholder="Brief reason for other expenses"
+              />
+            </label>
             <div className="mt-2">
               <button type="button" onClick={addExpense} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded text-sm hover:bg-blue-100">
                 + add expenses
