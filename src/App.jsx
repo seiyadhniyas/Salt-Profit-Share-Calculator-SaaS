@@ -84,8 +84,14 @@ export default function App(){
     const pageWidth = pdf.internal.pageSize.getWidth()
     const pageHeight = pdf.internal.pageSize.getHeight()
     const imgProps = pdf.getImageProperties(imgData)
-    const imgWidth = pageWidth - 40
-    const imgHeight = (imgProps.height * imgWidth) / imgProps.width
+    let imgWidth = pageWidth - 40
+    let imgHeight = (imgProps.height * imgWidth) / imgProps.width
+    const maxHeight = pageHeight - 40
+    if (imgHeight > maxHeight) {
+      const ratio = maxHeight / imgHeight
+      imgHeight = imgHeight * ratio
+      imgWidth = imgWidth * ratio
+    }
     pdf.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight)
     pdf.save('salt-profit-share.pdf')
   }
@@ -176,39 +182,56 @@ export default function App(){
 
         {/* Hidden/off-screen printable area (captures Summary -> Final Results) */}
         {results && (
-          <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: 20, background: '#fff' }}>
-            <div style={{ maxWidth: 800 }}>
-              <h2 style={{ fontSize: 22, marginBottom: 8 }}>Summary</h2>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, gap: 12 }}>
-                <div>Date: {inputs.date || ''}</div>
-                <div>Buyer's Name: {inputs.buyerName || ''}</div>
-                <div>Bill #: {inputs.billNumber || ''}</div>
+          <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: 12, background: '#fff' }}>
+            <style>{`
+              #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 12.5pt; line-height: 1.2; color: #000; }
+              #print-area h2 { font-size: 14pt; margin: 6pt 0; }
+              #print-area .section { margin-bottom: 8pt; }
+              #print-area .row { display: flex; justify-content: space-between; gap: 8pt; margin-bottom: 4pt; }
+              #print-area .muted { color: #444; font-size: 11pt }
+              #print-area .value { font-weight: 600 }
+            `}</style>
+            <div style={{ width: '100%', maxWidth: 560 }}>
+              <div className="section">
+                <h2>Document Details</h2>
+                <div className="row"><div className="muted">Date</div><div className="value">{inputs.date || '-'}</div></div>
+                <div className="row"><div className="muted">Buyer's Name</div><div className="value">{inputs.buyerName || '-'}</div></div>
+                <div className="row"><div className="muted">Bill #</div><div className="value">{inputs.billNumber || '-'}</div></div>
               </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>Net Bags:</div>
-                  <div>{results.netBags}</div>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>Initial Price:</div>
-                  <div>{formatLKR(results.initialPrice)}</div>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>Contractor Spent:</div>
-                  <div>{formatLKR(results.contractorTotalSpent)}</div>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <div>Contractor Share:</div>
-                  <div>{formatLKR(results.contractorShare)}</div>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>Per Owner Share:</div>
-                  <div>{formatLKR(results.generalSharePerOwner)}</div>
+
+              <div className="section">
+                <h2>Summary</h2>
+                <div className="row"><div className="muted">Net Bags</div><div className="value">{results.netBags}</div></div>
+                <div className="row"><div className="muted">Initial Price</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
+                <div className="row"><div className="muted">Contractor Spent</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div></div>
+                <div className="row"><div className="muted">Contractor Share</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
+                <div className="row"><div className="muted">Per Owner Share</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+              </div>
+
+              <div className="section">
+                <h2>Calculation Breakdown</h2>
+                <div className="row"><div className="muted">Grand Total Received</div><div className="value">{formatLKR(results.grandTotalReceived)}</div></div>
+                <div className="row"><div className="muted">Owner Pool (Received - Contractor)</div><div className="value">{formatLKR(results.ownerPool)}</div></div>
+                <div className="row"><div className="muted">General Share Per Owner</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+              </div>
+
+              <div className="section">
+                <h2>Total Distributed</h2>
+                <div className="row"><div className="muted">Inaya Final Share</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
+                <div className="row"><div className="muted">Inaya Zakat (5%)</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
+                <div className="row"><div className="muted">Inaya After Zakat</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
+
+                <div style={{ height: 6 }}></div>
+
+                <div className="row"><div className="muted">Shakira Final Share</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
+                <div className="row"><div className="muted">Shakira Zakat (5%)</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
+                <div className="row"><div className="muted">Shakira After Zakat</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
+
+                <div className="row" style={{ borderTop: '1px solid #ddd', paddingTop: 6 }}>
+                  <div className="muted">Total Distributed</div>
+                  <div className="value">{formatLKR(results.finalInaya + results.finalShakira)}</div>
                 </div>
               </div>
-              <div style={{ height: 16 }}></div>
-              <h2 style={{ fontSize: 22, marginBottom: 8 }}>Final Results</h2>
-              <ResultSection results={results} />
             </div>
           </div>
         )}
