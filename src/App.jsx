@@ -4,7 +4,8 @@ import ResultSection from './components/ResultSection.jsx'
 import { computeAll, formatLKR } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
-import { saveReport, saveReportToSupabase } from './api/reports.js'
+import { saveReport, saveReportToSupabase, getReportsFromSupabase } from './api/reports.js'
+import { useCallback } from 'react'
 
 const STORAGE_KEY = 'salt_profit_share_last'
 
@@ -28,6 +29,22 @@ export default function App(){
   const [results, setResults] = useState(null)
   const rootRef = useRef()
   const printRef = useRef()
+  const [reports, setReports] = useState([])
+
+  const loadReports = useCallback(async () => {
+    try {
+      const r = await getReportsFromSupabase().catch(() => null)
+      if (r && r.ok) {
+        setReports(r.reports || [])
+      } else {
+        // try fallback endpoint
+        const r2 = await fetch('/.netlify/functions/getReports').then(res => res.json()).catch(() => null)
+        if (r2 && r2.ok) setReports(r2.reports || [])
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }, [])
 
   // load last from localStorage
   useEffect(()=>{
@@ -96,6 +113,15 @@ export default function App(){
     }
   }
 
+  const loadAndApplyReport = (report) => {
+    try {
+      const payload = report.payload || (report.inserted && report.inserted[0] && report.inserted[0].payload) || report
+      if (payload && payload.inputs) setInputs(prev => ({ ...prev, ...payload.inputs }))
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
       <div ref={rootRef} className="container-max">
@@ -153,6 +179,11 @@ export default function App(){
           <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: 20, background: '#fff' }}>
             <div style={{ maxWidth: 800 }}>
               <h2 style={{ fontSize: 22, marginBottom: 8 }}>Summary</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, gap: 12 }}>
+                <div>Date: {inputs.date || ''}</div>
+                <div>Buyer's Name: {inputs.buyerName || ''}</div>
+                <div>Bill #: {inputs.billNumber || ''}</div>
+              </div>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>Net Bags:</div>
@@ -185,11 +216,42 @@ export default function App(){
         {/* Download button at page bottom */}
         <div className="mt-6 flex justify-center gap-3">
           <button onClick={downloadPDF} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded">
-            📥 Download as PDF
+            📥 Download PDF
           </button>
           <button onClick={saveCurrentReport} className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded">
-            💾 Save Report
+            💾 Save
           </button>
+          <button onClick={loadReports} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded">
+            📂 Load Reports
+          </button>
+        </div>
+
+        {/* Reports list */}
+        <div className="mt-6">
+          <div className="bg-white shadow rounded-lg p-4">
+            <h3 className="text-lg font-bold mb-3">Saved Reports</h3>
+            {reports.length === 0 ? (
+              <div className="text-sm text-gray-500">No reports loaded.</div>
+            ) : (
+              <ul className="space-y-2">
+                {reports.map(r => (
+                  <li key={r.id || r.inserted?.[0]?.id || Math.random()} className="p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-sm font-medium">ID: {r.id || (r.inserted && r.inserted[0] && r.inserted[0].id) || r.inserted?.[0]?.id}</div>
+                        <div className="text-xs text-gray-600">{r.created_at || (r.inserted && r.inserted[0] && r.inserted[0].created_at) || ''}</div>
+                        <div className="text-xs text-gray-700 mt-1">Date: {((r.payload && r.payload.inputs && r.payload.inputs.date) || (r.inserted && r.inserted[0] && r.inserted[0].payload && r.inserted[0].payload.inputs && r.inserted[0].payload.inputs.date) || '')}</div>
+                        <div className="text-xs text-gray-700">Bill #: {((r.payload && r.payload.inputs && r.payload.inputs.billNumber) || (r.inserted && r.inserted[0] && r.inserted[0].payload && r.inserted[0].payload.inputs && r.inserted[0].payload.inputs.billNumber) || '')}</div>
+                      </div>
+                      <div>
+                        <button onClick={() => loadAndApplyReport(r)} className="px-2 py-1 bg-green-600 text-white rounded text-sm">Load</button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>
