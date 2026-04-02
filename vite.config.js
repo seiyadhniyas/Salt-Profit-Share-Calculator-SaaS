@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   root: './',
-  plugins: [react()],
+  plugins: [react({ fastRefresh: false })],
   css: {
     postcss: null
   },

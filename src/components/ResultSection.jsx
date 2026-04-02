@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatLKR } from '../utils/calculations'
+import { formatLKR } from '../utils/calculations.jsx'
 
 function StatRow({label, value, isNegative}){
   return (

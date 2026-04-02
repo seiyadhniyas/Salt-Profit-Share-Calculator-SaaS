@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react'
-import InputSection from './components/InputSection'
-import ResultSection from './components/ResultSection'
-import { computeAll, formatLKR } from './utils/calculations'
+import InputSection from './components/InputSection.jsx'
+import ResultSection from './components/ResultSection.jsx'
+import { computeAll, formatLKR } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 
