@@ -1,5 +1,6 @@
 const { URL } = require('url')
-const fetch = global.fetch || require('node-fetch')
+// Use global fetch available in Node 18+ (Netlify uses Node 22). Avoid requiring node-fetch to prevent bundler errors.
+const fetch = globalThis.fetch
 
 exports.handler = async function(event) {
   if (event.httpMethod !== 'GET') {
