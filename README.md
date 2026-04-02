@@ -1,217 +1,119 @@
 # Salt Profit Share Calculator
 
-A modern, client-side React.js web application for calculating and distributing profits between owners and contractors in the salt production business.
+A small React + Vite web app to calculate profit share between two owners (Inaya and Shakira) for packed salt sales. It supports contractor expenses, extra expenses, loans, Zakat (5%), PDF export, and basic report persistence (localStorage and serverless examples).
 
-## Features
+## Highlights
 
-✨ **Complete Financial Calculator**
-- Real-time auto-calculations on input changes
-- No submit button required
-- Client-side only (no backend needed)
-
-📊 **Comprehensive Breakdown**
-- Production details tracking
-- Income management (cash & cheques)
-- Contractor expense calculation
-- Loan tracking for both owners
-- Detailed profit distribution
-
-💾 **Data Management**
-- Auto-save to browser localStorage
-- Reset functionality
-- Download calculations as PDF
-
-📱 **Responsive Design**
-- Mobile-first approach
-- Works on all screen sizes
-- Clean, modern UI with Tailwind CSS
+- Real-time calculations as you type
+- Add multiple extra expenses
+- Optional per-owner loans and Zakat calculation
+- Printable PDF summary (jsPDF + html2canvas)
+- Save/load reports locally; Netlify/Supabase examples included for server persistence
 
 ## Tech Stack
 
-- **React 18** with Hooks (useState, useEffect, useRef)
-- **Vite** for bundling & dev server
-- **Tailwind CSS** for styling
-- **jsPDF + html2canvas** for PDF export
-- **Client-side only** (no backend required)
+- React 18 + Vite
+- Tailwind CSS (utility styles)
+- jsPDF + html2canvas for PDF export
+- Netlify Functions (examples) and Supabase REST examples
 
-## Installation & Running
+## Quick Start
 
-### Prerequisites
-- Node.js (v14+)
-- npm
+Prerequisites:
 
-### Setup
+- Node.js 16+ and npm
+
+Install and run locally:
 
 ```bash
-# Navigate to project directory
-cd salt-profit-share-calculator
-
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
 ```
 
-The app will open at `http://localhost:5173`
+Open the app at the URL shown by Vite (e.g. `http://localhost:5173` or another port Vite selects).
 
-### Building for Production
+Build and preview production bundle:
 
 ```bash
 npm run build
-npm run preview
+npm run preview -- --port 5174
 ```
 
-## Project Structure
+## Important Files
 
-```
-src/
-├── App.jsx                  # Main component with state management
-├── index.jsx               # React entry point
-├── index.css               # Tailwind CSS styles
-├── components/
-│   ├── InputSection.jsx    # Input form component
-│   └── ResultSection.jsx   # Results display component
-└── utils/
-    └── calculations.jsx    # All calculation logic
+- `src/App.jsx` — main app component
+- `src/components/InputSection.jsx` — form inputs and document details
+- `src/components/ResultSection.jsx` — results/summary UI
+- `src/utils/calculations.jsx` — core calculation logic
+- `src/api/reports.js` — client API wrappers for save/get
+- `netlify/functions/` — example serverless functions (demo + Supabase)
+- `supabase/create_reports_table.sql` — SQL to create `reports` table
 
-public/
-└── index.html              # HTML entry point
+## Deploying to Netlify
 
-vite.config.js              # Vite configuration
-package.json                # Dependencies & scripts
-```
+1. Create a new site in Netlify and connect this GitHub repo or deploy manually.
+2. Set environment variables if using Supabase (do NOT expose service role keys in client code):
+   - `SUPABASE_URL`
+   - `SUPABASE_KEY` (use server-side only)
+3. Build command: `npm run build`
+4. Publish directory: `dist`
+5. Functions directory: `netlify/functions`
 
-## Usage Guide
+The repository already contains `netlify.toml` and example functions to help get started.
 
-### 1. Enter Production Details
-- **Salt Packed Bags**: Total bags packed for this batch
-- **Deducted Bags**: Bags removed/damaged
-- **Price per Bag**: LKR per bag
+## Supabase (optional)
 
-### 2. Record Income
-- **Cash Received**: Direct cash payments
-- **Cheque Received**: Cheque payments
+If you plan to persist reports in Supabase, run the SQL file in `supabase/create_reports_table.sql` to create the `reports` table. Configure the Supabase REST endpoint and use a secure, server-only key inside your serverless functions.
 
-### 3. Input Contractor Expenses
-- **Packing Fee per Bag**: Cost per packed bag
-- **Plastic Bag Cost**: Cost per bag unit
-- **Other Expenses**: Any additional expenses
+## How to use the app
 
-### 4. Add Loans (Optional)
-- Toggle "Both owners have loans"
-- Enter loan amounts for each owner
+1. Fill `Document Details` (date, buyer, bill no.)
+2. Enter production numbers: packed/deducted bags, price per bag
+3. Add incomes (cash/cheque) and contractor fees
+4. Add any extra expenses using `+ add expenses`
+5. Toggle loans if both owners have loans and enter amounts
+6. View results and download the PDF, or save the report
 
-### 5. View Results
-- See auto-calculated breakdown
-- Final shares for each owner
-- Download as PDF
+## PDF Export
 
-## Calculation Logic
+Click `Download PDF` to export the printable summary. The app captures a hidden printable area and generates a PDF client-side using `html2canvas` and `jsPDF`.
 
-### Net Bags
-```
-net_bags = packed_bags - deducted_bags
-```
+## Saving Reports
 
-### Initial Price
-```
-initial_price = net_bags × price_per_bag
-```
+- Local: reports are saved to localStorage by default.
+- Server: optional Netlify Functions / Supabase examples are provided for remote persistence (demo code under `netlify/functions/`). The default demo function writes to a temporary file — replace with a persistent store for production.
 
-### Income & Expenses
-```
-grand_total_received = cash_received + cheque_received
+## Contributing
 
-contractor_total_spent = 
-  (packing_fee_per_bag × packed_bags) +
-  (bag_cost_per_unit × packed_bags) +
-  other_expenses
+- Add collaborators in GitHub: `Settings` → `Manage access` → `Invite a collaborator`.
+- Create a branch, make changes, open a pull request.
+
+Recommended workflow:
+
+```bash
+git checkout -b feat/your-feature
+git add .
+git commit -m "feat: ..."
+git push origin feat/your-feature
 ```
 
-### Shares
-```
-contractor_share = (initial_price / 2) + contractor_total_spent
+## Security note
 
-owner_pool = grand_total_received - contractor_share
-
-general_share_per_owner = owner_pool / 2
-
-final_inaya = general_share_per_owner - loan_inaya
-final_shakira = general_share_per_owner - loan_shakira
-```
-
-### Validation
-- Ensures: `final_inaya + final_shakira = owner_pool`
-- If mismatch: difference is added to person with LOWER loan
-- Prevents negative values (shows 0 if negative)
-
-## Features Explained
-
-### Auto-Save
-- Calculations are automatically saved to browser localStorage
-- Data persists across browser sessions
-- Manually accessible via browser dev tools
-
-### PDF Export
-- Download complete calculation as PDF
-- Includes all inputs and results
-- Professional layout
-
-### Reset Button
-- Clears all inputs and data
-- Removes localStorage entry
-- Starts fresh calculation
-
-### Loan Toggle
-- Optional feature for loan tracking
-- Only appears when enabled
-- Can be switched on/off anytime
-
-### Negative Value Highlighting
-- Loss/negative values shown in RED
-- Warnings displayed for attention
-- Helpful for identifying issues
-
-## Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (v14+)
-- Mobile browsers
-
-## Notes for Users
-
-1. **Currency**: All amounts are in LKR (Sri Lankan Rupees)
-2. **Precision**: Calculations show 2 decimal places
-3. **Formatting**: Currency formatted as "LKR 1,000.00"
-4. **Real-time**: Changes calculate instantly
-5. **No Internet**: Works completely offline
-
-## Troubleshooting
-
-**App won't start**
-- Clear node_modules: `rm -r node_modules`
-- Reinstall: `npm install`
-- Restart: `npm run dev`
-
-**localStorage full**
-- Clear browser cache
-- Check browser localStorage quota
-
-**PDF download fails**
-- Check pop-up blocker
-- Refresh page and try again
-- Use latest browser version
+Do not commit secret keys or service-role credentials to the repo. Use Netlify environment variables or a secrets manager for production.
 
 ## License
 
-Free to use for educational and commercial purposes.
+MIT — feel free to use and adapt.
 
-## Support
+## Next steps
 
-For issues or feature requests, contact the development team.
+If you'd like, I can:
+
+- Add a `README` badge and license file
+- Create a GitHub Release
+- Add CI (GitHub Actions) to run lint/build on push
 
 ---
 
-**Built with ❤️ for the salt production industry**
+If you want any of these, tell me which and I will add them.
+
