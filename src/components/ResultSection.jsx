@@ -73,9 +73,20 @@ export default function ResultSection({results}){
                 <span className="text-sm text-gray-700">Total Distributed</span>
                 <strong className="text-gray-900">{formatLKR(results.finalInaya + results.finalShakira)}</strong>
               </div>
-              <div className="flex justify-between mt-1">
-                <span className="text-sm text-gray-700">Owner Pool</span>
-                <strong className="text-gray-900">{formatLKR(results.ownerPool)}</strong>
+              <div className="my-2 border-t"></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <div className="text-xs text-gray-600">Inaya Zakat (5%)</div>
+                  <div className="font-semibold">{formatLKR(results.zakatInaya)}</div>
+                  <div className="text-xs text-gray-600 mt-1">After Zakat</div>
+                  <div className="font-semibold">{formatLKR(results.finalInayaAfterZakat)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-600">Shakira Zakat (5%)</div>
+                  <div className="font-semibold">{formatLKR(results.zakatShakira)}</div>
+                  <div className="text-xs text-gray-600 mt-1">After Zakat</div>
+                  <div className="font-semibold">{formatLKR(results.finalShakiraAfterZakat)}</div>
+                </div>
               </div>
             </div>
           </div>

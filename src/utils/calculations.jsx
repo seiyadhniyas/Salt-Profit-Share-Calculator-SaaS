@@ -19,6 +19,10 @@ export function computeAll(inputs) {
   const packingFeePerBag = safeNum(inputs.packingFeePerBag)
   const bagCostPerUnit = safeNum(inputs.bagCostPerUnit)
   const otherExpenses = safeNum(inputs.otherExpenses)
+  // extra expenses array: [{id, label, amount}]
+  const extraExpenses = Array.isArray(inputs.extraExpenses) ? inputs.extraExpenses : []
+  const extraExpensesTotal = extraExpenses.reduce((s, it) => s + safeNum(it.amount), 0)
+  const totalOtherExpenses = otherExpenses + extraExpensesTotal
   const loanInaya = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanInaya) : 0
   const loanShakira = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanShakira) : 0
 
@@ -33,7 +37,7 @@ export function computeAll(inputs) {
   const grandTotalReceived = cashReceived + chequeReceived
 
   // contractor_total_spent
-  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + otherExpenses
+  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + totalOtherExpenses
 
   // contractor_share = (initial_price / 2) + contractor_total_spent
   const contractorShare = (initialPrice / 2) + contractorTotalSpent
@@ -70,6 +74,12 @@ export function computeAll(inputs) {
     }
   }
 
+  // Zakat: 5% of each final share (before zakat)
+  const zakatInaya = finalInaya * 0.05
+  const zakatShakira = finalShakira * 0.05
+  const finalInayaAfterZakat = Math.max(0, finalInaya - zakatInaya)
+  const finalShakiraAfterZakat = Math.max(0, finalShakira - zakatShakira)
+
   // Prepare flags for negative/raw highlighting (before clamp)
   const highlights = {
     ownerPoolNegative: ownerPool < 0,
@@ -87,13 +97,17 @@ export function computeAll(inputs) {
     grandTotalReceived,
     packingFeePerBag,
     bagCostPerUnit,
-    otherExpenses,
+    otherExpenses: totalOtherExpenses,
     contractorTotalSpent,
     contractorShare,
     ownerPool,
     generalSharePerOwner,
     finalInaya,
     finalShakira,
+    zakatInaya,
+    zakatShakira,
+    finalInayaAfterZakat,
+    finalShakiraAfterZakat,
     highlights,
   }
 }

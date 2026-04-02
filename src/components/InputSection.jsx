@@ -22,6 +22,22 @@ export default function InputSection({inputs, setInput, reset, toggleLoans}){
     setInput(prev => ({...prev, [name]: val}))
   }
 
+  const addExpense = () => {
+    const id = Date.now()
+    const next = [...(inputs.extraExpenses || []), { id, label: 'Expense', amount: 0 }]
+    setInput(prev => ({ ...prev, extraExpenses: next }))
+  }
+
+  const updateExpense = (id, field, value) => {
+    const next = (inputs.extraExpenses || []).map(e => e.id === id ? { ...e, [field]: field === 'amount' ? value : value } : e)
+    setInput(prev => ({ ...prev, extraExpenses: next }))
+  }
+
+  const removeExpense = (id) => {
+    const next = (inputs.extraExpenses || []).filter(e => e.id !== id)
+    setInput(prev => ({ ...prev, extraExpenses: next }))
+  }
+
   return (
     <div className="bg-white shadow rounded-lg p-5">
       <div className="flex justify-between items-center mb-4">
@@ -56,6 +72,20 @@ export default function InputSection({inputs, setInput, reset, toggleLoans}){
           <NumberInput label="Packing Fee per Bag (LKR)" name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} />
           <NumberInput label="Plastic Bag Cost (LKR)" name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} />
           <NumberInput label="Other Expenses (LKR)" name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} />
+          <div className="mt-2">
+            <button type="button" onClick={addExpense} className="text-sm text-blue-600 hover:underline">+ add expenses</button>
+          </div>
+          {(inputs.extraExpenses || []).length > 0 && (
+            <div className="mt-3 space-y-2">
+              {(inputs.extraExpenses || []).map(exp => (
+                <div key={exp.id} className="flex items-center gap-2">
+                  <input className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value)} />
+                  <input type="number" step="any" className="w-28 border border-gray-300 rounded px-2 py-1 text-sm" value={exp.amount} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
+                  <button type="button" onClick={() => removeExpense(exp.id)} className="text-sm text-red-600">Remove</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
