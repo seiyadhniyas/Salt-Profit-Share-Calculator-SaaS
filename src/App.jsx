@@ -92,7 +92,7 @@ export default function App(){
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
       subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்ததாரர்களுக்கான நிதிக் கணக்கெழுத்து',
       documentDetails: 'ஆவண விவரங்கள்',
-      locationDay: 'இலக்கம்',
+      locationDay: 'இடம்',
       date: 'தேதி',
       buyerName: 'வாங்குபவரின் பெயர்',
       billNumber: 'பில் எண்',
@@ -137,7 +137,7 @@ export default function App(){
       totalDistributed: 'மொத்த வீதம்',
       extraExpenses: 'மேலும் செலவுகள்',
       toggleLoansHint: 'கடன்களைச் சேர்க்க மேல் குறிப்பு பெட்டியை அழுத்தவும்',
-      locationLabel: 'இலக்கம்',
+      locationLabel: 'இடம்',
       load: 'ஏற்று',
       inayaZakat: 'இனாயாவின் ஜக்கத் (5%)',
       shakiraZakat: 'ஷாக்கீராவின் ஜக்கத் (5%)',
@@ -252,7 +252,7 @@ export default function App(){
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-sm' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-xs lg:text-sm' : ''}`}>
       <div ref={rootRef} className="container-max">
         <header className="mb-6 text-center">
           <div className="flex items-center justify-center gap-4 mb-3">
