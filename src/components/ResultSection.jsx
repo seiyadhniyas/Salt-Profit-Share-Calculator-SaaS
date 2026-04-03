@@ -23,7 +23,7 @@ function StatRow({label, value, isNegative}){
   )
 }
 
-export default function ResultSection({results}){
+export default function ResultSection({results, t}){
   if(!results) return null
 
   return (
@@ -31,27 +31,27 @@ export default function ResultSection({results}){
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Detailed Breakdown */}
         <div className="shadow rounded-lg p-5" style={{ backgroundColor: '#fff0f0' }}>
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Calculation Breakdown</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-4">{t ? t('calculationBreakdown') : 'Calculation Breakdown'}</h3>
           <div className="space-y-1">
-            <StatRow label="Net Bags (Packed - Deducted)" value={results.netBags} isNegative={false} />
-            <StatRow label="Initial Price (Net × Price/Bag)" value={formatLKR(results.initialPrice)} isNegative={false} />
+            <StatRow label={t ? t('netBags') + ' (Packed - Deducted)' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
+            <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (Net × Price/Bag)'} value={formatLKR(results.initialPrice)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label="Contractor Total Spent (Packing Fee × PackedBags + Bag Cost × PackedBags + Other Expenses)" value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
-            <StatRow label="Contractor Share (Initial/2 + Spent)" value={formatLKR(results.contractorShare)} isNegative={false} />
+            <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (Packing Fee × PackedBags + Bag Cost × PackedBags + Other Expenses)'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
+            <StatRow label={(t ? t('contractorShare') : 'Contractor Share') + ' (Initial/2 + Spent)'} value={formatLKR(results.contractorShare)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label="Grand Total Received" value={formatLKR(results.grandTotalReceived)} isNegative={false} />
-            <StatRow label="Owner Pool (Received - Contractor)" value={formatLKR(results.ownerPool)} isNegative={results.highlights.ownerPoolNegative} />
-            <StatRow label="General Share Per Owner (Pool/2)" value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
+            <StatRow label={t ? 'Grand Total Received' : 'Grand Total Received'} value={formatLKR(results.grandTotalReceived)} isNegative={false} />
+            <StatRow label={t ? 'Owner Pool (Received - Contractor)' : 'Owner Pool (Received - Contractor)'} value={formatLKR(results.ownerPool)} isNegative={results.highlights.ownerPoolNegative} />
+            <StatRow label={t ? (t('perOwnerShare') + ' (Pool/2)') : 'General Share Per Owner (Pool/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
           </div>
         </div>
 
         {/* Final Results */}
         <div className="shadow rounded-lg p-5" style={{ backgroundColor: '#f7fff0' }}>
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Final Results</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-4">{t ? t('finalResults') : 'Final Results'}</h3>
           <div className="space-y-3">
             <div className="rounded-lg p-4" style={{ backgroundColor: '#b1ecff' }}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">Inaya Final Share</span>
+                <span className="text-sm font-medium text-gray-700">{t ? t('inayaFinalShare') : 'Inaya Final Share'}</span>
                 {results.loanInaya > 0 && (
                   <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">Loan: {formatLKR(results.loanInaya)}</span>
                 )}
@@ -66,7 +66,7 @@ export default function ResultSection({results}){
 
             <div className="rounded-lg p-4" style={{ backgroundColor: '#bcfaea' }}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">Shakira Final Share</span>
+                <span className="text-sm font-medium text-gray-700">{t ? t('shakiraFinalShare') : 'Shakira Final Share'}</span>
                 {results.loanShakira > 0 && (
                   <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">Loan: {formatLKR(results.loanShakira)}</span>
                 )}
@@ -80,8 +80,8 @@ export default function ResultSection({results}){
             </div>
 
             <div className="rounded-lg p-3 mt-3" style={{ backgroundColor: '#ffc6b1' }}>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-700">Total Distributed</span>
+                <div className="flex justify-between">
+                <span className="text-sm text-gray-700">{t ? t('totalDistributed') : 'Total Distributed'}</span>
                 <strong className="text-gray-900">{formatLKR(results.finalInaya + results.finalShakira)}</strong>
               </div>
               <div className="my-2 border-t"></div>
