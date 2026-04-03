@@ -41,7 +41,7 @@ export default function ResultSection({results, t}){
             <div className="my-2 border-t"></div>
             <StatRow label={t ? t('grandTotalReceived') : 'Grand Total Received'} value={formatLKR(results.grandTotalReceived)} isNegative={false} />
             <StatRow label={t ? t('ownerPool') : 'Owners Group Amount'} value={formatLKR(results.ownerPool)} isNegative={results.highlights.ownerPoolNegative} />
-            <StatRow label={t ? (t('perOwnerShare') + ' (Pool/2)') : 'General Share Per Owner (Pool/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
+            <StatRow label={t ? (t('perOwnerShare') + ' (' + t('ownerPool') + '/2)') : 'Per Owner Share (Owners Group Amount/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
           </div>
         </div>
 
