@@ -12,9 +12,17 @@
       .green-value { @apply text-green-600 font-semibold; }
       .container-max { max-width: 1200px; margin: 0 auto; }
     </style>
+    <!-- Google Translate integration for Tamil translation support -->
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   </head>
   <body>
     <div id="root"></div>
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,ta', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+      }
+    </script>
+    <div id="google_translate_element" style="position: fixed; bottom: 10px; right: 10px; z-index: 1000;"></div>
     <script type="module" src="/src/index.jsx"></script>
   </body>
 </html>

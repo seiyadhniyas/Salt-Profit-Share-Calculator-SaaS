@@ -39,7 +39,9 @@ export function computeAll(inputs) {
 
   // contractor_total_spent
   // If owners pay other expenses, do not include them in contractor's total spent.
-  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'contractor' ? totalOtherExpenses : 0)
+  // Inverted logic: include other expenses in contractor's total when expensePayment === 'owners'
+  // Use netBags for per-bag contractor costs (packing/bag cost apply to delivered net bags)
+  const contractorTotalSpent = (packingFeePerBag * netBags) + (bagCostPerUnit * netBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0)
 
   // contractor_share = (initial_price / 2) + contractor_total_spent
   const contractorShare = (initialPrice / 2) + contractorTotalSpent
@@ -89,31 +91,34 @@ export function computeAll(inputs) {
     finalShakiraNegative: finalShakiraRaw < 0,
   }
 
+  // Helper to round decimal values to 2 places (currency)
+  const round2 = (v) => Math.round(v * 100) / 100
+
   return {
     packedBags,
     deductedBags,
     netBags,
-    initialPrice,
-    cashReceived,
-    chequeReceived,
-    grandTotalReceived,
-    packingFeePerBag,
-    bagCostPerUnit,
-    otherExpenses: totalOtherExpenses,
+    initialPrice: round2(initialPrice),
+    cashReceived: round2(cashReceived),
+    chequeReceived: round2(chequeReceived),
+    grandTotalReceived: round2(grandTotalReceived),
+    packingFeePerBag: round2(packingFeePerBag),
+    bagCostPerUnit: round2(bagCostPerUnit),
+    otherExpenses: round2(totalOtherExpenses),
     extraExpenses,
-    extraExpensesTotal,
-    loanInaya,
-    loanShakira,
-    contractorTotalSpent,
-    contractorShare,
-    ownerPool,
-    generalSharePerOwner,
-    finalInaya,
-    finalShakira,
-    zakatInaya,
-    zakatShakira,
-    finalInayaAfterZakat,
-    finalShakiraAfterZakat,
+    extraExpensesTotal: round2(extraExpensesTotal),
+    loanInaya: round2(loanInaya),
+    loanShakira: round2(loanShakira),
+    contractorTotalSpent: round2(contractorTotalSpent),
+    contractorShare: round2(contractorShare),
+    ownerPool: round2(ownerPool),
+    generalSharePerOwner: round2(generalSharePerOwner),
+    finalInaya: round2(finalInaya),
+    finalShakira: round2(finalShakira),
+    zakatInaya: round2(zakatInaya),
+    zakatShakira: round2(zakatShakira),
+    finalInayaAfterZakat: round2(finalInayaAfterZakat),
+    finalShakiraAfterZakat: round2(finalShakiraAfterZakat),
     highlights,
   }
 }

@@ -40,7 +40,9 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         const netBags = Math.max(0, packedBags - deductedBags)
         const initialPrice = netBags * pricePerBag
         const calculatedCash = initialPrice - chequeReceived
-        setInput(prev => ({ ...prev, cashReceived: Math.max(0, calculatedCash) }))
+        // Round to 2 decimal places for currency
+        const roundedCash = Math.round(Math.max(0, calculatedCash) * 100) / 100
+        setInput(prev => ({ ...prev, cashReceived: roundedCash }))
       }
     }
   }, [inputs.packedBags, inputs.deductedBags, inputs.pricePerBag, inputs.chequeReceived, cashReceivedManuallySet, setInput])
