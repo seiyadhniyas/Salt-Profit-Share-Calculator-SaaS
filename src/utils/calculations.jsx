@@ -36,9 +36,9 @@ export function computeAll(inputs) {
 
   // contractor_total_spent
   // Use total packed bags for contractor per-bag wage/cost calculations as requested:
-  // (Packing Wage × packedBags) + (Bag Cost × packedBags) + Other Expenses (if contractor pays)
+  // (Packing Wage × packedBags) + (Bag Cost × packedBags) + Other Expenses (if owners pay expenses)
   // Treat any missing/blank inputs as 0 via safeNum above.
-  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'contractor' ? totalOtherExpenses : 0)
+  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0)
 
   // total loan (sum of both owners' loans)
   const totalLoan = loanInaya + loanShakira
@@ -58,8 +58,12 @@ export function computeAll(inputs) {
     ? ((initialPrice + contractorTotalSpent) / 2)
     : ((initialPrice - contractorTotalSpent) / 2)
 
-  // owner_pool
-  const ownerPool = grandTotalReceived - contractorShare
+  // owner_pool (Owners Group Amount)
+  // If owners pay expenses: ownerPool = grandTotalReceived - contractorShare
+  // If contractor pays expenses: ownerPool = (grandTotalReceived + totalLoan) / 2
+  const ownerPool = (expensePayment === 'owners')
+    ? (grandTotalReceived - contractorShare)
+    : ((grandTotalReceived + totalLoan) / 2)
 
   // general_share_per_owner
   const generalSharePerOwner = ownerPool / 2
@@ -72,22 +76,23 @@ export function computeAll(inputs) {
   let finalInaya = Math.max(0, finalInayaRaw)
   let finalShakira = Math.max(0, finalShakiraRaw)
 
-  // Validation: ensure final_inaya + final_shakira == owner_pool
-  // If mismatch, difference = owner_pool - (final_inaya + final_shakira)
-  // Add difference to person with LOWER loan
-  // Note: use loan values to decide; if equal, give to Inaya.
-  const sumFinals = finalInaya + finalShakira
-  const diff = ownerPool - sumFinals
+  // Validation: ensure final_inaya + final_shakira + contractor_share == grand_total_received
+  // This is critical when contractor pays expenses or when clamping causes the sum to mismatch
+  const sumAll = finalInaya + finalShakira + contractorShare
+  const totalDiff = grandTotalReceived - sumAll
 
-  if (Math.abs(diff) > 0.0001) {
-    // choose owner with lower loan (smaller number)
+  if (Math.abs(totalDiff) > 0.0001) {
+    // Distribute the difference to the owner with LOWER loan
     const aLoan = loanInaya
     const bLoan = loanShakira
     if (aLoan <= bLoan) {
-      finalInaya = Math.max(0, finalInaya + diff)
+      finalInaya += totalDiff
     } else {
-      finalShakira = Math.max(0, finalShakira + diff)
+      finalShakira += totalDiff
     }
+    // Clamp to prevent negative final shares
+    finalInaya = Math.max(0, finalInaya)
+    finalShakira = Math.max(0, finalShakira)
   }
 
   // Zakat: 5% of each final share (before zakat)

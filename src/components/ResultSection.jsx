@@ -48,7 +48,11 @@ export default function ResultSection({results, t}){
               value={formatLKR(results.grandTotalReceived)}
               isNegative={false}
             />
-            <StatRow label={t ? t('ownerPool') : 'Owners Group Amount'} value={formatLKR(results.ownerPool)} isNegative={results.highlights.ownerPoolNegative} />
+            <StatRow
+              label={(t ? t('ownerPool') : 'Owners Group Amount') + (results.expensePayment === 'owners' ? ' (GrandTotal - ContractorShare)' : ' (GrandTotal + TotalLoan)/2')}
+              value={formatLKR(results.ownerPool)}
+              isNegative={results.highlights.ownerPoolNegative}
+            />
             <StatRow label={t ? (t('perOwnerShare') + ' (' + t('ownerPool') + '/2)') : 'Per Owner Share (Owners Group Amount/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
           </div>
         </div>
