@@ -34,17 +34,29 @@ export function computeAll(inputs) {
   // initial price = net_bags * price_per_bag
   const initialPrice = netBags * pricePerBag
 
-  // grand total received
-  const grandTotalReceived = cashReceived + chequeReceived
-
   // contractor_total_spent
   // Use total packed bags for contractor per-bag wage/cost calculations as requested:
   // (Packing Wage × packedBags) + (Bag Cost × packedBags) + Other Expenses (if contractor pays)
   // Treat any missing/blank inputs as 0 via safeNum above.
   const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'contractor' ? totalOtherExpenses : 0)
 
-  // contractor_share = (initial_price / 2) + contractor_total_spent
-  const contractorShare = (initialPrice / 2) + contractorTotalSpent
+  // total loan (sum of both owners' loans)
+  const totalLoan = loanInaya + loanShakira
+
+  // grand total received (conditional on expense payment responsibility)
+  // If owners pay expenses: (InitialPrice + ContractorSpent - TotalLoan)
+  // If contractor pays expenses: (InitialPrice - ContractorSpent - TotalLoan)
+  const grandTotalReceived = (expensePayment === 'owners')
+    ? (initialPrice + contractorTotalSpent - totalLoan)
+    : (initialPrice - contractorTotalSpent - totalLoan)
+
+  // contractor_share
+  // If owners pay expenses: contractor_share = (InitialPrice + Spent) / 2
+  // If contractor pays expenses: contractor_share = (InitialPrice - Spent) / 2
+  // Uses packedBags-based spent calculation defined above; blanks are treated as 0 via safeNum
+  const contractorShare = (expensePayment === 'owners')
+    ? ((initialPrice + contractorTotalSpent) / 2)
+    : ((initialPrice - contractorTotalSpent) / 2)
 
   // owner_pool
   const ownerPool = grandTotalReceived - contractorShare
@@ -111,6 +123,7 @@ export function computeAll(inputs) {
     loanShakira: round2(loanShakira),
     contractorTotalSpent: round2(contractorTotalSpent),
     contractorShare: round2(contractorShare),
+    expensePayment,
     ownerPool: round2(ownerPool),
     generalSharePerOwner: round2(generalSharePerOwner),
     finalInaya: round2(finalInaya),
