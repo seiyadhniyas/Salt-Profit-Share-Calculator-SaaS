@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 function NumberInput({ label, value, onChange, min = 0, step = 'any', name }) {
   return (
@@ -18,7 +18,32 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name }) {
 }
 
 export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang }) {
-  const onChange = (name, val) => setInput(prev => ({ ...prev, [name]: val }))
+  const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
+
+  const onChange = (name, val) => {
+    setInput(prev => ({ ...prev, [name]: val }))
+    // Track if user manually sets Cash Received
+    if (name === 'cashReceived' && val !== '') {
+      setCashReceivedManuallySet(true)
+    }
+  }
+
+  // Auto-calculate Cash Received when packed bags, price, or cheque changes (if not manually set)
+  useEffect(() => {
+    if (!cashReceivedManuallySet) {
+      const packedBags = Math.max(0, Math.floor(Number(inputs.packedBags) || 0))
+      const deductedBags = Math.max(0, Math.floor(Number(inputs.deductedBags) || 0))
+      const pricePerBag = Number(inputs.pricePerBag) || 0
+      const chequeReceived = Number(inputs.chequeReceived) || 0
+
+      if (packedBags > 0 && pricePerBag > 0) {
+        const netBags = Math.max(0, packedBags - deductedBags)
+        const initialPrice = netBags * pricePerBag
+        const calculatedCash = initialPrice - chequeReceived
+        setInput(prev => ({ ...prev, cashReceived: Math.max(0, calculatedCash) }))
+      }
+    }
+  }, [inputs.packedBags, inputs.deductedBags, inputs.pricePerBag, inputs.chequeReceived, cashReceivedManuallySet, setInput])
 
   const addExpense = () => {
     const id = Date.now()
@@ -110,12 +135,6 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           </div>
 
           <div>
-            <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 {t('income')}</h4>
-            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} />
-            <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} />
-          </div>
-
-          <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">🏭 {t('contractorExpenses')}</h4>
             <NumberInput label={t('packingFeePerBag') || 'Packing Fee per Bag (LKR)'} name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} />
             <NumberInput label={t('bagCostPerUnit') || 'Plastic Bag Cost (LKR)'} name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} />
@@ -163,6 +182,12 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 ))}
               </div>
             )}
+          </div>
+
+          <div>
+            <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 {t('income')}</h4>
+            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} />
+            <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} />
           </div>
         </div>
 
