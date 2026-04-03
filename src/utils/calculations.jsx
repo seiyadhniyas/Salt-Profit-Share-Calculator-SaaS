@@ -38,10 +38,9 @@ export function computeAll(inputs) {
   const grandTotalReceived = cashReceived + chequeReceived
 
   // contractor_total_spent
-  // If owners pay other expenses, do not include them in contractor's total spent.
-  // Inverted logic: include other expenses in contractor's total when expensePayment === 'owners'
+  // Include other expenses in contractor's total only when the contractor pays expenses.
   // Use netBags for per-bag contractor costs (packing/bag cost apply to delivered net bags)
-  const contractorTotalSpent = (packingFeePerBag * netBags) + (bagCostPerUnit * netBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0)
+  const contractorTotalSpent = (packingFeePerBag * netBags) + (bagCostPerUnit * netBags) + (expensePayment === 'contractor' ? totalOtherExpenses : 0)
 
   // contractor_share = (initial_price / 2) + contractor_total_spent
   const contractorShare = (initialPrice / 2) + contractorTotalSpent
