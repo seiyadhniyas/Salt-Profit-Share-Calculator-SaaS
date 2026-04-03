@@ -28,6 +28,126 @@ export default function App(){
     extraExpenses: [],
   }
 
+  const [lang, setLang] = useState('en')
+
+  const translations = {
+    en: {
+      title: 'Salt Profit Share Calculator',
+      subtitle: 'Financial calculator for owners and contractors',
+      documentDetails: "Document Details",
+      locationDay: 'Location / Day',
+      date: 'Date',
+      buyerName: "Buyer's Name",
+      billNumber: 'Bill Number',
+      inputData: 'Input Data',
+      reset: '🔄 Reset',
+      totalSaltPackedBags: 'Total Salt Packed Bags',
+      deductedBags: 'Deducted Bags',
+      pricePerBag: 'Price per Bag (LKR)',
+      cashReceived: 'Cash Received (LKR)',
+      chequeReceived: 'Cheque Received (LKR)',
+      contractorExpenses: 'Contractor Expenses',
+      packingFeePerBag: 'Packing Fee per Bag (LKR)',
+      bagCostPerUnit: 'Plastic Bag Cost (LKR)',
+      otherExpenses: 'Other Expenses (LKR)',
+      otherExpensesReason: 'Other Expenses Reason',
+      expenseResponsibility: 'Expense Responsibility',
+      expenseOwners: 'Owners Pay Expenses',
+      expenseContractor: 'Contractor Pays Expenses',
+      addExpenses: '+ add expenses',
+      remove: 'Remove',
+      bothOwnersHaveLoans: 'Both owners have loans',
+      loanInaya: 'Loan (Inaya) - LKR',
+      loanShakira: 'Loan (Shakira) - LKR',
+      income: 'Income',
+      downloadPDF: '📥 Download PDF',
+      save: '💾 Save',
+      loadReports: '📂 Load Reports',
+      savedReports: 'Saved Reports',
+      noReportsLoaded: 'No reports loaded.',
+      summary: 'Summary',
+      netBags: 'Net Bags',
+      initialPrice: 'Initial Price',
+      contractorSpent: 'Contractor Spent',
+      contractorShare: 'Contractor Share',
+      perOwnerShare: 'Per Owner Share',
+      calculationBreakdown: 'Calculation Breakdown',
+      grandTotalReceived: 'Grand Total Received',
+      ownerPool: 'Owner Pool (Received - Contractor)',
+      finalResults: 'Final Results',
+      inayaFinalShare: 'Inaya Final Share',
+      shakiraFinalShare: 'Shakira Final Share',
+      totalDistributed: 'Total Distributed',
+        enterValues: 'Enter values to see summary',
+        toggleLoansHint: 'Toggle checkbox above to add loans',
+        extraExpenses: 'Extra Expenses',
+      locationLabel: 'Location',
+      load: 'Load',
+      inayaZakat: 'Inaya Zakat (5%)',
+      shakiraZakat: 'Shakira Zakat (5%)',
+      inayaAfterZakat: 'Inaya After Zakat',
+      shakiraAfterZakat: 'Shakira After Zakat',
+    },
+    ta: {
+      title: 'உப்பு லாப பகிர்வு கணக்கீடு',
+      subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்ததாரர்களுக்கான நிதி கல்குலேட்டர்',
+      documentDetails: 'ஆவண விவரங்கள்',
+      locationDay: 'இலக்கம் / நாள்',
+      date: 'தேதி',
+      buyerName: 'வாங்குபவரின் பெயர்',
+      billNumber: 'பில் எண்',
+      inputData: 'உள்ளீட்டு தரவு',
+      reset: '🔄 மீட்டமை',
+      totalSaltPackedBags: 'மொத்த உப்பு நிரப்பப்பட்ட பைகள்',
+      deductedBags: 'குறைவிடப்பட்ட பைகள்',
+      pricePerBag: 'ஒரே பை விலை (LKR)',
+      cashReceived: 'பணம் பெற்றது (LKR)',
+      chequeReceived: 'காசோலை பெற்றது (LKR)',
+      contractorExpenses: 'ஒப்பந்ததாரர் செலவுகள்',
+      packingFeePerBag: 'ஒரு பைக்கு ஏற்றும் கட்டணம் (LKR)',
+      bagCostPerUnit: 'பிளாஸ்டிக் பை கட்டணம் (LKR)',
+      otherExpenses: 'பிற செலவுகள் (LKR)',
+      otherExpensesReason: 'பிற செலவுகளுக்கான காரணம்',
+      expenseResponsibility: 'செலவு பொறுப்பு',
+      expenseOwners: 'உரிமையாளர்கள் செலவுகளை செலுத்துகிறார்கள்',
+      expenseContractor: 'ஒப்பந்ததாரர் செலவுகளை செலுத்துகிறார்',
+      addExpenses: '+ செலவுகளை சேர்க்க',
+      remove: 'அகற்று',
+      bothOwnersHaveLoans: 'இரு உரிமையாளர்களுக்கும் கடன் உள்ளது',
+      loanInaya: 'கடன் (இனயா) - LKR',
+      loanShakira: 'கடன் (ஷாக்கீரா) - LKR',
+      income: 'வருவாய்',
+      downloadPDF: '📥 PDF பதிவிறக்கு',
+      save: '💾 சேமி',
+      loadReports: '📂 பதிவேற்றப்பட்ட அறிக்கைகள்',
+      savedReports: 'சேமிக்கப்பட்ட அறிக்கைகள்',
+      noReportsLoaded: 'பதிவுகள் இல்லை.',
+      summary: 'சுருக்கம்',
+      netBags: 'நிகரப் பைகள்',
+      initialPrice: 'ஆரம்பப் விலை',
+      contractorSpent: 'ஒப்பந்ததாரர் செலவிட்டது',
+      contractorShare: 'ஒப்பந்ததாரர் பகுதி',
+      perOwnerShare: 'ஒரு உரிமையாளருக்கான பகுதி',
+      calculationBreakdown: 'கணக்கீட்டு உடைப்பு',
+      grandTotalReceived: 'மொத்த பெறப்பட்ட தொகை',
+      ownerPool: 'உரிமையாளர் குவிப்பு (பெறப்பட்டது - ஒப்பந்ததாரர்)',
+      finalResults: 'இறுதி பலன்கள்',
+      inayaFinalShare: 'இனயா இறுதி பகுதி',
+      shakiraFinalShare: 'ஷாக்கீரா இறுதி பகுதி',
+      totalDistributed: 'மொத்த வீதம்',
+      extraExpenses: 'மேலும் செலவுகள்',
+      toggleLoansHint: 'கடன்களைச் சேர்க்க மேல் குறிப்பு பெட்டியை அழுத்தவும்',
+      locationLabel: 'இலக்கம்',
+      load: 'ஏற்று',
+      inayaZakat: 'இனயா ஸகத் (5%)',
+      shakiraZakat: 'ஷாக்கீரா ஸகத் (5%)',
+      inayaAfterZakat: 'இனயா - ஸகத் பிறகு',
+      shakiraAfterZakat: 'ஷாக்கீரா - ஸகத் பிறகு',
+    }
+  }
+
+  const t = (key) => (translations[lang] && translations[lang][key]) || key
+
   const [inputs, setInputs] = useState(defaultInputs)
   const [results, setResults] = useState(null)
   const rootRef = useRef()
@@ -132,56 +252,57 @@ export default function App(){
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-sm' : ''}`}>
       <div ref={rootRef} className="container-max">
         <header className="mb-6 text-center">
-          <h1 className="text-4xl font-bold text-gray-800">Salt Profit Share Calculator</h1>
-          <p className="text-md text-gray-600 mt-2">Financial calculator for owners and contractors</p>
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <h1 className="text-4xl font-bold text-gray-800">{t('title')}</h1>
+          </div>
+          <p className="text-md text-gray-600 mt-2">{t('subtitle')}</p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} />
+            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} />
             {/* PDF button moved to bottom */}
           </div>
 
           <div>
             {results ? (
               <div className="shadow rounded-lg p-4" style={{ backgroundColor: '#f2d3ff' }}>
-                <h3 className="text-lg font-bold text-gray-800 mb-3">Summary</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-3">{t('summary')}</h3>
                 <div className="text-sm space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Net Bags:</span>
+                    <span className="text-gray-600">{t('netBags')}:</span>
                     <strong className="text-gray-900">{results.netBags}</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Initial Price:</span>
+                    <span className="text-gray-600">{t('initialPrice')}:</span>
                     <strong className="text-gray-900">{formatLKR(results.initialPrice)}</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Contractor Spent:</span>
+                    <span className="text-gray-600">{t('contractorSpent')}:</span>
                     <strong className="text-gray-900">{formatLKR(results.contractorTotalSpent)}</strong>
                   </div>
                   <div className="flex justify-between border-t pt-2 mt-2">
-                    <span className="text-gray-600">Contractor Share:</span>
+                    <span className="text-gray-600">{t('contractorShare')}:</span>
                     <strong className="text-gray-900">{formatLKR(results.contractorShare)}</strong>
                   </div>
-                  {/* Owner Pool removed from summary (shown in details) */}
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Per Owner Share:</span>
+                    <span className="text-gray-600">{t('perOwnerShare')}:</span>
                     <strong className="text-gray-900">{formatLKR(results.generalSharePerOwner)}</strong>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="bg-white shadow rounded-lg p-4 text-center text-gray-500">
-                Enter values to see summary
+                {t('enterValues')}
               </div>
             )}
           </div>
         </div>
 
-        {results && <ResultSection results={results} />}
+        {results && <ResultSection results={results} t={t} />}
 
         {/* Hidden/off-screen printable area (captures Summary -> Final Results) */}
         {results && (
@@ -196,54 +317,54 @@ export default function App(){
             `}</style>
             <div style={{ width: '100%', maxWidth: 560 }}>
               <div className="section">
-                <h2>Document Details</h2>
-                <div className="row"><div className="muted">Location</div><div className="value">{inputs.location === 'puthoor-2' ? 'Puthoor 2 (N & S)' : inputs.location}</div></div>
-                <div className="row"><div className="muted">Date</div><div className="value">{inputs.date || '-'}</div></div>
-                <div className="row"><div className="muted">Buyer's Name</div><div className="value">{inputs.buyerName || '-'}</div></div>
-                <div className="row"><div className="muted">Bill #</div><div className="value">{inputs.billNumber || '-'}</div></div>
+                <h2>{t('documentDetails')}</h2>
+                <div className="row"><div className="muted">{t('locationLabel') || 'Location'}</div><div className="value">{inputs.location === 'puthoor-2' ? 'Puthoor 2 (N & S)' : inputs.location}</div></div>
+                <div className="row"><div className="muted">{t('date')}</div><div className="value">{inputs.date || '-'}</div></div>
+                <div className="row"><div className="muted">{t('buyerName')}</div><div className="value">{inputs.buyerName || '-'}</div></div>
+                <div className="row"><div className="muted">{t('billNumber')}</div><div className="value">{inputs.billNumber || '-'}</div></div>
               </div>
 
-              <div className="section">
-                <h2>Summary</h2>
-                <div className="row"><div className="muted">Net Bags</div><div className="value">{results.netBags}</div></div>
-                <div className="row"><div className="muted">Initial Price</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
-                <div className="row"><div className="muted">Contractor Spent</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div></div>
-                <div className="row"><div className="muted">Other Expenses Reason</div><div className="value">{inputs.otherExpensesReason || '-'}</div></div>
-                <div className="row"><div className="muted">Expense Responsibility</div><div className="value">{(inputs.expensePayment === 'contractor') ? 'Contractor Pays Expenses' : 'Owners Pay Expenses'}</div></div>
+                <div className="section">
+                <h2>{t('summary')}</h2>
+                <div className="row"><div className="muted">{t('netBags')}</div><div className="value">{results.netBags}</div></div>
+                <div className="row"><div className="muted">{t('initialPrice')}</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
+                <div className="row"><div className="muted">{t('contractorSpent')}</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div></div>
+                <div className="row"><div className="muted">{t('otherExpensesReason')}</div><div className="value">{inputs.otherExpensesReason || '-'}</div></div>
+                <div className="row"><div className="muted">{t('expenseResponsibility')}</div><div className="value">{(inputs.expensePayment === 'contractor') ? t('expenseContractor') : t('expenseOwners')}</div></div>
                 {/* list manual extra expenses if any */}
                 {(inputs.extraExpenses || []).length > 0 && (
                   <div style={{ marginTop: 6 }}>
-                    <div className="muted" style={{ marginBottom: 4 }}>Extra Expenses</div>
+                    <div className="muted" style={{ marginBottom: 4 }}>{t('extraExpenses')}</div>
                     {(inputs.extraExpenses || []).map(e => (
                       <div key={e.id} className="row"><div className="muted">{e.label}</div><div className="value">{formatLKR(e.amount)}</div></div>
                     ))}
                   </div>
                 )}
-                <div className="row"><div className="muted">Contractor Share</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
-                <div className="row"><div className="muted">Per Owner Share</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+                <div className="row"><div className="muted">{t('contractorShare')}</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
+                <div className="row"><div className="muted">{t('perOwnerShare')}</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
               </div>
 
               <div className="section">
-                <h2>Calculation Breakdown</h2>
-                <div className="row"><div className="muted">Grand Total Received</div><div className="value">{formatLKR(results.grandTotalReceived)}</div></div>
-                <div className="row"><div className="muted">Owner Pool (Received - Contractor)</div><div className="value">{formatLKR(results.ownerPool)}</div></div>
-                <div className="row"><div className="muted">General Share Per Owner</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+                <h2>{t('calculationBreakdown')}</h2>
+                <div className="row"><div className="muted">{t('grandTotalReceived')}</div><div className="value">{formatLKR(results.grandTotalReceived)}</div></div>
+                <div className="row"><div className="muted">{t('ownerPool')}</div><div className="value">{formatLKR(results.ownerPool)}</div></div>
+                <div className="row"><div className="muted">{t('perOwnerShare')}</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
               </div>
 
               <div className="section">
                 <h2>Total Distributed</h2>
-                <div className="row"><div className="muted">Inaya Final Share</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
-                <div className="row"><div className="muted">Inaya Zakat (5%)</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
-                <div className="row"><div className="muted">Inaya After Zakat</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
+                <div className="row"><div className="muted">{t('inayaFinalShare')}</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
+                <div className="row"><div className="muted">{t('inayaZakat')}</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
+                <div className="row"><div className="muted">{t('inayaAfterZakat')}</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
 
                 <div style={{ height: 6 }}></div>
 
-                <div className="row"><div className="muted">Shakira Final Share</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
-                <div className="row"><div className="muted">Shakira Zakat (5%)</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
-                <div className="row"><div className="muted">Shakira After Zakat</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
+                <div className="row"><div className="muted">{t('shakiraFinalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
+                <div className="row"><div className="muted">{t('shakiraZakat')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
+                <div className="row"><div className="muted">{t('shakiraAfterZakat')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
 
                 <div className="row" style={{ borderTop: '1px solid #ddd', paddingTop: 6 }}>
-                  <div className="muted">Total Distributed</div>
+                  <div className="muted">{t('totalDistributed')}</div>
                   <div className="value">{formatLKR(results.finalInaya + results.finalShakira)}</div>
                 </div>
               </div>
@@ -254,22 +375,22 @@ export default function App(){
         {/* Download button at page bottom */}
         <div className="mt-6 flex justify-center gap-3">
           <button onClick={downloadPDF} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded">
-            📥 Download PDF
+            {t('downloadPDF')}
           </button>
           <button onClick={saveCurrentReport} className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded">
-            💾 Save
+            {t('save')}
           </button>
           <button onClick={loadReports} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded">
-            📂 Load Reports
+            {t('loadReports')}
           </button>
         </div>
 
         {/* Reports list */}
         <div className="mt-6">
           <div className="bg-white shadow rounded-lg p-4">
-            <h3 className="text-lg font-bold mb-3">Saved Reports</h3>
+            <h3 className="text-lg font-bold mb-3">{t('savedReports')}</h3>
             {reports.length === 0 ? (
-              <div className="text-sm text-gray-500">No reports loaded.</div>
+              <div className="text-sm text-gray-500">{t('noReportsLoaded')}</div>
             ) : (
               <ul className="space-y-2">
                 {reports.map(r => (
@@ -282,7 +403,7 @@ export default function App(){
                         <div className="text-xs text-gray-700">Bill #: {((r.payload && r.payload.inputs && r.payload.inputs.billNumber) || (r.inserted && r.inserted[0] && r.inserted[0].payload && r.inserted[0].payload.inputs && r.inserted[0].payload.inputs.billNumber) || '')}</div>
                       </div>
                       <div>
-                        <button onClick={() => loadAndApplyReport(r)} className="px-2 py-1 bg-green-600 text-white rounded text-sm">Load</button>
+                        <button onClick={() => loadAndApplyReport(r)} className="px-2 py-1 bg-green-600 text-white rounded text-sm">{t('load')}</button>
                       </div>
                     </div>
                   </li>
