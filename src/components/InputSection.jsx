@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-function NumberInput({ label, value, onChange, min = 0, step = 'any', name }) {
+function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2 }) {
+  // Format display to show specified decimal places
+  const displayValue = value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
+  
   return (
     <label className="block mb-3">
       <div className="text-base font-medium text-gray-700 mb-1">{label}</div>
@@ -9,7 +12,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name }) {
         type="number"
         step={step}
         min={min}
-        value={value === 0 ? '' : value}
+        value={displayValue}
         onChange={(e) => onChange(name, e.target.value)}
         className="w-full border border-gray-300 rounded px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
@@ -131,16 +134,16 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">📦 Salt Packed Bags</h4>
-            <NumberInput label={t('totalSaltPackedBags')} name="packedBags" value={inputs.packedBags} onChange={onChange} step="1" />
-            <NumberInput label={t('deductedBags') || 'Deducted Bags'} name="deductedBags" value={inputs.deductedBags} onChange={onChange} step="1" />
-            <NumberInput label={t('pricePerBag') || 'Price per Bag (LKR)'} name="pricePerBag" value={inputs.pricePerBag} onChange={onChange} />
+            <NumberInput label={t('totalSaltPackedBags')} name="packedBags" value={inputs.packedBags} onChange={onChange} step="1" decimals={null} />
+            <NumberInput label={t('deductedBags') || 'Deducted Bags'} name="deductedBags" value={inputs.deductedBags} onChange={onChange} step="1" decimals={null} />
+            <NumberInput label={t('pricePerBag') || 'Price per Bag (LKR)'} name="pricePerBag" value={inputs.pricePerBag} onChange={onChange} decimals={2} />
           </div>
 
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">🏭 {t('contractorExpenses')}</h4>
-            <NumberInput label={t('packingFeePerBag') || 'Packing Fee per Bag (LKR)'} name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} />
-            <NumberInput label={t('bagCostPerUnit') || 'Plastic Bag Cost (LKR)'} name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} />
-            <NumberInput label={t('otherExpenses') || 'Other Expenses (LKR)'} name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} />
+            <NumberInput label={t('packingFeePerBag') || 'Packing Fee per Bag (LKR)'} name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} decimals={2} />
+            <NumberInput label={t('bagCostPerUnit') || 'Plastic Bag Cost (LKR)'} name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} decimals={2} />
+            <NumberInput label={t('otherExpenses') || 'Other Expenses (LKR)'} name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} decimals={2} />
             <label className="block mb-3">
               <div className="text-sm font-medium text-gray-700 mb-1">Other Expenses Reason</div>
               <input
@@ -178,7 +181,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 {(inputs.extraExpenses || []).map(exp => (
                     <div key={exp.id} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <input className="flex-1 border border-gray-300 rounded px-3 py-2 text-base" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value)} />
-                    <input type="number" step="any" className="w-full sm:w-28 border border-gray-300 rounded px-3 py-2 text-base" value={exp.amount === 0 ? '' : exp.amount} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
+                    <input type="number" step="any" className="w-full sm:w-28 border border-gray-300 rounded px-3 py-2 text-base" value={exp.amount === 0 ? '' : Number(exp.amount).toFixed(2)} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
                     <button type="button" onClick={() => removeExpense(exp.id)} className="text-sm text-red-600">{t('remove') || 'Remove'}</button>
                   </div>
                 ))}
@@ -188,8 +191,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 {t('income')}</h4>
-            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} />
-            <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} />
+            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} />
+            <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} decimals={2} />
           </div>
         </div>
 
@@ -209,8 +212,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
           {inputs.bothOwnersHaveLoans && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <NumberInput label="Loan (Inaya) - LKR" name="loanInaya" value={inputs.loanInaya} onChange={onChange} />
-              <NumberInput label="Loan (Shakira) - LKR" name="loanShakira" value={inputs.loanShakira} onChange={onChange} />
+              <NumberInput label="Loan (Inaya) - LKR" name="loanInaya" value={inputs.loanInaya} onChange={onChange} decimals={2} />
+              <NumberInput label="Loan (Shakira) - LKR" name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
             </div>
           )}
 
