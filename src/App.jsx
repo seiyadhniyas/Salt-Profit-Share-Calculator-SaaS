@@ -20,6 +20,8 @@ export default function App(){
     bagCostPerUnit: 0,
     otherExpenses: 0,
     otherExpensesReason: '',
+    expensePayment: 'owners',
+    location: 'puthoor-2',
     loanInaya: 0,
     loanShakira: 0,
     bothOwnersHaveLoans: false,

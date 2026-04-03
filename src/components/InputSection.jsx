@@ -3,7 +3,7 @@ import React from 'react'
 function NumberInput({ label, value, onChange, min = 0, step = 'any', name }) {
   return (
     <label className="block mb-3">
-      <div className="text-sm font-medium text-gray-700 mb-1">{label}</div>
+      <div className="text-base font-medium text-gray-700 mb-1">{label}</div>
       <input
         name={name}
         type="number"
@@ -11,7 +11,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name }) {
         min={min}
         value={value}
         onChange={(e) => onChange(name, e.target.value)}
-        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full border border-gray-300 rounded px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </label>
   )
@@ -42,12 +42,19 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
         <h4 className="text-xl font-bold text-gray-800 mb-2">Document Details</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="block">
+            <div className="text-sm font-medium text-gray-700 mb-1">Location / Day</div>
+            <select name="location" value={inputs.location || 'puthoor-2'} onChange={(e) => onChange('location', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-base">
+              <option value="puthoor-2">Puthoor 2 (N & S)</option>
+            </select>
+          </label>
+
+          <label className="block">
             <div className="text-sm font-medium text-gray-700 mb-1">Date</div>
             <input
               type="date"
               value={inputs.date || ''}
               onChange={(e) => onChange('date', e.target.value)}
-              className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-base"
             />
           </label>
 
@@ -110,10 +117,24 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
                 name="otherExpensesReason"
                 value={inputs.otherExpensesReason || ''}
                 onChange={(e) => onChange('otherExpensesReason', e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-base"
                 placeholder="Brief reason for other expenses"
               />
             </label>
+
+            <div className="block mb-3">
+              <div className="text-sm font-medium text-gray-700 mb-2">Expense Responsibility</div>
+              <div className="flex items-center gap-4">
+                <label className="inline-flex items-center">
+                  <input type="radio" name="expensePayment" value="owners" checked={(inputs.expensePayment || 'owners') === 'owners'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
+                  <span className="text-sm">Owners Pay Expenses</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input type="radio" name="expensePayment" value="contractor" checked={(inputs.expensePayment || 'owners') === 'contractor'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
+                  <span className="text-sm">Contractor Pays Expenses</span>
+                </label>
+              </div>
+            </div>
             <div className="mt-2">
               <button type="button" onClick={addExpense} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded text-sm hover:bg-blue-100">
                 + add expenses

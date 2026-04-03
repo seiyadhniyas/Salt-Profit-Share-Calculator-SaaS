@@ -36,7 +36,7 @@ export default function ResultSection({results}){
             <StatRow label="Net Bags (Packed - Deducted)" value={results.netBags} isNegative={false} />
             <StatRow label="Initial Price (Net × Price/Bag)" value={formatLKR(results.initialPrice)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label="Contractor Total Spent" value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
+            <StatRow label="Contractor Total Spent (Packing Fee × PackedBags + Bag Cost × PackedBags + Other Expenses)" value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
             <StatRow label="Contractor Share (Initial/2 + Spent)" value={formatLKR(results.contractorShare)} isNegative={false} />
             <div className="my-2 border-t"></div>
             <StatRow label="Grand Total Received" value={formatLKR(results.grandTotalReceived)} isNegative={false} />

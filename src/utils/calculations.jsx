@@ -23,6 +23,7 @@ export function computeAll(inputs) {
   const extraExpenses = Array.isArray(inputs.extraExpenses) ? inputs.extraExpenses : []
   const extraExpensesTotal = extraExpenses.reduce((s, it) => s + safeNum(it.amount), 0)
   const totalOtherExpenses = otherExpenses + extraExpensesTotal
+  const expensePayment = inputs.expensePayment || 'owners'
   const loanInaya = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanInaya) : 0
   const loanShakira = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanShakira) : 0
 
@@ -37,7 +38,8 @@ export function computeAll(inputs) {
   const grandTotalReceived = cashReceived + chequeReceived
 
   // contractor_total_spent
-  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + totalOtherExpenses
+  // If owners pay other expenses, do not include them in contractor's total spent.
+  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'contractor' ? totalOtherExpenses : 0)
 
   // contractor_share = (initial_price / 2) + contractor_total_spent
   const contractorShare = (initialPrice / 2) + contractorTotalSpent
