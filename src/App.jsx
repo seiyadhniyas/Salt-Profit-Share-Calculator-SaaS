@@ -43,11 +43,11 @@ export default function App(){
       reset: '🔄 Reset',
       totalSaltPackedBags: 'Total Salt Packed Bags',
       deductedBags: 'Deducted Bags',
-      pricePerBag: 'Price per Bag (LKR)',
+      pricePerBag: 'Salt Price per Bag (LKR)',
       cashReceived: 'Cash Received (LKR)',
       chequeReceived: 'Cheque Received (LKR)',
       contractorExpenses: 'Contractor Expenses',
-      packingFeePerBag: 'Packing Wage per Bag (LKR)',
+      packingFeePerBag: 'pack wage per bag (LKR)',
       bagCostPerUnit: 'Plastic Bag Cost (LKR)',
       otherExpenses: 'Other Expenses (LKR)',
       otherExpensesReason: 'Other Expenses Reason',
@@ -100,11 +100,11 @@ export default function App(){
       reset: '🔄 மீட்டமை',
       totalSaltPackedBags: 'மொத்த உப்பு நிரப்பப்பட்ட பைகள்',
       deductedBags: 'குறைவிடப்பட்ட பைகள்',
-      pricePerBag: 'ஒரு பையின் விலை (LKR)',
+      pricePerBag: 'உப்பின் விலை (LKR)',
       cashReceived: 'பெற்ற பணம் (LKR)',
       chequeReceived: 'பெற்ற காசோலை (LKR)',
       contractorExpenses: 'ஒப்பந்ததாரரின் செலவுகள்',
-      packingFeePerBag: 'ஒரு பையின் ஊதியம் (LKR)',
+      packingFeePerBag: 'ஒரு மூட்டைக்கான கூலி (LKR)',
       bagCostPerUnit: 'பிளாஸ்டிக் பையின் விலை (LKR)',
       otherExpenses: 'பிற செலவுகள் (LKR)',
       otherExpensesReason: 'பிற செலவுகளுக்கான காரணம்',
@@ -306,14 +306,14 @@ export default function App(){
 
         {/* Hidden/off-screen printable area (captures Summary -> Final Results) */}
         {results && (
-          <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: 12, background: '#fff' }}>
+          <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: '12pt 12pt', background: '#fff' }}>
             <style>{`
-              #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.15; color: #000; }
-              #print-area h2 { font-size: 14pt; margin: 6pt 0; font-weight: 700 }
-              #print-area .section { margin-bottom: 8pt; }
-              #print-area .row { display: flex; justify-content: space-between; gap: 8pt; margin-bottom: 4pt; }
-              #print-area .muted { color: #444; font-size: 10.5pt }
-              #print-area .value { font-weight: 700 }
+              #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.1; color: #000; }
+              #print-area h2 { font-size: 11pt; margin: 4pt 0; font-weight: 700 }
+              #print-area .section { margin-bottom: 6pt; }
+              #print-area .row { display: flex; justify-content: space-between; gap: 8pt; margin-bottom: 2pt; }
+              #print-area .muted { color: #444; font-size: 8.5pt }
+              #print-area .value { font-weight: 700; font-size: 9pt }
             `}</style>
             <div style={{ width: '100%', maxWidth: 560 }}>
               <div className="section">
@@ -327,7 +327,10 @@ export default function App(){
                 <div className="section">
                 <h2>{t('summary')}</h2>
                 <div className="row"><div className="muted">{t('netBags')}</div><div className="value">{results.netBags}</div></div>
+                <div className="row"><div className="muted">{t('pricePerBag')}</div><div className="value">{formatLKR(inputs.pricePerBag)}</div></div>
                 <div className="row"><div className="muted">{t('initialPrice')}</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
+                <div className="row"><div className="muted">{t('cashReceived')}</div><div className="value">{formatLKR(inputs.cashReceived)}</div></div>
+                <div className="row"><div className="muted">{t('chequeReceived')}</div><div className="value">{formatLKR(inputs.chequeReceived)}</div></div>
                 <div className="row"><div className="muted">{t('contractorSpent')}</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div></div>
                 <div className="row"><div className="muted">{t('otherExpensesReason')}</div><div className="value">{inputs.otherExpensesReason || '-'}</div></div>
                 <div className="row"><div className="muted">{t('expenseResponsibility')}</div><div className="value">{(inputs.expensePayment === 'contractor') ? t('expenseContractor') : t('expenseOwners')}</div></div>
@@ -359,7 +362,7 @@ export default function App(){
 
                 <div style={{ height: 6 }}></div>
 
-                <div className="row"><div className="muted">{t('shakiraFinalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
+                <div className="row" style={{ marginTop: '6pt' }}><div className="muted">{t('shakiraFinalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
                 <div className="row"><div className="muted">{t('shakiraZakat')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
                 <div className="row"><div className="muted">{t('shakiraAfterZakat')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
 
