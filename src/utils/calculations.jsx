@@ -38,9 +38,10 @@ export function computeAll(inputs) {
   const grandTotalReceived = cashReceived + chequeReceived
 
   // contractor_total_spent
-  // Include other expenses in contractor's total only when the contractor pays expenses.
-  // Use netBags for per-bag contractor costs (packing/bag cost apply to delivered net bags)
-  const contractorTotalSpent = (packingFeePerBag * netBags) + (bagCostPerUnit * netBags) + (expensePayment === 'contractor' ? totalOtherExpenses : 0)
+  // Use total packed bags for contractor per-bag wage/cost calculations as requested:
+  // (Packing Wage × packedBags) + (Bag Cost × packedBags) + Other Expenses (if contractor pays)
+  // Treat any missing/blank inputs as 0 via safeNum above.
+  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'contractor' ? totalOtherExpenses : 0)
 
   // contractor_share = (initial_price / 2) + contractor_total_spent
   const contractorShare = (initialPrice / 2) + contractorTotalSpent
