@@ -39,8 +39,8 @@ export default function ResultSection({results, t}){
             <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (Packing Fee × PackedBags + Bag Cost × PackedBags + Other Expenses)'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
             <StatRow label={(t ? t('contractorShare') : 'Contractor Share') + ' (Initial/2 + Spent)'} value={formatLKR(results.contractorShare)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label={t ? 'Grand Total Received' : 'Grand Total Received'} value={formatLKR(results.grandTotalReceived)} isNegative={false} />
-            <StatRow label={t ? 'Owner Pool (Received - Contractor)' : 'Owner Pool (Received - Contractor)'} value={formatLKR(results.ownerPool)} isNegative={results.highlights.ownerPoolNegative} />
+            <StatRow label={t ? t('grandTotalReceived') : 'Grand Total Received'} value={formatLKR(results.grandTotalReceived)} isNegative={false} />
+            <StatRow label={t ? t('ownerPool') : 'Owners Group Amount'} value={formatLKR(results.ownerPool)} isNegative={results.highlights.ownerPoolNegative} />
             <StatRow label={t ? (t('perOwnerShare') + ' (Pool/2)') : 'General Share Per Owner (Pool/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
           </div>
         </div>

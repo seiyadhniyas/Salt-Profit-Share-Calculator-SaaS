@@ -141,11 +141,11 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">🏭 {t('contractorExpenses')}</h4>
-            <NumberInput label={t('packingFeePerBag') || 'Packing Fee per Bag (LKR)'} name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} decimals={2} />
+            <NumberInput label={t('packingFeePerBag') || 'Packing Wage per Bag (LKR)'} name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} decimals={2} />
             <NumberInput label={t('bagCostPerUnit') || 'Plastic Bag Cost (LKR)'} name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} decimals={2} />
             <NumberInput label={t('otherExpenses') || 'Other Expenses (LKR)'} name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} decimals={2} />
             <label className="block mb-3">
-              <div className="text-sm font-medium text-gray-700 mb-1">Other Expenses Reason</div>
+              <div className="text-sm font-medium text-gray-700 mb-1">{t('otherExpensesReason')}</div>
               <input
                 type="text"
                 name="otherExpensesReason"
