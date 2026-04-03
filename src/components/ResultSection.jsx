@@ -36,7 +36,7 @@ export default function ResultSection({results, t}){
             <StatRow label={t ? t('netBags') + ' (Packed - Deducted)' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
             <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (Net × Price/Bag)'} value={formatLKR(results.initialPrice)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (Packing Fee × PackedBags + Bag Cost × PackedBags + Other Expenses)'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
+            <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses)'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
             <StatRow label={(t ? t('contractorShare') : 'Contractor Share') + ' (Initial/2 + Spent)'} value={formatLKR(results.contractorShare)} isNegative={false} />
             <div className="my-2 border-t"></div>
             <StatRow label={t ? t('grandTotalReceived') : 'Grand Total Received'} value={formatLKR(results.grandTotalReceived)} isNegative={false} />
