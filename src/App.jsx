@@ -187,16 +187,17 @@ export default function App(){
         {results && (
           <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: 12, background: '#fff' }}>
             <style>{`
-              #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 12.5pt; line-height: 1.2; color: #000; }
-              #print-area h2 { font-size: 14pt; margin: 6pt 0; }
+              #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.15; color: #000; }
+              #print-area h2 { font-size: 14pt; margin: 6pt 0; font-weight: 700 }
               #print-area .section { margin-bottom: 8pt; }
               #print-area .row { display: flex; justify-content: space-between; gap: 8pt; margin-bottom: 4pt; }
-              #print-area .muted { color: #444; font-size: 11pt }
-              #print-area .value { font-weight: 600 }
+              #print-area .muted { color: #444; font-size: 10.5pt }
+              #print-area .value { font-weight: 700 }
             `}</style>
             <div style={{ width: '100%', maxWidth: 560 }}>
               <div className="section">
                 <h2>Document Details</h2>
+                <div className="row"><div className="muted">Location</div><div className="value">{inputs.location === 'puthoor-2' ? 'Puthoor 2 (N & S)' : inputs.location}</div></div>
                 <div className="row"><div className="muted">Date</div><div className="value">{inputs.date || '-'}</div></div>
                 <div className="row"><div className="muted">Buyer's Name</div><div className="value">{inputs.buyerName || '-'}</div></div>
                 <div className="row"><div className="muted">Bill #</div><div className="value">{inputs.billNumber || '-'}</div></div>
@@ -208,6 +209,7 @@ export default function App(){
                 <div className="row"><div className="muted">Initial Price</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
                 <div className="row"><div className="muted">Contractor Spent</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div></div>
                 <div className="row"><div className="muted">Other Expenses Reason</div><div className="value">{inputs.otherExpensesReason || '-'}</div></div>
+                <div className="row"><div className="muted">Expense Responsibility</div><div className="value">{(inputs.expensePayment === 'contractor') ? 'Contractor Pays Expenses' : 'Owners Pay Expenses'}</div></div>
                 {/* list manual extra expenses if any */}
                 {(inputs.extraExpenses || []).length > 0 && (
                   <div style={{ marginTop: 6 }}>

@@ -9,7 +9,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name }) {
         type="number"
         step={step}
         min={min}
-        value={value}
+        value={value === 0 ? '' : value}
         onChange={(e) => onChange(name, e.target.value)}
         className="w-full border border-gray-300 rounded px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
@@ -64,7 +64,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
               type="text"
               value={inputs.buyerName || ''}
               onChange={(e) => onChange('buyerName', e.target.value)}
-              className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+              className="w-full border border-gray-300 rounded px-4 py-3 text-base"
+              placeholder=""
             />
           </label>
 
@@ -74,7 +75,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
               type="text"
               value={inputs.billNumber || ''}
               onChange={(e) => onChange('billNumber', e.target.value)}
-              className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+              className="w-full border border-gray-300 rounded px-4 py-3 text-base"
+              placeholder=""
             />
           </label>
         </div>
@@ -124,7 +126,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
 
             <div className="block mb-3">
               <div className="text-sm font-medium text-gray-700 mb-2">Expense Responsibility</div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <label className="inline-flex items-center">
                   <input type="radio" name="expensePayment" value="owners" checked={(inputs.expensePayment || 'owners') === 'owners'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
                   <span className="text-sm">Owners Pay Expenses</span>
@@ -145,8 +147,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans }) {
               <div className="mt-3 space-y-2">
                 {(inputs.extraExpenses || []).map(exp => (
                   <div key={exp.id} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    <input className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value)} />
-                    <input type="number" step="any" className="w-full sm:w-28 border border-gray-300 rounded px-2 py-1 text-sm" value={exp.amount} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
+                    <input className="flex-1 border border-gray-300 rounded px-3 py-2 text-base" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value)} />
+                    <input type="number" step="any" className="w-full sm:w-28 border border-gray-300 rounded px-3 py-2 text-base" value={exp.amount === 0 ? '' : exp.amount} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
                     <button type="button" onClick={() => removeExpense(exp.id)} className="text-sm text-red-600">Remove</button>
                   </div>
                 ))}
