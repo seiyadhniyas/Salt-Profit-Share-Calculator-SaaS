@@ -309,13 +309,16 @@ export default function App(){
           <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: '12pt 12pt', background: '#fff' }}>
             <style>{`
               #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.1; color: #000; }
+              #print-area h1 { font-size: 13pt; margin: 0 0 8pt 0; font-weight: 700; text-align: center; }
               #print-area h2 { font-size: 11pt; margin: 4pt 0; font-weight: 700 }
               #print-area .section { margin-bottom: 6pt; }
               #print-area .row { display: flex; justify-content: space-between; gap: 8pt; margin-bottom: 2pt; }
               #print-area .muted { color: #444; font-size: 8.5pt }
               #print-area .value { font-weight: 700; font-size: 9pt }
             `}</style>
-            <div style={{ width: '100%', maxWidth: 560 }}>
+            <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', padding: '0' }}>
+              <h1>{t('title')}</h1>
+              <div style={{ width: '100%', maxWidth: 540, margin: '0 auto' }}>
               <div className="section">
                 <h2>{t('documentDetails')}</h2>
                 <div className="row"><div className="muted">{t('locationLabel') || 'Location'}</div><div className="value">{inputs.location === 'puthoor-2' ? 'Puthoor 2 (N & S)' : inputs.location}</div></div>
@@ -360,17 +363,18 @@ export default function App(){
                 <div className="row"><div className="muted">{t('inayaZakat')}</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
                 <div className="row"><div className="muted">{t('inayaAfterZakat')}</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
 
-                <div style={{ height: 6 }}></div>
+                <div style={{ height: '6pt' }}></div>
 
-                <div className="row" style={{ marginTop: '6pt' }}><div className="muted">{t('shakiraFinalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
+                <div className="row"><div className="muted">{t('shakiraFinalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
                 <div className="row"><div className="muted">{t('shakiraZakat')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
                 <div className="row"><div className="muted">{t('shakiraAfterZakat')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
 
-                <div className="row" style={{ borderTop: '1px solid #ddd', paddingTop: 6 }}>
+                <div className="row" style={{ borderTop: '1px solid #ddd', paddingTop: '4pt', marginTop: '8pt' }}>
                   <div className="muted">{t('totalDistributed')}</div>
                   <div className="value">{formatLKR(results.finalInaya + results.finalShakira)}</div>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         )}
