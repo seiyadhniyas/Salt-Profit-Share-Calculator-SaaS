@@ -53,11 +53,12 @@ export function computeAll(inputs) {
     : (initialPrice - contractorTotalSpent - totalLoan)
 
   // contractor_share
-  // If owners pay expenses: contractor_share = (InitialPrice + Spent) / 2
+  // If owners pay expenses: contractor receives full contractor expenses plus half
+  // of the initial price -> contractor_share = (InitialPrice / 2) + Spent
   // If contractor pays expenses: contractor_share = (InitialPrice - Spent) / 2
   // Uses packedBags-based spent calculation defined above; blanks are treated as 0 via safeNum
   const contractorShare = (expensePayment === 'owners')
-    ? ((initialPrice + contractorTotalSpent) / 2)
+    ? ((initialPrice / 2) + contractorTotalSpent)
     : ((initialPrice - contractorTotalSpent) / 2)
 
   // owner_pool (Owners Group Amount)
