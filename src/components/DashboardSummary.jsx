@@ -36,6 +36,8 @@ export default function DashboardSummary({
   onLoadSavedFile,
   customLocations = [],
   onAddLocation,
+  ownerNames = ['Owner 1', 'Owner 2'],
+  onOwnerNamesChange,
   contractorSharePercentage = 50,
   onContractorSharePercentageChange,
 }) {
@@ -162,12 +164,43 @@ export default function DashboardSummary({
             </div>
           </div>
         </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl md:col-span-2">
+          <div className="inline-flex rounded-full bg-gradient-to-r from-cyan-600 to-blue-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            👥 Owner Names
+          </div>
+          <div className="mt-3">
+            <div className="text-sm text-slate-600 mb-3">Customize your partners' names to display in reports</div>
+            <div className="grid gap-3 grid-cols-2">
+              {[0, 1].map(idx => (
+                <label key={idx} className="block">
+                  <div className="text-xs font-semibold text-slate-700 mb-2">Owner {idx + 1}</div>
+                  <input
+                    type="text"
+                    value={ownerNames?.[idx] || `Owner ${idx + 1}`}
+                    onChange={(e) => {
+                      const updated = [...(ownerNames || ['Owner 1', 'Owner 2'])]
+                      updated[idx] = e.target.value || `Owner ${idx + 1}`
+                      onOwnerNamesChange && onOwnerNamesChange(updated)
+                    }}
+                    placeholder={`Owner ${idx + 1}`}
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                  />
+                </label>
+              ))}
+            </div>
+            {ownerNames && ownerNames[0] && ownerNames[1] && (
+              <div className="mt-3 text-xs text-slate-600">
+                Reports will show: <span className="font-semibold text-slate-900">{ownerNames[0]} & {ownerNames[1]}</span>
+              </div>
+            )}
+          </div>
+        </div>
         <div className="md:col-span-2">
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
             <div className="flex flex-col gap-4 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-                  Reports
+                  Reports ({ownerNames ? `2 Owners` : 'No owners set'})
                 </div>
                 <div className="mt-3 text-2xl font-bold text-slate-900">{reportsCount}</div>
                 <div className="text-sm text-slate-500">{lastReportDate && lastReportDate !== 'No reports yet' ? `Last sync: ${lastReportDate}` : 'Save a report to populate the list'}</div>

@@ -37,6 +37,12 @@ export default function App(){
       return JSON.parse(localStorage.getItem('customLocations') || '[]')
     } catch { return [] }
   })
+  const [ownerNames, setOwnerNames] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('ownerNames') || '[]')
+      return Array.isArray(saved) && saved.length === 2 ? saved : ['Owner 1', 'Owner 2']
+    } catch { return ['Owner 1', 'Owner 2'] }
+  })
   const [contractorSharePercentage, setContractorSharePercentage] = useState(() => {
     try {
       return Number(localStorage.getItem('contractorSharePercentage')) || 50
@@ -47,6 +53,11 @@ export default function App(){
   useEffect(() => {
     try { localStorage.setItem('customLocations', JSON.stringify(customLocations)) } catch(e){}
   }, [customLocations])
+
+  // Persist ownerNames to localStorage
+  useEffect(() => {
+    try { localStorage.setItem('ownerNames', JSON.stringify(ownerNames)) } catch(e){}
+  }, [ownerNames])
 
   // Persist contractorSharePercentage to localStorage
   useEffect(() => {
@@ -615,7 +626,7 @@ export default function App(){
           </div>
         </div>
 
-        {results && <ResultSection results={results} t={t} />}
+        {results && <ResultSection results={results} t={t} ownerNames={ownerNames} />}
 
         {/* Hidden/off-screen printable area (captures Summary -> Final Results) */}
         {results && (
@@ -673,15 +684,15 @@ export default function App(){
 
               <div className="section">
                 <h2>Total Distributed</h2>
-                <div className="row"><div className="muted">{t('inayaFinalShare')}</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
-                <div className="row"><div className="muted">{t('inayaZakat')}</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
-                <div className="row"><div className="muted">{t('inayaAfterZakat')}</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[0] || 'Owner 1'} - Final Share</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[0] || 'Owner 1'} - Zakat (5%)</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[0] || 'Owner 1'} - After Zakat</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
 
                 <div style={{ height: '6pt' }}></div>
 
-                <div className="row"><div className="muted">{t('shakiraFinalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
-                <div className="row"><div className="muted">{t('shakiraZakat')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
-                <div className="row"><div className="muted">{t('shakiraAfterZakat')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[1] || 'Owner 2'} - Final Share</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[1] || 'Owner 2'} - Zakat (5%)</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[1] || 'Owner 2'} - After Zakat</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
 
                 <div className="row" style={{ borderTop: '1px solid #ddd', paddingTop: '4pt', marginTop: '8pt' }}>
                   <div className="muted">{t('totalDistributed')}</div>
@@ -752,6 +763,8 @@ export default function App(){
                   onLoadSavedFile={handleOpenSavedFile}
                   customLocations={customLocations}
                   onAddLocation={(location) => setCustomLocations(prev => prev.includes(location) ? prev : [...prev, location])}
+                  ownerNames={ownerNames}
+                  onOwnerNamesChange={setOwnerNames}
                   contractorSharePercentage={contractorSharePercentage}
                   onContractorSharePercentageChange={setContractorSharePercentage}
                 />
