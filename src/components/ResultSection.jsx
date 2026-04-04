@@ -30,7 +30,7 @@ export default function ResultSection({results, t}){
     <div className="mt-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Detailed Breakdown */}
-        <div className="shadow rounded-lg p-5" style={{ backgroundColor: '#fff0f0' }}>
+        <div className="shadow-xl rounded-2xl p-5" style={{ backgroundColor: '#fff0f0' }}>
           <h3 className="text-lg font-bold text-gray-800 mb-4">{t ? t('calculationBreakdown') : 'Calculation Breakdown'}</h3>
           <div className="space-y-1">
             <StatRow label={t ? t('netBags') + ' (Packed - Deducted)' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
@@ -58,7 +58,7 @@ export default function ResultSection({results, t}){
         </div>
 
         {/* Final Results */}
-        <div className="shadow rounded-lg p-5" style={{ backgroundColor: '#f7fff0' }}>
+        <div className="shadow-xl rounded-2xl p-5" style={{ backgroundColor: '#f7fff0' }}>
           <h3 className="text-lg font-bold text-gray-800 mb-4">{t ? t('finalResults') : 'Final Results'}</h3>
           <div className="space-y-3">
             <div className="rounded-lg p-4" style={{ backgroundColor: '#b1ecff' }}>

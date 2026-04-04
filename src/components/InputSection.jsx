@@ -68,7 +68,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
   return (
     <>
-      <div className="shadow rounded-lg p-4 mb-4" style={{ backgroundColor: '#ddfafe' }}>
+      <div className="shadow-xl rounded-2xl p-5 mb-4" style={{ backgroundColor: '#ddfafe' }}>
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-xl font-bold text-gray-800">{t('documentDetails')}</h4>
           <div>
@@ -120,7 +120,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         </div>
       </div>
 
-      <div className="bg-yellow-50 shadow rounded-lg p-5">
+      <div className="bg-yellow-50 shadow-xl rounded-2xl p-5">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold text-gray-800">{t('inputData')}</h3>
           <button

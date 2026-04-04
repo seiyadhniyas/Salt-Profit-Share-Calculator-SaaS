@@ -82,6 +82,20 @@ export default function App(){
       inayaFinalShare: 'Inaaya Final Share',
       shakiraFinalShare: 'Shakira Final Share',
       totalDistributed: 'Total Distributed',
+      productionSnapshot: 'Production Snapshot',
+      latestNetBags: 'Latest Net Bags',
+      latestSaltWeight: 'Latest Salt Weight',
+      latestInitialPrice: 'Latest Initial Price',
+      reportPeriod: 'Report Period',
+      fromDate: 'From Date',
+      toDate: 'To Date',
+      clearFilter: 'Clear',
+      pnlReport: 'P&L Report',
+      grossSales: 'Gross Sales',
+      totalExpenses: 'Operating Expenses',
+      totalLoans: 'Loans',
+      netProfit: 'Net Profit',
+      noReportsInPeriod: 'No reports in this period.',
         enterValues: 'Enter values to see summary',
         toggleLoansHint: 'Toggle checkbox above to add loans',
         cashAutoHint: 'Auto-filled from Net Bags × Price per Bag; edit to override',
@@ -141,6 +155,20 @@ export default function App(){
       inayaFinalShare: 'இனாயா இறுதி பகுதி',
       shakiraFinalShare: 'ஷாக்கீரா இறுதி பகுதி',
       totalDistributed: 'மொத்த வீதம்',
+      productionSnapshot: 'உற்பத்தி சுருக்கம்',
+      latestNetBags: 'கடைசி நிகர பைகள்',
+      latestSaltWeight: 'கடைசி உப்பு எடை',
+      latestInitialPrice: 'கடைசி ஆரம்ப விலை',
+      reportPeriod: 'அறிக்கை காலம்',
+      fromDate: 'தொடக்க தேதி',
+      toDate: 'முடிவு தேதி',
+      clearFilter: 'அழி',
+      pnlReport: 'இலாப / இழப்பு அறிக்கை',
+      grossSales: 'மொத்த விற்பனை',
+      totalExpenses: 'மொத்த செலவுகள்',
+      totalLoans: 'கடன்கள்',
+      netProfit: 'நிகர இலாபம்',
+      noReportsInPeriod: 'இந்த காலத்தில் அறிக்கைகள் இல்லை.',
       extraExpenses: 'மேலும் செலவுகள்',
       toggleLoansHint: 'கடன்களைச் சேர்க்க மேல் குறிப்பு பெட்டியை அழுத்தவும்',
       cashAutoHint: 'நிகர பைகள் × ஒரு பையின் விலை மூலம் தானாக நிரப்பப்படுகிறது; மாற்ற வேண்டும் என்றால் மாற்றுங்கள்',
@@ -161,16 +189,24 @@ export default function App(){
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState('signin')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [reportFromDate, setReportFromDate] = useState('')
+  const [reportToDate, setReportToDate] = useState('')
   const rootRef = useRef()
   const printRef = useRef()
   const [reports, setReports] = useState([])
+  const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
 
   const loadReports = useCallback(async (activeSession = session) => {
+    if (isProdSupabase && !activeSession?.user?.id) {
+      setReports([])
+      return
+    }
+
     try {
       const r = await getReportsFromSupabase(activeSession).catch(() => null)
       if (r && r.ok) {
         setReports(r.reports || [])
-      } else {
+      } else if (!isProdSupabase) {
         // try fallback endpoint
         const fallbackUrl = activeSession?.user?.id
           ? `/.netlify/functions/getReportsSupabase?userId=${encodeURIComponent(activeSession.user.id)}`
@@ -265,16 +301,25 @@ export default function App(){
 
   const saveCurrentReport = async () => {
     if (!results) return alert('No results to save')
+    if (isProdSupabase && !session?.user?.id) {
+      handleOpenAuth('signin')
+      return
+    }
+
     try {
       const payload = { inputs, results }
-      // try Supabase-backed function first
-      const resp = await saveReportToSupabase(payload, session).catch(() => null)
-      if (resp && resp.ok) {
-        alert('Report saved to Supabase')
+      if (isProdSupabase) {
+        const resp = await saveReportToSupabase(payload, session)
+        if (resp && resp.ok) {
+          alert('Report saved to Supabase')
+          await loadReports(session)
+          return
+        }
+        alert('Save failed')
         return
       }
 
-      // fallback to local function
+      // local/demo fallback when Supabase is not configured
       const resp2 = await saveReport(payload)
       if (resp2 && resp2.ok) {
         alert('Report saved (local demo)')
@@ -282,6 +327,10 @@ export default function App(){
         alert('Save failed')
       }
     } catch (e) {
+      if (String(e?.message || '').toLowerCase().includes('auth')) {
+        handleOpenAuth('signin')
+        return
+      }
       alert('Save error: ' + (e.message || e))
     }
   }
@@ -307,6 +356,87 @@ export default function App(){
       console.error(e)
     }
   }
+
+  const handleLoadReportsClick = async () => {
+    if (isProdSupabase && !session?.user?.id) {
+      handleOpenAuth('signin')
+      return
+    }
+
+    await loadReports(session)
+  }
+
+  const getReportPayload = (report) => report?.payload || report?.inserted?.[0]?.payload || report || {}
+
+  const getReportDate = (report) => {
+    const payload = getReportPayload(report)
+    const rawDate = payload?.inputs?.date || report?.created_at || payload?.created_at || null
+    if (!rawDate) return null
+
+    const parsed = rawDate.length === 10 ? new Date(`${rawDate}T00:00:00`) : new Date(rawDate)
+    return Number.isNaN(parsed.getTime()) ? null : parsed
+  }
+
+  const buildPnlMetrics = (report) => {
+    const payload = getReportPayload(report)
+    const inputs = payload.inputs || {}
+    const results = payload.results || {}
+    const packedBags = Number(inputs.packedBags) || 0
+    const bagCostPerUnit = Number(inputs.bagCostPerUnit) || 0
+    const packingFeePerBag = Number(inputs.packingFeePerBag) || 0
+    const otherExpenses = Number(inputs.otherExpenses) || 0
+    const extraExpensesTotal = Array.isArray(inputs.extraExpenses)
+      ? inputs.extraExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
+      : 0
+    const totalOperatingExpenses = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + otherExpenses + extraExpensesTotal
+    const grossSales = Number(results.initialPrice) || 0
+    const totalLoans = (Number(results.loanInaya) || 0) + (Number(results.loanShakira) || 0)
+    const grossMargin = grossSales - totalOperatingExpenses
+    const netProfit = grossMargin - totalLoans
+
+    return {
+      grossSales,
+      totalOperatingExpenses,
+      totalLoans,
+      grossMargin,
+      netProfit,
+    }
+  }
+
+  const filteredReports = reports.filter((report) => {
+    const reportDate = getReportDate(report)
+    if (!reportDate) return false
+
+    if (reportFromDate) {
+      const from = new Date(`${reportFromDate}T00:00:00`)
+      if (reportDate < from) return false
+    }
+
+    if (reportToDate) {
+      const to = new Date(`${reportToDate}T23:59:59.999`)
+      if (reportDate > to) return false
+    }
+
+    return true
+  })
+
+  const pnlSummary = filteredReports.reduce((summary, report) => {
+    const metrics = buildPnlMetrics(report)
+    summary.count += 1
+    summary.grossSales += metrics.grossSales
+    summary.totalOperatingExpenses += metrics.totalOperatingExpenses
+    summary.totalLoans += metrics.totalLoans
+    summary.grossMargin += metrics.grossMargin
+    summary.netProfit += metrics.netProfit
+    return summary
+  }, {
+    count: 0,
+    grossSales: 0,
+    totalOperatingExpenses: 0,
+    totalLoans: 0,
+    grossMargin: 0,
+    netProfit: 0,
+  })
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-xs lg:text-sm' : ''}`}>
@@ -340,7 +470,7 @@ export default function App(){
 
           <div>
             {results ? (
-              <div className="shadow rounded-lg p-4" style={{ backgroundColor: '#f2d3ff' }}>
+                <div className="shadow-xl rounded-2xl p-5" style={{ backgroundColor: '#f2d3ff' }}>
                 <h3 className="text-lg font-bold text-gray-800 mb-3">{t('summary')}</h3>
                 <div className="text-sm space-y-2">
                   <div className="flex justify-between">
@@ -456,44 +586,16 @@ export default function App(){
         )}
 
         {/* Download button at page bottom */}
-        <div className="mt-6 flex justify-center gap-3">
+        <div className="mt-6 mb-8 flex justify-center gap-3 pb-4">
           <button onClick={downloadPDF} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded">
             {t('downloadPDF')}
           </button>
           <button onClick={saveCurrentReport} className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded">
             {t('save')}
           </button>
-          <button onClick={loadReports} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded">
+          <button onClick={handleLoadReportsClick} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded">
             {t('loadReports')}
           </button>
-        </div>
-
-        {/* Reports list */}
-        <div className="mt-6">
-          <div className="bg-white shadow rounded-lg p-4">
-            <h3 className="text-lg font-bold mb-3">{t('savedReports')}</h3>
-            {reports.length === 0 ? (
-              <div className="text-sm text-gray-500">{t('noReportsLoaded')}</div>
-            ) : (
-              <ul className="space-y-2">
-                {reports.map(r => (
-                  <li key={r.id || r.inserted?.[0]?.id || Math.random()} className="p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-sm font-medium">ID: {r.id || (r.inserted && r.inserted[0] && r.inserted[0].id) || r.inserted?.[0]?.id}</div>
-                        <div className="text-xs text-gray-600">{r.created_at || (r.inserted && r.inserted[0] && r.inserted[0].created_at) || ''}</div>
-                        <div className="text-xs text-gray-700 mt-1">Date: {((r.payload && r.payload.inputs && r.payload.inputs.date) || (r.inserted && r.inserted[0] && r.inserted[0].payload && r.inserted[0].payload.inputs && r.inserted[0].payload.inputs.date) || '')}</div>
-                        <div className="text-xs text-gray-700">Bill #: {((r.payload && r.payload.inputs && r.payload.inputs.billNumber) || (r.inserted && r.inserted[0] && r.inserted[0].payload && r.inserted[0].payload.inputs && r.inserted[0].payload.inputs.billNumber) || '')}</div>
-                      </div>
-                      <div>
-                        <button onClick={() => loadAndApplyReport(r)} className="px-2 py-1 bg-green-600 text-white rounded text-sm">{t('load')}</button>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
         </div>
 
         {menuOpen && (
@@ -522,9 +624,19 @@ export default function App(){
                 <DashboardSummary
                   session={session}
                   reports={reports}
-                  isSupabaseConfigured={isSupabaseConfigured}
+                  filteredReports={filteredReports}
+                  pnlSummary={pnlSummary}
+                  reportFromDate={reportFromDate}
+                  reportToDate={reportToDate}
+                  onReportFromDateChange={setReportFromDate}
+                  onReportToDateChange={setReportToDate}
+                  onClearReportFilters={() => {
+                    setReportFromDate('')
+                    setReportToDate('')
+                  }}
                   onOpenAuth={() => handleOpenAuth('signin')}
                   onSignOut={handleSignOut}
+                  onLoadReport={loadAndApplyReport}
                 />
               </div>
             </aside>
