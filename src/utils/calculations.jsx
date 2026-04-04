@@ -6,10 +6,15 @@ const safeNum = (v) => {
   return Number.isFinite(n) ? n : 0
 }
 
-// Primary compute function. Takes an inputs object and returns an object
+// Primary compute function. Takes an inputs object and options, returns an object
 // with all intermediate and final values. Keeps raw values for
 // highlighting and applies validation rules described in spec.
-export function computeAll(inputs) {
+// Options: { contractorSharePercentage: 0-100 } (default 50)
+export function computeAll(inputs, options = {}) {
+  const contractorSharePercentage = Math.max(0, Math.min(100, options?.contractorSharePercentage ?? 50))
+  const contractorShareFactor = contractorSharePercentage / 100
+  const ownerShareFactor = 1 - contractorShareFactor
+  
   // parse inputs safely
   const packedBags = Math.max(0, Math.floor(safeNum(inputs.packedBags)))
   const deductedBags = Math.max(0, Math.floor(safeNum(inputs.deductedBags)))
@@ -53,20 +58,20 @@ export function computeAll(inputs) {
     : (initialPrice - contractorTotalSpent - totalLoan)
 
   // contractor_share
-  // If owners pay expenses: contractor receives full contractor expenses plus half
-  // of the initial price -> contractor_share = (InitialPrice / 2) + Spent
-  // If contractor pays expenses: contractor_share = (InitialPrice - Spent) / 2
+  // If owners pay expenses: contractor receives full contractor expenses plus contractor%
+  // of the initial price -> contractor_share = (InitialPrice * contractorShareFactor) + Spent
+  // If contractor pays expenses: contractor_share = (InitialPrice - Spent) * contractorShareFactor
   // Uses packedBags-based spent calculation defined above; blanks are treated as 0 via safeNum
   const contractorShare = (expensePayment === 'owners')
-    ? ((initialPrice / 2) + contractorTotalSpent)
-    : ((initialPrice - contractorTotalSpent) / 2)
+    ? ((initialPrice * contractorShareFactor) + contractorTotalSpent)
+    : ((initialPrice - contractorTotalSpent) * contractorShareFactor)
 
   // owner_pool (Owners Group Amount)
   // If owners pay expenses: ownerPool = grandTotalReceived - contractorShare
-  // If contractor pays expenses: ownerPool = (grandTotalReceived + totalLoan) / 2
+  // If contractor pays expenses: ownerPool = (grandTotalReceived + totalLoan) * ownerShareFactor
   const ownerPool = (expensePayment === 'owners')
     ? (grandTotalReceived - contractorShare)
-    : ((grandTotalReceived + totalLoan) / 2)
+    : ((grandTotalReceived + totalLoan) * ownerShareFactor)
 
   // general_share_per_owner
   const generalSharePerOwner = ownerPool / 2

@@ -24,7 +24,7 @@ export default function App(){
     otherExpenses: 0,
     otherExpensesReason: '',
     expensePayment: 'owners',
-    location: 'puthoor-2',
+    location: '',
     loanInaya: 0,
     loanShakira: 0,
     bothOwnersHaveLoans: false,
@@ -32,6 +32,26 @@ export default function App(){
   }
 
   const [lang, setLang] = useState('en')
+  const [customLocations, setCustomLocations] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('customLocations') || '[]')
+    } catch { return [] }
+  })
+  const [contractorSharePercentage, setContractorSharePercentage] = useState(() => {
+    try {
+      return Number(localStorage.getItem('contractorSharePercentage')) || 50
+    } catch { return 50 }
+  })
+
+  // Persist customLocations to localStorage
+  useEffect(() => {
+    try { localStorage.setItem('customLocations', JSON.stringify(customLocations)) } catch(e){}
+  }, [customLocations])
+
+  // Persist contractorSharePercentage to localStorage
+  useEffect(() => {
+    try { localStorage.setItem('contractorSharePercentage', String(contractorSharePercentage)) } catch(e){}
+  }, [contractorSharePercentage])
 
   const translations = {
     en: {
@@ -282,12 +302,12 @@ export default function App(){
     }
   }, [])
 
-  // compute on every input change
+  // compute on every input change or when contractor share percentage changes
   useEffect(()=>{
-    const res = computeAll(inputs)
+    const res = computeAll(inputs, { contractorSharePercentage })
     setResults(res)
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs)) } catch(e){}
-  }, [inputs])
+  }, [inputs, contractorSharePercentage])
 
   const reset = () => {
     setInputs(defaultInputs)
@@ -552,7 +572,7 @@ export default function App(){
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} />
+            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} />
             {/* PDF button moved to bottom */}
           </div>
 
@@ -730,6 +750,10 @@ export default function App(){
                   onSignOut={handleSignOut}
                   onLoadReport={loadAndApplyReport}
                   onLoadSavedFile={handleOpenSavedFile}
+                  customLocations={customLocations}
+                  onAddLocation={(location) => setCustomLocations(prev => prev.includes(location) ? prev : [...prev, location])}
+                  contractorSharePercentage={contractorSharePercentage}
+                  onContractorSharePercentageChange={setContractorSharePercentage}
                 />
               </div>
             </aside>

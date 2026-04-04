@@ -34,6 +34,10 @@ export default function DashboardSummary({
   onSignOut,
   onLoadReport,
   onLoadSavedFile,
+  customLocations = [],
+  onAddLocation,
+  contractorSharePercentage = 50,
+  onContractorSharePercentageChange,
 }) {
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || 'Guest member'
@@ -46,6 +50,7 @@ export default function DashboardSummary({
   const latestSaltWeight = latestNetBags * 50
   const latestInitialPrice = Number(latestResults.initialPrice) || 0
   const [reportsOpen, setReportsOpen] = useState(false)
+  const [newLocation, setNewLocation] = useState('')
   const fileRows = Array.isArray(savedFiles) ? savedFiles : []
 
   return (
@@ -89,6 +94,74 @@ export default function DashboardSummary({
           note={`Weight: ${latestSaltWeight} kg • Initial price: LKR ${latestInitialPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           accent="slate"
         />
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+          <div className="inline-flex rounded-full bg-gradient-to-r from-purple-600 to-pink-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            📍 Work Locations
+          </div>
+          <div className="mt-3">
+            <div className="text-sm text-slate-600 mb-2">Add your work locations here to use them in reports</div>
+            <div className="flex gap-2 mb-3">
+              <input
+                type="text"
+                value={newLocation}
+                onChange={(e) => setNewLocation(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && newLocation.trim() && onAddLocation) {
+                    onAddLocation(newLocation.trim())
+                    setNewLocation('')
+                  }
+                }}
+                placeholder="Enter location name"
+                className="flex-1 border border-slate-300 rounded px-3 py-2 text-sm"
+              />
+              <button
+                onClick={() => {
+                  if (newLocation.trim() && onAddLocation) {
+                    onAddLocation(newLocation.trim())
+                    setNewLocation('')
+                  }
+                }}
+                className="rounded-full bg-slate-800 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
+              >
+                Add
+              </button>
+            </div>
+            {Array.isArray(customLocations) && customLocations.length > 0 && (
+              <div className="text-xs text-slate-600">
+                {customLocations.map(loc => (
+                  <span key={loc} className="inline-block bg-slate-100 rounded px-2 py-1 mr-2 mb-1">{loc}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+          <div className="inline-flex rounded-full bg-gradient-to-r from-orange-600 to-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            % Profit Share
+          </div>
+          <div className="mt-3">
+            <div className="text-sm text-slate-600 mb-2">Contractor share percentage</div>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                value={contractorSharePercentage}
+                onChange={(e) => onContractorSharePercentageChange && onContractorSharePercentageChange(Number(e.target.value))}
+                className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="text-sm font-semibold text-slate-900 min-w-fit">
+                {contractorSharePercentage}% Contractor • {100 - contractorSharePercentage}% Owners
+              </div>
+            </div>
+            <div className="text-xs text-slate-500 mt-2">
+              {contractorSharePercentage === 50 ? '50/50 split (standard)' : 
+               contractorSharePercentage > 50 ? `Contractor gets more (${contractorSharePercentage}%)` :
+               'Owners get more'}
+            </div>
+          </div>
+        </div>
         <div className="md:col-span-2">
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
             <div className="flex flex-col gap-4 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">

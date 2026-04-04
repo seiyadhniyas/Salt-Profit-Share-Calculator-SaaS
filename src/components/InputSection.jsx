@@ -20,7 +20,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   )
 }
 
-export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang }) {
+export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [] }) {
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
 
   const onChange = (name, val) => {
@@ -81,9 +81,22 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="block">
             <div className="text-sm font-medium text-gray-700 mb-1">{t('locationDay')}</div>
-            <select name="location" value={inputs.location || 'puthoor-2'} onChange={(e) => onChange('location', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-base">
-              <option value="puthoor-2">Puthoor 2 (N & S)</option>
-            </select>
+            {Array.isArray(customLocations) && customLocations.length > 0 ? (
+              <select name="location" value={inputs.location || ''} onChange={(e) => onChange('location', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-base">
+                <option value="">Select a location</option>
+                {customLocations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value=""
+                disabled
+                placeholder="Add land name in Dashboard"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-base bg-gray-50 text-gray-500 cursor-not-allowed"
+              />
+            )}
           </label>
 
           <label className="block">
