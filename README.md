@@ -66,7 +66,7 @@ The repository already contains `netlify.toml` and example functions to help get
 
 ## Supabase (optional)
 
-If you plan to persist reports in Supabase, run the SQL file in `supabase/create_reports_table.sql` to create the `profiles` and `reports` tables, enable row-level security, and configure the auth trigger. The browser client uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` or `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY`; serverless fallbacks use `SUPABASE_URL` and `SUPABASE_KEY`.
+If you plan to persist data in Supabase, run the SQL file in `supabase/create_reports_table.sql` to create the `profiles`, `reports`, and `saved_files` tables, enable row-level security, create the `saved-files` Storage bucket, and configure the auth trigger. The browser client uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` or `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY`; serverless fallbacks use `SUPABASE_URL` and `SUPABASE_KEY`.
 
 ## How to use the app
 
@@ -83,8 +83,12 @@ Click `Download PDF` to export the printable summary. The app captures a hidden 
 
 ## Saving Reports
 
-- Local: reports are saved to localStorage by default.
-- Server: optional Netlify Functions / Supabase examples are provided for remote persistence (demo code under `netlify/functions/`). The default demo function writes to a temporary file — replace with a persistent store for production.
+- Local/demo: reports use the bundled Netlify function flow when Supabase is not configured.
+- Production: the app saves reports to Supabase and loads them back into the dashboard for the signed-in user.
+
+## Saving PDFs
+
+Click `Save PDF` to upload the generated printable report to Supabase Storage. The file is stored in the `saved-files` bucket and a matching row is written to `saved_files` so the dashboard can list and open saved documents.
 
 ## Contributing
 

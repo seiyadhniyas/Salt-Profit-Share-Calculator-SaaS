@@ -6,7 +6,7 @@ import AuthModal from './components/AuthModal.jsx'
 import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
-import { saveReport, saveReportToSupabase, getReportsFromSupabase } from './api/reports.js'
+import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFilesFromSupabase, savePdfFileToSupabase } from './api/reports.js'
 import { useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
 
@@ -194,6 +194,7 @@ export default function App(){
   const rootRef = useRef()
   const printRef = useRef()
   const [reports, setReports] = useState([])
+  const [savedFiles, setSavedFiles] = useState([])
   const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
 
   const loadReports = useCallback(async (activeSession = session) => {
@@ -216,6 +217,25 @@ export default function App(){
       }
     } catch (e) {
       console.error(e)
+    }
+  }, [session])
+
+  const loadSavedFiles = useCallback(async (activeSession = session) => {
+    if (isProdSupabase && !activeSession?.user?.id) {
+      setSavedFiles([])
+      return
+    }
+
+    try {
+      const r = await getSavedFilesFromSupabase(activeSession).catch(() => null)
+      if (r && r.ok) {
+        setSavedFiles(r.files || [])
+      } else {
+        setSavedFiles([])
+      }
+    } catch (e) {
+      console.error(e)
+      setSavedFiles([])
     }
   }, [session])
 
@@ -247,7 +267,8 @@ export default function App(){
 
   useEffect(() => {
     loadReports(session)
-  }, [session, loadReports])
+    loadSavedFiles(session)
+  }, [session, loadReports, loadSavedFiles])
 
   // load last from localStorage
   useEffect(()=>{
@@ -278,7 +299,7 @@ export default function App(){
     setInputs(prev => ({...prev, bothOwnersHaveLoans: !!val}))
   }
 
-  const downloadPDF = async () => {
+  const createPrintablePdfBlob = async () => {
     const el = printRef.current || rootRef.current
     if(!el) return
     const canvas = await html2canvas(el, {scale: 2})
@@ -296,7 +317,65 @@ export default function App(){
       imgWidth = imgWidth * ratio
     }
     pdf.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight)
-    pdf.save('salt-profit-share.pdf')
+    const pdfBlob = pdf.output('blob')
+    return pdfBlob instanceof Blob ? pdfBlob : new Blob([pdf.output('arraybuffer')], { type: 'application/pdf' })
+  }
+
+  const downloadPDF = async () => {
+    const pdfBlob = await createPrintablePdfBlob()
+    if (!pdfBlob) return
+    const downloadUrl = URL.createObjectURL(pdfBlob)
+    const anchor = document.createElement('a')
+    anchor.href = downloadUrl
+    anchor.download = 'salt-profit-share.pdf'
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+    URL.revokeObjectURL(downloadUrl)
+  }
+
+  const savePdfToStorage = async () => {
+    if (!results) return alert('No results to save')
+    if (isProdSupabase && !session?.user?.id) {
+      handleOpenAuth('signin')
+      return
+    }
+
+    try {
+      const pdfBlob = await createPrintablePdfBlob()
+      if (!pdfBlob) {
+        alert('Could not create PDF')
+        return
+      }
+
+      if (isProdSupabase) {
+        const safeDate = inputs.date || new Date().toISOString().slice(0, 10)
+        const safeBill = (inputs.billNumber || 'report').toString().replace(/[^a-zA-Z0-9-_]+/g, '-')
+        const safeBuyer = (inputs.buyerName || 'buyer').toString().replace(/[^a-zA-Z0-9-_]+/g, '-')
+        const fileName = `salt-profit-share-${safeDate}-${safeBill}-${safeBuyer}.pdf`
+        const resp = await savePdfFileToSupabase({
+          blob: pdfBlob,
+          session,
+          payload: { inputs, results },
+          fileName,
+        })
+        if (resp && resp.ok) {
+          alert('PDF saved to Supabase Storage')
+          await loadSavedFiles(session)
+          return
+        }
+        alert('PDF save failed')
+        return
+      }
+
+      await downloadPDF()
+    } catch (e) {
+      if (String(e?.message || '').toLowerCase().includes('auth')) {
+        handleOpenAuth('signin')
+        return
+      }
+      alert('PDF save error: ' + (e.message || e))
+    }
   }
 
   const saveCurrentReport = async () => {
@@ -313,6 +392,7 @@ export default function App(){
         if (resp && resp.ok) {
           alert('Report saved to Supabase')
           await loadReports(session)
+          await loadSavedFiles(session)
           return
         }
         alert('Save failed')
@@ -345,6 +425,7 @@ export default function App(){
     await supabase.auth.signOut()
     setSession(null)
     setReports([])
+    setSavedFiles([])
     setMenuOpen(false)
   }
 
@@ -364,6 +445,13 @@ export default function App(){
     }
 
     await loadReports(session)
+  }
+
+  const handleOpenSavedFile = (file) => {
+    const url = file?.storage_url || null
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
   }
 
   const getReportPayload = (report) => report?.payload || report?.inserted?.[0]?.payload || report || {}
@@ -586,9 +674,12 @@ export default function App(){
         )}
 
         {/* Download button at page bottom */}
-        <div className="mt-6 mb-8 flex justify-center gap-3 pb-4">
+        <div className="mt-6 mb-8 flex flex-wrap justify-center gap-3 pb-4">
           <button onClick={downloadPDF} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded">
             {t('downloadPDF')}
+          </button>
+          <button onClick={savePdfToStorage} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded">
+            ☁️ Save PDF
           </button>
           <button onClick={saveCurrentReport} className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded">
             {t('save')}
@@ -624,6 +715,7 @@ export default function App(){
                 <DashboardSummary
                   session={session}
                   reports={reports}
+                  savedFiles={savedFiles}
                   filteredReports={filteredReports}
                   pnlSummary={pnlSummary}
                   reportFromDate={reportFromDate}
@@ -637,6 +729,7 @@ export default function App(){
                   onOpenAuth={() => handleOpenAuth('signin')}
                   onSignOut={handleSignOut}
                   onLoadReport={loadAndApplyReport}
+                  onLoadSavedFile={handleOpenSavedFile}
                 />
               </div>
             </aside>

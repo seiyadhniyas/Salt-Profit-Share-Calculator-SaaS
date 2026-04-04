@@ -22,6 +22,7 @@ function StatCard({ title, value, note, accent = 'slate' }) {
 export default function DashboardSummary({
   session,
   reports,
+  savedFiles,
   filteredReports,
   pnlSummary,
   reportFromDate,
@@ -32,6 +33,7 @@ export default function DashboardSummary({
   onOpenAuth,
   onSignOut,
   onLoadReport,
+  onLoadSavedFile,
 }) {
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || 'Guest member'
@@ -44,6 +46,7 @@ export default function DashboardSummary({
   const latestSaltWeight = latestNetBags * 50
   const latestInitialPrice = Number(latestResults.initialPrice) || 0
   const [reportsOpen, setReportsOpen] = useState(false)
+  const fileRows = Array.isArray(savedFiles) ? savedFiles : []
 
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
@@ -178,6 +181,49 @@ export default function DashboardSummary({
                       </li>
                     ))}
                   </ul>
+                )}
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-lg">
+                <div className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Saved Files</div>
+                {fileRows.length === 0 ? (
+                  <div className="text-sm text-slate-500">No saved files yet.</div>
+                ) : (
+                  <div className="overflow-hidden rounded-xl border border-slate-200">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                        <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                          <tr>
+                            <th className="px-4 py-3 font-semibold">File</th>
+                            <th className="px-4 py-3 font-semibold">Created</th>
+                            <th className="px-4 py-3 font-semibold">Size</th>
+                            <th className="px-4 py-3 font-semibold">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 bg-white">
+                          {fileRows.map((file) => (
+                            <tr key={file.id || file.file_path} className="hover:bg-slate-50">
+                              <td className="px-4 py-3">
+                                <div className="font-medium text-slate-900">{file.file_name || 'Unnamed file'}</div>
+                                <div className="text-xs text-slate-500 break-all">{file.file_path}</div>
+                              </td>
+                              <td className="px-4 py-3 text-slate-600">{file.created_at || '-'}</td>
+                              <td className="px-4 py-3 text-slate-600">{file.file_size ? `${(Number(file.file_size) / 1024).toFixed(1)} KB` : '-'}</td>
+                              <td className="px-4 py-3">
+                                <button
+                                  type="button"
+                                  onClick={() => onLoadSavedFile?.(file)}
+                                  className="rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                                >
+                                  Open
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
