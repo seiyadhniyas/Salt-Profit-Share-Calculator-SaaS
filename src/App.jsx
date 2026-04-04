@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react'
 import InputSection from './components/InputSection.jsx'
 import ResultSection from './components/ResultSection.jsx'
-import { computeAll, formatLKR } from './utils/calculations.jsx'
+import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase } from './api/reports.js'
@@ -56,7 +56,8 @@ export default function App(){
       expenseContractor: 'Contractor Pays Expenses',
       addExpenses: '+ add expenses',
       remove: 'Remove',
-      bothOwnersHaveLoans: 'Both owners have loans',
+      bothOwnersHaveLoans: 'Owners have loans',
+      saltNetWeight: 'Salt Net Weight',
       loanInaya: 'Loan (Inaya) - LKR',
       loanShakira: 'Loan (Shakira) - LKR',
       income: 'Income',
@@ -113,7 +114,8 @@ export default function App(){
       expenseContractor: 'ஒப்பந்ததாரர் செலவுகளை செலுத்துகிறார்',
       addExpenses: '+ செலவுகளை சேர்க்க',
       remove: 'அகற்று',
-      bothOwnersHaveLoans: 'இரு உரிமையாளர்களுக்கும் கடன் உள்ளது',
+      bothOwnersHaveLoans: 'உரிமையாளர்களுக்கு கடன் உள்ளது',
+      saltNetWeight: 'உப்பு நிகர எடை',
       loanInaya: 'கடன் (இனயா) - LKR',
       loanShakira: 'கடன் (ஷாக்கீரா) - LKR',
       income: 'வருவாய்',
@@ -277,6 +279,10 @@ export default function App(){
                     <strong className="text-gray-900">{results.netBags}</strong>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-gray-600">{t('saltNetWeight')}:</span>
+                    <strong className="text-gray-900">{formatKg(results.netBags * 50)}</strong>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-gray-600">{t('initialPrice')}:</span>
                     <strong className="text-gray-900">{formatLKR(results.initialPrice)}</strong>
                   </div>
@@ -330,6 +336,7 @@ export default function App(){
                 <div className="section">
                 <h2>{t('summary')}</h2>
                 <div className="row"><div className="muted">{t('netBags')}</div><div className="value">{results.netBags}</div></div>
+                <div className="row"><div className="muted">{t('saltNetWeight')}</div><div className="value">{formatKg(results.netBags * 50)}</div></div>
                 <div className="row"><div className="muted">{t('pricePerBag')}</div><div className="value">{formatLKR(inputs.pricePerBag)}</div></div>
                 <div className="row"><div className="muted">{t('initialPrice')}</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
                 <div className="row"><div className="muted">{t('cashReceived')}</div><div className="value">{formatLKR(inputs.cashReceived)}</div></div>

@@ -35,19 +35,21 @@ export function computeAll(inputs) {
   const initialPrice = netBags * pricePerBag
 
   // contractor_total_spent
-  // Use total packed bags for contractor per-bag wage/cost calculations as requested:
-  // (Packing Wage × packedBags) + (Bag Cost × packedBags) + Other Expenses (if owners pay expenses)
-  // Treat any missing/blank inputs as 0 via safeNum above.
+  // Allow a manual override: if the user provides `contractorTotalSpentManual` then
+  // use that value directly (treats contractor expenses as strictly user-controlled).
+  // Otherwise compute from per-bag rates and other expenses as before.
   const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0)
 
   // total loan (sum of both owners' loans)
   const totalLoan = loanInaya + loanShakira
 
   // grand total received (conditional on expense payment responsibility)
-  // If owners pay expenses: (InitialPrice + ContractorSpent - TotalLoan)
-  // If contractor pays expenses: (InitialPrice - ContractorSpent - TotalLoan)
+  // Grand total received (conditional on expense payment responsibility)
+  // If owners pay expenses: owners cover contractor expenses, so treat Grand Total
+  // as InitialPrice minus TotalLoan (do not add/subtract contractor spent here).
+  // If contractor pays expenses: subtract contractor spent and loans.
   const grandTotalReceived = (expensePayment === 'owners')
-    ? (initialPrice + contractorTotalSpent - totalLoan)
+    ? (initialPrice - totalLoan)
     : (initialPrice - contractorTotalSpent - totalLoan)
 
   // contractor_share
@@ -145,4 +147,12 @@ export function computeAll(inputs) {
 export function formatLKR(n) {
   const num = Number(n) || 0
   return `LKR ${num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+}
+
+// Format weight in kilograms with locale-aware separators and unit suffix
+export function formatKg(value) {
+  const num = Number(value) || 0
+  const rounded = Math.round(num * 100) / 100
+  const opts = Number.isInteger(rounded) ? { minimumFractionDigits: 0, maximumFractionDigits: 0 } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+  return `${rounded.toLocaleString('en-US', opts)} kg`
 }
