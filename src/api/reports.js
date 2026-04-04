@@ -1,3 +1,5 @@
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient.js'
+
 export async function saveReport(payload) {
   const res = await fetch('/.netlify/functions/saveReport', {
     method: 'POST',
@@ -22,11 +24,34 @@ export async function getReports() {
   return res.json()
 }
 
-export async function saveReportToSupabase(payload) {
+export async function saveReportToSupabase(payload, session) {
+  if (isSupabaseConfigured && supabase && session?.user?.id) {
+    const record = {
+      user_id: session.user.id,
+      user_email: session.user.email || null,
+      payload,
+    }
+
+    const { data, error } = await supabase
+      .from('reports')
+      .insert(record)
+      .select('*')
+
+    if (error) {
+      throw error
+    }
+
+    return { ok: true, inserted: data }
+  }
+
   const res = await fetch('/.netlify/functions/saveReportSupabase', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      payload,
+      userId: session?.user?.id || null,
+      userEmail: session?.user?.email || null,
+    }),
   })
   if (!res.ok) {
     const text = await res.text()
@@ -36,7 +61,25 @@ export async function saveReportToSupabase(payload) {
   return res.json()
 }
 
-export async function getReportsFromSupabase() {
+export async function getReportsFromSupabase(session) {
+  if (isSupabaseConfigured && supabase && session?.user?.id) {
+    const { data, error } = await supabase
+      .from('reports')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      throw error
+    }
+
+    return { ok: true, reports: data || [] }
+  }
+
+  if (isSupabaseConfigured) {
+    return { ok: true, reports: [] }
+  }
+
   const res = await fetch('/.netlify/functions/getReportsSupabase')
   if (!res.ok) {
     const text = await res.text()

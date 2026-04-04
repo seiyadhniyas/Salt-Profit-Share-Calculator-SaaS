@@ -1,6 +1,6 @@
 # Salt Profit Share Calculator
 
-A small React + Vite web app to calculate profit share between two owners (Inaya and Shakira) for packed salt sales. It supports contractor expenses, extra expenses, loans, Zakat (5%), PDF export, and basic report persistence (localStorage and serverless examples).
+A small React + Vite web app to calculate profit share between two owners (Inaya and Shakira) for packed salt sales. It supports contractor expenses, extra expenses, loans, Zakat (5%), PDF export, basic report persistence, and a Supabase-powered member dashboard with popup authentication.
 
 ## Highlights
 
@@ -9,6 +9,7 @@ A small React + Vite web app to calculate profit share between two owners (Inaya
 - Optional per-owner loans and Zakat calculation
 - Printable PDF summary (jsPDF + html2canvas)
 - Save/load reports locally; Netlify/Supabase examples included for server persistence
+- Supabase auth modal + dashboard shell for member workspaces
 
 ## Tech Stack
 
@@ -52,9 +53,11 @@ npm run preview -- --port 5174
 ## Deploying to Netlify
 
 1. Create a new site in Netlify and connect this GitHub repo or deploy manually.
-2. Set environment variables if using Supabase (do NOT expose service role keys in client code):
-   - `SUPABASE_URL`
-   - `SUPABASE_KEY` (use server-side only)
+3. Copy `.env.example` to `.env.local` and set the environment variables:
+   - `VITE_SUPABASE_URL` for browser auth/dashboard
+   - `VITE_SUPABASE_ANON_KEY` or `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY` for browser auth/dashboard
+   - `SUPABASE_URL` for serverless functions
+   - `SUPABASE_KEY` for serverless functions only (service role or privileged server key)
 3. Build command: `npm run build`
 4. Publish directory: `dist`
 5. Functions directory: `netlify/functions`
@@ -63,7 +66,7 @@ The repository already contains `netlify.toml` and example functions to help get
 
 ## Supabase (optional)
 
-If you plan to persist reports in Supabase, run the SQL file in `supabase/create_reports_table.sql` to create the `reports` table. Configure the Supabase REST endpoint and use a secure, server-only key inside your serverless functions.
+If you plan to persist reports in Supabase, run the SQL file in `supabase/create_reports_table.sql` to create the `profiles` and `reports` tables, enable row-level security, and configure the auth trigger. The browser client uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` or `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY`; serverless fallbacks use `SUPABASE_URL` and `SUPABASE_KEY`.
 
 ## How to use the app
 

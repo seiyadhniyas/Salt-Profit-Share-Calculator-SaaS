@@ -16,9 +16,12 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body || '{}')
-    // expect payload: { inputs, results }
+    // expect payload: { payload, userId, userEmail }
+    const payload = body.payload || body
     const record = {
-      payload: body,
+      user_id: body.userId || null,
+      user_email: body.userEmail || null,
+      payload,
       created_at: new Date().toISOString()
     }
 

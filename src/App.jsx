@@ -1,11 +1,14 @@
 import React, {useEffect, useState, useRef} from 'react'
 import InputSection from './components/InputSection.jsx'
 import ResultSection from './components/ResultSection.jsx'
+import DashboardSummary from './components/DashboardSummary.jsx'
+import AuthModal from './components/AuthModal.jsx'
 import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase } from './api/reports.js'
 import { useCallback } from 'react'
+import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
 
 const STORAGE_KEY = 'salt_profit_share_last'
 
@@ -154,24 +157,61 @@ export default function App(){
 
   const [inputs, setInputs] = useState(defaultInputs)
   const [results, setResults] = useState(null)
+  const [session, setSession] = useState(null)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState('signin')
+  const [menuOpen, setMenuOpen] = useState(false)
   const rootRef = useRef()
   const printRef = useRef()
   const [reports, setReports] = useState([])
 
-  const loadReports = useCallback(async () => {
+  const loadReports = useCallback(async (activeSession = session) => {
     try {
-      const r = await getReportsFromSupabase().catch(() => null)
+      const r = await getReportsFromSupabase(activeSession).catch(() => null)
       if (r && r.ok) {
         setReports(r.reports || [])
       } else {
         // try fallback endpoint
-        const r2 = await fetch('/.netlify/functions/getReports').then(res => res.json()).catch(() => null)
+        const fallbackUrl = activeSession?.user?.id
+          ? `/.netlify/functions/getReportsSupabase?userId=${encodeURIComponent(activeSession.user.id)}`
+          : '/.netlify/functions/getReports'
+        const r2 = await fetch(fallbackUrl).then(res => res.json()).catch(() => null)
         if (r2 && r2.ok) setReports(r2.reports || [])
       }
     } catch (e) {
       console.error(e)
     }
+  }, [session])
+
+  useEffect(() => {
+    if (!supabase) {
+      return undefined
+    }
+
+    let alive = true
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (alive) {
+        setSession(data?.session || null)
+      }
+    })
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession || null)
+      if (!nextSession) {
+        setReports([])
+      }
+    })
+
+    return () => {
+      alive = false
+      authListener?.subscription?.unsubscribe()
+    }
   }, [])
+
+  useEffect(() => {
+    loadReports(session)
+  }, [session, loadReports])
 
   // load last from localStorage
   useEffect(()=>{
@@ -228,7 +268,7 @@ export default function App(){
     try {
       const payload = { inputs, results }
       // try Supabase-backed function first
-      const resp = await saveReportToSupabase(payload).catch(() => null)
+      const resp = await saveReportToSupabase(payload, session).catch(() => null)
       if (resp && resp.ok) {
         alert('Report saved to Supabase')
         return
@@ -246,6 +286,19 @@ export default function App(){
     }
   }
 
+  const handleOpenAuth = (mode = 'signin') => {
+    setAuthMode(mode)
+    setAuthModalOpen(true)
+  }
+
+  const handleSignOut = async () => {
+    if (!supabase) return
+    await supabase.auth.signOut()
+    setSession(null)
+    setReports([])
+    setMenuOpen(false)
+  }
+
   const loadAndApplyReport = (report) => {
     try {
       const payload = report.payload || (report.inserted && report.inserted[0] && report.inserted[0].payload) || report
@@ -258,11 +311,25 @@ export default function App(){
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-xs lg:text-sm' : ''}`}>
       <div ref={rootRef} className="container-max">
-        <header className="mb-6 text-center">
-          <div className="flex items-center justify-center gap-4 mb-3">
-            <h1 className="text-4xl font-bold text-gray-800">{t('title')}</h1>
+        <header className="relative mb-6 rounded-3xl border border-white/70 bg-white/80 px-4 pb-5 pt-16 shadow-sm backdrop-blur-sm sm:px-6 sm:pb-6 sm:pt-5">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-6 sm:top-5"
+            aria-label="Open dashboard menu"
+          >
+            <span className="text-lg leading-none">☰</span>
+            <span className="hidden sm:inline">Dashboard</span>
+          </button>
+
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="text-3xl font-bold leading-tight text-gray-800 sm:text-4xl lg:text-5xl">
+              {t('title')}
+            </h1>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base">
+              {t('subtitle')}
+            </p>
           </div>
-          <p className="text-md text-gray-600 mt-2">{t('subtitle')}</p>
         </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -428,6 +495,49 @@ export default function App(){
             )}
           </div>
         </div>
+
+        {menuOpen && (
+          <div className="fixed inset-0 z-50">
+            <button
+              type="button"
+              className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
+              aria-label="Close dashboard menu"
+              onClick={() => setMenuOpen(false)}
+            />
+            <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-slate-200 bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Menu</p>
+                  <h2 className="mt-1 text-lg font-bold text-slate-900">Member Dashboard</h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-full px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="p-4">
+                <DashboardSummary
+                  session={session}
+                  reports={reports}
+                  isSupabaseConfigured={isSupabaseConfigured}
+                  onOpenAuth={() => handleOpenAuth('signin')}
+                  onSignOut={handleSignOut}
+                />
+              </div>
+            </aside>
+          </div>
+        )}
+
+        <AuthModal
+          open={authModalOpen}
+          mode={authMode}
+          onClose={() => setAuthModalOpen(false)}
+          onModeChange={setAuthMode}
+          onSuccess={() => setAuthModalOpen(false)}
+        />
       </div>
     </div>
   )

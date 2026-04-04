@@ -9,6 +9,7 @@
   status = 200
 
 [context.production.environment]
-# Set these in Netlify UI instead of committing secrets
+# Set server-side values in the Netlify UI instead of committing secrets.
+# Browser auth/dashboard variables should live in .env.local as VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY.
   SUPABASE_URL = "https://your-project.supabase.co"
   SUPABASE_KEY = "<YOUR_SUPABASE_SERVICE_ROLE_OR_API_KEY>"

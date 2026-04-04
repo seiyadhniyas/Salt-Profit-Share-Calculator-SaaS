@@ -16,7 +16,9 @@ exports.handler = async function(event) {
 
   try {
     const selectUrl = new URL('/rest/v1/reports', SUPABASE_URL)
-    const res = await fetch(selectUrl.toString() + '?select=*', {
+    const userId = event.queryStringParameters && event.queryStringParameters.userId
+    const query = userId ? `?select=*&user_id=eq.${encodeURIComponent(userId)}` : '?select=*'
+    const res = await fetch(selectUrl.toString() + query, {
       method: 'GET',
       headers: {
         'apikey': SUPABASE_KEY,
