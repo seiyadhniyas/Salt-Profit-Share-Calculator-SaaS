@@ -81,6 +81,7 @@ export default function App(){
       totalDistributed: 'Total Distributed',
         enterValues: 'Enter values to see summary',
         toggleLoansHint: 'Toggle checkbox above to add loans',
+        cashAutoHint: 'Auto-filled from Net Bags × Price per Bag; edit to override',
         extraExpenses: 'Extra Expenses',
       locationLabel: 'Location',
       load: 'Load',
@@ -139,6 +140,7 @@ export default function App(){
       totalDistributed: 'மொத்த வீதம்',
       extraExpenses: 'மேலும் செலவுகள்',
       toggleLoansHint: 'கடன்களைச் சேர்க்க மேல் குறிப்பு பெட்டியை அழுத்தவும்',
+      cashAutoHint: 'நிகர பைகள் × ஒரு பையின் விலை மூலம் தானாக நிரப்பப்படுகிறது; மாற்ற வேண்டும் என்றால் மாற்றுங்கள்',
       locationLabel: 'இடம்',
       load: 'ஏற்று',
       inayaZakat: 'இனாயாவின் ஜக்கத் (5%)',
@@ -197,7 +199,7 @@ export default function App(){
   }
 
   const toggleLoans = (val) => {
-    setInputs(prev => ({...prev, bothOwnersHaveLoans: !!val, loanInaya: prev.loanInaya || 0, loanShakira: prev.loanShakira || 0}))
+    setInputs(prev => ({...prev, bothOwnersHaveLoans: !!val}))
   }
 
   const downloadPDF = async () => {

@@ -25,7 +25,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
   const onChange = (name, val) => {
     setInput(prev => ({ ...prev, [name]: val }))
-    // Track if user manually sets Cash Received
+    // Track if user manually sets Cash Received so we don't override it
     if (name === 'cashReceived' && val !== '') {
       setCashReceivedManuallySet(true)
     }
@@ -192,6 +192,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 {t('income')}</h4>
             <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} />
+            <div className="text-xs text-gray-500 mt-1">{t ? t('cashAutoHint') : 'Auto-filled from Net Bags × Price per Bag; edit to override'}</div>
             <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} decimals={2} />
           </div>
         </div>
