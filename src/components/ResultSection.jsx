@@ -12,9 +12,9 @@ function StatRow({label, value, isNegative}){
     <div className="py-2 px-3 rounded hover:bg-gray-50 transition">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <div className="text-sm text-gray-700">{main}</div>
+          <div className="text-sm text-gray-700 font-bold">{main}</div>
           {hasBracket && (
-            <div className="text-xs text-gray-500 mt-1 sm:mt-0">{sub}</div>
+            <div className="text-xs text-gray-500 font-bold mt-1 sm:mt-0">{sub}</div>
           )}
         </div>
         <div className={`mt-2 sm:mt-0 font-semibold ${isNegative ? 'text-red-600' : 'text-gray-900'}`}>{value}</div>
