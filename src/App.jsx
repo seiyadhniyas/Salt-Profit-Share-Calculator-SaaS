@@ -52,16 +52,17 @@ export default function App(){
     } catch { return 50 }
   })
 
-  // Disaster Recovery state
-  const [disasterRecovery, setDisasterRecovery] = useState({
-    lossQuantity: '',
-    lossUnit: 'bags',
-    pondsReconstruction: '',
-    hutReconstruction: '',
-    electricityBills: '',
-    compensationReceived: '',
-    donationsReceived: '',
-  })
+    // Disaster Recovery state
+    const [showDisasterRecovery, setShowDisasterRecovery] = useState(false)
+    const [disasterRecovery, setDisasterRecovery] = useState({
+      lossQuantity: '',
+      lossUnit: 'bags',
+      pondsReconstruction: '',
+      hutReconstruction: '',
+      electricityBills: '',
+      compensationReceived: '',
+      donationsReceived: '',
+    })
 
   // Persist customLocations to localStorage
   useEffect(() => {
@@ -90,6 +91,23 @@ export default function App(){
       inputData: 'Input Data',
       reset: '🔄 Reset',
       totalSaltPackedBags: 'Total Salt Packed Bags',
+        // Disaster Recovery
+        disasterRecovery: 'Disaster Recovery Expenses',
+        addDisasterRecovery: '+ Add Disaster Recovery Expenses',
+        lossQuantity: 'Loss Quantity of Salt',
+        lossQuantityPlaceholder: 'e.g. 100',
+        bags: 'Bags',
+        kg: 'kg',
+        pondsReconstruction: 'Ponds Reconstruction (LKR)',
+        pondsReconstructionPlaceholder: 'e.g. 50000',
+        hutReconstruction: 'Hut Reconstruction (LKR)',
+        hutReconstructionPlaceholder: 'e.g. 20000',
+        electricityBills: 'Electricity Bills (LKR)',
+        electricityBillsPlaceholder: 'e.g. 5000',
+        compensationReceived: 'Compensation Received (LKR)',
+        compensationReceivedPlaceholder: 'e.g. 10000',
+        donationsReceived: 'Donations Received (LKR)',
+        donationsReceivedPlaceholder: 'e.g. 5000',
       deductedBags: 'Deducted Bags',
       pricePerBag: 'Salt Price per Bag (LKR)',
       cashReceived: 'Cash Received (LKR)',
@@ -299,27 +317,27 @@ export default function App(){
       adminAuthSuccess: 'Authentication Successful',
       adminAccess: 'Admin Access',
       adminLoginPrompt: 'Sign in with admin credentials to access the admin dashboard.',
-      // Disaster Recovery
-      disasterRecovery: 'Disaster Recovery Expenses',
-      addDisasterRecovery: '+ Add Disaster Recovery Expenses',
-      lossQuantity: 'Loss Quantity of Salt',
-      lossQuantityPlaceholder: 'e.g. 100',
-      bags: 'Bags',
-      kg: 'kg',
-      pondsReconstruction: 'Ponds Reconstruction (LKR)',
-      pondsReconstructionPlaceholder: 'e.g. 50000',
-      hutReconstruction: 'Hut Reconstruction (LKR)',
-      hutReconstructionPlaceholder: 'e.g. 20000',
-      electricityBills: 'Electricity Bills (LKR)',
-      electricityBillsPlaceholder: 'e.g. 5000',
-      compensationReceived: 'Compensation Received (LKR)',
-      compensationReceivedPlaceholder: 'e.g. 10000',
-      donationsReceived: 'Donations Received (LKR)',
-      donationsReceivedPlaceholder: 'e.g. 5000',
     },
     ta: {
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
       subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்ததாரர்களுக்கான நிதிக் கணக்கெழுத்து',
+        // Disaster Recovery
+        disasterRecovery: 'பேரழிவு மீட்பு செலவுகள்',
+        addDisasterRecovery: '+ பேரழிவு மீட்பு செலவுகளைச் சேர்க்கவும்',
+        lossQuantity: 'உப்பின் இழப்பு அளவு',
+        lossQuantityPlaceholder: 'உதா. 100',
+        bags: 'பைகள்',
+        kg: 'கிலோ',
+        pondsReconstruction: 'குளங்கள் மறுசீரமைப்பு (ரூ.)',
+        pondsReconstructionPlaceholder: 'உதா. 50000',
+        hutReconstruction: 'குடிசை மறுசீரமைப்பு (ரூ.)',
+        hutReconstructionPlaceholder: 'உதா. 20000',
+        electricityBills: 'மின்சார கட்டணங்கள் (ரூ.)',
+        electricityBillsPlaceholder: 'உதா. 5000',
+        compensationReceived: 'பெறப்பட்ட இழப்பீடு (ரூ.)',
+        compensationReceivedPlaceholder: 'உதா. 10000',
+        donationsReceived: 'பெறப்பட்ட நன்கொடை (ரூ.)',
+        donationsReceivedPlaceholder: 'உதா. 5000',
       documentDetails: 'ஆவண விவரங்கள்',
       locationDay: 'இடம்',
       date: 'தேதி',
@@ -536,23 +554,6 @@ export default function App(){
       adminAuthSuccess: 'அங்கீகாரம் வெற்றிகரமாக',
       adminAccess: 'நிர்வாக அணுகல்',
       adminLoginPrompt: 'நிர்வாக டாஷ்போர்டைக் அணுக நிர்வாக நற்சான்றுகளில் உள்நுழையவும்.',
-      // Disaster Recovery
-      disasterRecovery: 'பேரிடர் மீட்பு செலவுகள்',
-      addDisasterRecovery: '+ பேரிடர் மீட்பு செலவுகளைச் சேர்க்கவும்',
-      lossQuantity: 'உப்பு இழப்পின் அளவு',
-      lossQuantityPlaceholder: 'எ.கா. 100',
-      bags: 'பைகள்',
-      kg: 'கிகி',
-      pondsReconstruction: 'குளங்கள் புनర्নितिर्माण (LKR)',
-      pondsReconstructionPlaceholder: 'எ.கா. 50000',
-      hutReconstruction: 'குடிலுக்கான புनर्നितिर्माण (LKR)',
-      hutReconstructionPlaceholder: 'எ.கா. 20000',
-      electricityBills: 'மின்சாரக் கட்டணங்கள் (LKR)',
-      electricityBillsPlaceholder: 'எ.கா. 5000',
-      compensationReceived: 'பெற்ற இழப்பீடு (LKR)',
-      compensationReceivedPlaceholder: 'எ.கா. 10000',
-      donationsReceived: 'பெற்ற தானங்கள் (LKR)',
-      donationsReceivedPlaceholder: 'எ.கா. 5000',
     }
   }
 
@@ -998,6 +999,7 @@ export default function App(){
         results,
         ownerNames,
         contractorSharePercentage,
+        disasterRecovery,
       }
       if (isProdSupabase) {
         const resp = await saveReportToSupabase(payload, session)
@@ -1100,6 +1102,17 @@ export default function App(){
     const extraExpensesTotal = Array.isArray(inputs.extraExpenses)
       ? inputs.extraExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
       : 0
+    // Disaster Recovery fields
+    const disasterRecovery = payload.disasterRecovery || {}
+    const drLossQty = Number(disasterRecovery.lossQuantity) || 0
+    const drPonds = Number(disasterRecovery.pondsReconstruction) || 0
+    const drHut = Number(disasterRecovery.hutReconstruction) || 0
+    const drElectricity = Number(disasterRecovery.electricityBills) || 0
+    const drCompensation = Number(disasterRecovery.compensationReceived) || 0
+    const drDonations = Number(disasterRecovery.donationsReceived) || 0
+    const totalDisasterExpenses = drPonds + drHut + drElectricity
+    const totalDisasterReceipts = drCompensation + drDonations
+
     const totalOperatingExpenses = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + otherExpenses + extraExpensesTotal
     const grossSales = Number(results.initialPrice) || 0
     const totalLoans = (Number(results.loanInaya) || 0) + (Number(results.loanShakira) || 0)
@@ -1112,6 +1125,10 @@ export default function App(){
       totalLoans,
       grossMargin,
       netProfit,
+      // Disaster Recovery
+      totalDisasterExpenses,
+      totalDisasterReceipts,
+      disasterRecovery,
     }
   }
 
@@ -1177,14 +1194,34 @@ export default function App(){
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} />
-            
-            {/* Disaster Recovery Pricing Card */}
-            <div className="mt-6">
-              <DisasterRecoveryCard
-                value={disasterRecovery}
-                onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
-                t={t}
-              />
+            {/* Disaster Recovery toggle and card */}
+            <div className="mt-4 flex flex-col items-center w-full">
+              {!showDisasterRecovery ? (
+                <button
+                  type="button"
+                  className="w-full max-w-md px-6 py-3 rounded-xl bg-rose-100 text-rose-700 font-semibold border border-rose-300 shadow hover:bg-rose-200 transition text-center flex items-center justify-center"
+                  style={{letterSpacing: 0.2, fontSize: '1.08rem'}} 
+                  onClick={() => setShowDisasterRecovery(true)}
+                >
+                  <span className="mx-auto">{t('addDisasterRecovery')}</span>
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="w-full max-w-md mb-2 px-6 py-2 rounded-xl bg-gray-100 text-gray-700 border border-gray-300 shadow hover:bg-gray-200 transition text-center flex items-center justify-center"
+                    style={{letterSpacing: 0.2, fontSize: '1.08rem'}}
+                    onClick={() => setShowDisasterRecovery(false)}
+                  >
+                    <span className="mx-auto">✕ {t('disasterRecovery')}</span>
+                  </button>
+                  <DisasterRecoveryCard
+                    value={disasterRecovery}
+                    onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
+                    t={t}
+                  />
+                </>
+              )}
             </div>
           </div>
 
@@ -1226,6 +1263,48 @@ export default function App(){
             )}
           </div>
         </div>
+
+
+        {/* Disaster Recovery P&L summary */}
+        {showDisasterRecovery && (
+          <div className="mt-8 mb-8">
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 shadow-xl">
+              <h3 className="text-lg font-bold text-rose-900 mb-3 flex items-center gap-2">
+                <span>🌊</span> {t('disasterRecovery')}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-rose-800 font-semibold mb-1">{t('pondsReconstruction')}</div>
+                  <div>{disasterRecovery.pondsReconstruction || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-rose-800 font-semibold mb-1">{t('hutReconstruction')}</div>
+                  <div>{disasterRecovery.hutReconstruction || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-rose-800 font-semibold mb-1">{t('electricityBills')}</div>
+                  <div>{disasterRecovery.electricityBills || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-rose-800 font-semibold mb-1">{t('compensationReceived')}</div>
+                  <div>{disasterRecovery.compensationReceived || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-rose-800 font-semibold mb-1">{t('donationsReceived')}</div>
+                  <div>{disasterRecovery.donationsReceived || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-rose-800 font-semibold mb-1">{t('lossQuantity')}</div>
+                  <div>{disasterRecovery.lossQuantity || '-'} {t(disasterRecovery.lossUnit || 'bags')}</div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-col md:flex-row gap-4">
+                <div className="text-rose-900 font-bold">{t('disasterRecovery')} {t('totalExpenses', 'Total Expenses')}: <span className="font-mono">{disasterRecovery.pondsReconstruction || 0 + disasterRecovery.hutReconstruction || 0 + disasterRecovery.electricityBills || 0}</span></div>
+                <div className="text-rose-900 font-bold">{t('disasterRecovery')} {t('totalIncome', 'Total Receipts')}: <span className="font-mono">{disasterRecovery.compensationReceived || 0 + disasterRecovery.donationsReceived || 0}</span></div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {results && <ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} />}
 
