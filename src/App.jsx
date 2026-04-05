@@ -1488,27 +1488,28 @@ export default function App(){
         </div>
 
         {menuOpen && (
-          <div className="fixed inset-0 z-50">
+          <div className="fixed inset-0 z-[100] flex justify-end">
             <button
               type="button"
-              className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
+              className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
               aria-label={t('closeDashboardMenu')}
               onClick={() => setMenuOpen(false)}
             />
-            <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-slate-200 bg-white shadow-2xl">
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <aside className="relative h-full w-full sm:w-[500px] md:w-[650px] lg:w-[850px] xl:w-[1000px] bg-white shadow-2xl overflow-y-auto animate-slideInRight border-l border-slate-200">
+              <div className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur px-6 py-5">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900">{t('memberDashboard')}</h2>
+                  <h2 className="text-xl font-black text-slate-900 tracking-tight">{t('memberDashboard')}</h2>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-0.5">{t('billingAccess')}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-full px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                  className="rounded-2xl bg-slate-100 p-3 text-slate-500 transition hover:bg-slate-900 hover:text-white active:scale-90"
                 >
-                  {t('close')}
+                  <span className="text-lg">✕</span>
                 </button>
               </div>
-              <div className="p-4">
+              <div className="p-4 sm:p-8">
                 <DashboardSummary
                   session={session}
                   reports={reports}
