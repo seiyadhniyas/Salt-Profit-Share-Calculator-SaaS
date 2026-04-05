@@ -62,7 +62,9 @@ export default function DashboardSummary({
   const [reportsOpen, setReportsOpen] = useState(false)
   const [newLocation, setNewLocation] = useState('')
   const fileRows = Array.isArray(savedFiles) ? savedFiles : []
-  const hasOwnerNames = Boolean(ownerNames?.[0] || ownerNames?.[1])
+  const ownerNamesCount = Array.isArray(ownerNames)
+    ? ownerNames.map(name => String(name || '').trim()).filter(Boolean).length
+    : 0
 
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
@@ -235,7 +237,7 @@ export default function DashboardSummary({
             <div className="flex flex-col gap-4 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-                  {tr('reports', 'Reports')} ({hasOwnerNames ? `2 ${tr('owners', 'Owners')}` : tr('noOwnersSet', 'No owners set')})
+                  {tr('reports', 'Reports')} ({ownerNamesCount > 0 ? `${ownerNamesCount} ${tr('owners', 'Owners')}` : tr('noOwnersSet', 'No owners set')})
                 </div>
                 <div className="mt-3 text-2xl font-bold text-slate-900">{reportsCount}</div>
                 <div className="text-sm text-slate-500">{lastReportDate && lastReportDate !== tr('noReportsYet', 'No reports yet') ? `${tr('lastSync', 'Last sync')}: ${lastReportDate}` : tr('saveReportToPopulate', 'Save a report to populate the list')}</div>

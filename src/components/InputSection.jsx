@@ -20,7 +20,8 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   )
 }
 
-export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''] }) {
+export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2 }) {
+  const isSingleOwner = ownerCount === 1
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
 
   const onChange = (name, val) => {
@@ -223,14 +224,16 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
               className="h-4 w-4 text-blue-600 rounded cursor-pointer"
             />
             <label htmlFor="toggleLoans" className="font-medium text-gray-700 cursor-pointer">
-              💳 {t ? t('bothOwnersHaveLoans') : 'Both owners have loans'}
+              💳 {t ? t(isSingleOwner ? 'oneOwnerHasLoan' : 'bothOwnersHaveLoans') : (isSingleOwner ? 'Owner has loan' : 'Both owners have loans')}
             </label>
           </div>
 
           {inputs.bothOwnersHaveLoans && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`grid grid-cols-1 ${isSingleOwner ? '' : 'md:grid-cols-2'} gap-6`}>
               <NumberInput label={`${t ? t('loan') : 'Loan'} (${ownerNames?.[0] || `${t ? t('owner') : 'Owner'} 1`}) - LKR`} name="loanInaya" value={inputs.loanInaya} onChange={onChange} decimals={2} />
-              <NumberInput label={`${t ? t('loan') : 'Loan'} (${ownerNames?.[1] || `${t ? t('owner') : 'Owner'} 2`}) - LKR`} name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
+              {!isSingleOwner && (
+                <NumberInput label={`${t ? t('loan') : 'Loan'} (${ownerNames?.[1] || `${t ? t('owner') : 'Owner'} 2`}) - LKR`} name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
+              )}
             </div>
           )}
 

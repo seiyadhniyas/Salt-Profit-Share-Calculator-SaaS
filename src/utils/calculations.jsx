@@ -12,6 +12,7 @@ const safeNum = (v) => {
 // Options: { contractorSharePercentage: 0-100 } (default 50)
 export function computeAll(inputs, options = {}) {
   const contractorSharePercentage = Math.max(0, Math.min(100, options?.contractorSharePercentage ?? 50))
+  const ownerCount = options?.ownerCount === 1 ? 1 : 2
   const contractorShareFactor = contractorSharePercentage / 100
   const ownerShareFactor = 1 - contractorShareFactor
   
@@ -30,7 +31,7 @@ export function computeAll(inputs, options = {}) {
   const totalOtherExpenses = otherExpenses + extraExpensesTotal
   const expensePayment = inputs.expensePayment || 'owners'
   const loanInaya = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanInaya) : 0
-  const loanShakira = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanShakira) : 0
+  const loanShakira = (ownerCount === 2 && inputs.bothOwnersHaveLoans) ? safeNum(inputs.loanShakira) : 0
 
   // net bags
   const netBagsRaw = packedBags - deductedBags
@@ -74,46 +75,46 @@ export function computeAll(inputs, options = {}) {
     : ((grandTotalReceived + totalLoan) * ownerShareFactor)
 
   // general_share_per_owner
-  const generalSharePerOwner = ownerPool / 2
+  const generalSharePerOwner = ownerPool / ownerCount
 
   // raw final shares
   let finalInayaRaw = generalSharePerOwner - loanInaya
-  let finalShakiraRaw = generalSharePerOwner - loanShakira
+  let finalShakiraRaw = ownerCount === 2 ? (generalSharePerOwner - loanShakira) : 0
 
   // Prevent negative values: if result < 0 -> show 0 (we'll clamp)
   let finalInaya = Math.max(0, finalInayaRaw)
-  let finalShakira = Math.max(0, finalShakiraRaw)
+  let finalShakira = ownerCount === 2 ? Math.max(0, finalShakiraRaw) : 0
 
   // Validation: ensure final_inaya + final_shakira + contractor_share == grand_total_received
   // This is critical when contractor pays expenses or when clamping causes the sum to mismatch
-  const sumAll = finalInaya + finalShakira + contractorShare
+  const sumAll = finalInaya + (ownerCount === 2 ? finalShakira : 0) + contractorShare
   const totalDiff = grandTotalReceived - sumAll
 
   if (Math.abs(totalDiff) > 0.0001) {
     // Distribute the difference to the owner with LOWER loan
     const aLoan = loanInaya
-    const bLoan = loanShakira
-    if (aLoan <= bLoan) {
+    const bLoan = ownerCount === 2 ? loanShakira : Number.POSITIVE_INFINITY
+    if (aLoan <= bLoan || ownerCount === 1) {
       finalInaya += totalDiff
     } else {
       finalShakira += totalDiff
     }
     // Clamp to prevent negative final shares
     finalInaya = Math.max(0, finalInaya)
-    finalShakira = Math.max(0, finalShakira)
+    finalShakira = ownerCount === 2 ? Math.max(0, finalShakira) : 0
   }
 
   // Zakat: 5% of each final share (before zakat)
   const zakatInaya = finalInaya * 0.05
-  const zakatShakira = finalShakira * 0.05
+  const zakatShakira = ownerCount === 2 ? finalShakira * 0.05 : 0
   const finalInayaAfterZakat = Math.max(0, finalInaya - zakatInaya)
-  const finalShakiraAfterZakat = Math.max(0, finalShakira - zakatShakira)
+  const finalShakiraAfterZakat = ownerCount === 2 ? Math.max(0, finalShakira - zakatShakira) : 0
 
   // Prepare flags for negative/raw highlighting (before clamp)
   const highlights = {
     ownerPoolNegative: ownerPool < 0,
     finalInayaNegative: finalInayaRaw < 0,
-    finalShakiraNegative: finalShakiraRaw < 0,
+    finalShakiraNegative: ownerCount === 2 ? finalShakiraRaw < 0 : false,
   }
 
   // Helper to round decimal values to 2 places (currency)
@@ -136,6 +137,7 @@ export function computeAll(inputs, options = {}) {
     loanShakira: round2(loanShakira),
     contractorTotalSpent: round2(contractorTotalSpent),
     contractorShare: round2(contractorShare),
+    ownerCount,
     expensePayment,
     ownerPool: round2(ownerPool),
     generalSharePerOwner: round2(generalSharePerOwner),

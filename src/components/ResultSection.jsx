@@ -23,11 +23,12 @@ function StatRow({label, value, isNegative}){
   )
 }
 
-export default function ResultSection({results, t, ownerNames = ['', '']}){
+export default function ResultSection({results, t, ownerNames = ['', ''], ownerCount = 2}){
   if(!results) return null
   
   const owner1Name = (ownerNames && ownerNames[0]) || `${t ? t('owner') : 'Owner'} 1`
   const owner2Name = (ownerNames && ownerNames[1]) || `${t ? t('owner') : 'Owner'} 2`
+  const isSingleOwner = ownerCount === 1
 
   return (
     <div className="mt-6">
@@ -56,7 +57,7 @@ export default function ResultSection({results, t, ownerNames = ['', '']}){
               value={formatLKR(results.ownerPool)}
               isNegative={results.highlights.ownerPoolNegative}
             />
-            <StatRow label={t ? (t('perOwnerShare') + ' (' + t('ownerPool') + '/2)') : 'Per Owner Share (Owners Group Amount/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
+            <StatRow label={isSingleOwner ? (t ? t('ownerPool') : 'Owners Group Amount') : (t ? (t('perOwnerShare') + ' (' + t('ownerPool') + '/2)') : 'Per Owner Share (Owners Group Amount/2)')} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
             <div className="my-2 border-t"></div>
             <StatRow label={t ? `${t('societyServiceCharge')} (${t('netBags')} × 100)` : 'Society Service Charge (Net Bags × 100)'} value={formatLKR(results.netBags * 100)} isNegative={false} />
             <StatRow label={t ? t('societyServiceReserved30') : 'Society Service Reserved 30%'} value={formatLKR((results.netBags * 100) * 0.30)} isNegative={false} />
@@ -82,28 +83,30 @@ export default function ResultSection({results, t, ownerNames = ['', '']}){
               )}
             </div>
 
-            <div className="rounded-lg p-4" style={{ backgroundColor: '#bcfaea' }}>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">{owner2Name} - {t ? t('finalShare') : 'Final Share'}</span>
-                {results.loanShakira > 0 && (
-                  <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">{t ? t('loan') : 'Loan'}: {formatLKR(results.loanShakira)}</span>
+            {!isSingleOwner && (
+              <div className="rounded-lg p-4" style={{ backgroundColor: '#bcfaea' }}>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-700">{owner2Name} - {t ? t('finalShare') : 'Final Share'}</span>
+                  {results.loanShakira > 0 && (
+                    <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">{t ? t('loan') : 'Loan'}: {formatLKR(results.loanShakira)}</span>
+                  )}
+                </div>
+                <div className={`text-2xl font-bold ${results.highlights.finalShakiraNegative ? 'text-red-600' : 'text-green-600'}`}>
+                  {formatLKR(results.finalShakira)}
+                </div>
+                {results.highlights.finalShakiraNegative && (
+                  <p className="text-xs text-red-600 mt-2">⚠️ {t ? t('lossDetected') : 'Loss detected'}</p>
                 )}
               </div>
-              <div className={`text-2xl font-bold ${results.highlights.finalShakiraNegative ? 'text-red-600' : 'text-green-600'}`}>
-                {formatLKR(results.finalShakira)}
-              </div>
-              {results.highlights.finalShakiraNegative && (
-                <p className="text-xs text-red-600 mt-2">⚠️ {t ? t('lossDetected') : 'Loss detected'}</p>
-              )}
-            </div>
+            )}
 
             <div className="rounded-lg p-3 mt-3" style={{ backgroundColor: '#ffc6b1' }}>
                 <div className="flex justify-between">
                 <span className="text-sm text-gray-700">{t ? t('totalDistributed') : 'Total Distributed'}</span>
-                <strong className="text-gray-900">{formatLKR(results.finalInaya + results.finalShakira)}</strong>
+                <strong className="text-gray-900">{formatLKR(results.finalInaya + (isSingleOwner ? 0 : results.finalShakira))}</strong>
               </div>
               <div className="my-2 border-t"></div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className={`grid ${isSingleOwner ? 'grid-cols-2' : 'grid-cols-2'} gap-4`}>
                 <div>
                   <div className="text-xs text-gray-600">{owner1Name} {t ? t('zakatLabel') : 'Zakat (5%)'}</div>
                   <div className="font-semibold">{formatLKR(results.zakatInaya)}</div>
@@ -112,14 +115,18 @@ export default function ResultSection({results, t, ownerNames = ['', '']}){
                   <div className="text-xs text-gray-600">{owner1Name} {t ? t('afterZakatLabel') : 'After Zakat'}</div>
                   <div className="font-semibold">{formatLKR(results.finalInayaAfterZakat)}</div>
                 </div>
-                <div>
-                  <div className="text-xs text-gray-600">{owner2Name} {t ? t('zakatLabel') : 'Zakat (5%)'}</div>
-                  <div className="font-semibold">{formatLKR(results.zakatShakira)}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-600">{owner2Name} {t ? t('afterZakatLabel') : 'After Zakat'}</div>
-                  <div className="font-semibold">{formatLKR(results.finalShakiraAfterZakat)}</div>
-                </div>
+                {!isSingleOwner && (
+                  <>
+                    <div>
+                      <div className="text-xs text-gray-600">{owner2Name} {t ? t('zakatLabel') : 'Zakat (5%)'}</div>
+                      <div className="font-semibold">{formatLKR(results.zakatShakira)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600">{owner2Name} {t ? t('afterZakatLabel') : 'After Zakat'}</div>
+                      <div className="font-semibold">{formatLKR(results.finalShakiraAfterZakat)}</div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

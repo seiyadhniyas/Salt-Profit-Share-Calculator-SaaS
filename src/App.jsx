@@ -91,6 +91,7 @@ export default function App(){
       addExpenses: '+ add expenses',
       remove: 'Remove',
       bothOwnersHaveLoans: 'Owners have loans',
+      oneOwnerHasLoan: 'Owner has loan',
       saltNetWeight: 'Salt Net Weight',
       loanInaya: 'Loan (Inaya) - LKR',
       loanShakira: 'Loan (Shakira) - LKR',
@@ -270,6 +271,7 @@ export default function App(){
       addExpenses: '+ செலவுகளை சேர்க்க',
       remove: 'அகற்று',
       bothOwnersHaveLoans: 'உரிமையாளர்களுக்கு கடன் உள்ளது',
+      oneOwnerHasLoan: 'உரிமையாளருக்கு கடன் உள்ளது',
       saltNetWeight: 'உப்பு நிகர எடை',
       loanInaya: 'கடன் (இனயா) - LKR',
       loanShakira: 'கடன் (ஷாக்கீரா) - LKR',
@@ -440,6 +442,16 @@ export default function App(){
   const [savedFiles, setSavedFiles] = useState([])
   const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
 
+  const normalizedOwnerNames = Array.isArray(ownerNames)
+    ? ownerNames.map(name => String(name || '').trim()).filter(Boolean)
+    : []
+  const activeOwnerNames = normalizedOwnerNames.length >= 2
+    ? [normalizedOwnerNames[0], normalizedOwnerNames[1]]
+    : normalizedOwnerNames.length === 1
+      ? [normalizedOwnerNames[0], '']
+      : ['', '']
+  const ownerCount = normalizedOwnerNames.length === 1 ? 1 : 2
+
   const loadReports = useCallback(async (activeSession = session) => {
     if (isProdSupabase && !activeSession?.user?.id) {
       setReports([])
@@ -529,10 +541,17 @@ export default function App(){
 
   // compute on every input change or when contractor share percentage changes
   useEffect(()=>{
-    const res = computeAll(inputs, { contractorSharePercentage })
+    const res = computeAll(inputs, { contractorSharePercentage, ownerCount })
     setResults(res)
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs)) } catch(e){}
-  }, [inputs, contractorSharePercentage])
+  }, [inputs, contractorSharePercentage, ownerCount])
+
+  // Single-owner mode: ensure second owner loan does not affect persisted inputs/reports.
+  useEffect(() => {
+    if (ownerCount === 1 && Number(inputs.loanShakira || 0) !== 0) {
+      setInputs(prev => ({ ...prev, loanShakira: 0 }))
+    }
+  }, [ownerCount, inputs.loanShakira])
 
   const reset = () => {
     setInputs(defaultInputs)
@@ -808,7 +827,7 @@ export default function App(){
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={ownerNames} />
+            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} />
             {/* PDF button moved to bottom */}
           </div>
 
@@ -838,7 +857,7 @@ export default function App(){
                     <strong className="text-gray-900">{formatLKR(results.contractorShare)}</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('perOwnerShare')}:</span>
+                    <span className="text-gray-600">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}:</span>
                     <strong className="text-gray-900">{formatLKR(results.generalSharePerOwner)}</strong>
                   </div>
                 </div>
@@ -851,7 +870,7 @@ export default function App(){
           </div>
         </div>
 
-        {results && <ResultSection results={results} t={t} ownerNames={ownerNames} />}
+        {results && <ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} />}
 
         {/* Hidden/off-screen printable area (captures Summary -> Final Results) */}
         {results && (
@@ -897,31 +916,35 @@ export default function App(){
                   </div>
                 )}
                 <div className="row"><div className="muted">{t('contractorShare')}</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
-                <div className="row"><div className="muted">{t('perOwnerShare')}</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+                <div className="row"><div className="muted">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
               </div>
 
               <div className="section">
                 <h2>{t('calculationBreakdown')}</h2>
                 <div className="row"><div className="muted">{t('grandTotalReceived')}</div><div className="value">{formatLKR(results.grandTotalReceived)}</div></div>
                 <div className="row"><div className="muted">{t('ownerPool')}</div><div className="value">{formatLKR(results.ownerPool)}</div></div>
-                <div className="row"><div className="muted">{t('perOwnerShare')}</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+                <div className="row"><div className="muted">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
               </div>
 
               <div className="section">
                 <h2>{t('totalDistributedTitle')}</h2>
-                <div className="row"><div className="muted">{ownerNames?.[0] || `${t('owner')} 1`} - {t('finalShare')}</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[0] || `${t('owner')} 1`} - {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[0] || `${t('owner')} 1`} - {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
+                <div className="row"><div className="muted">{activeOwnerNames?.[0] || `${t('owner')} 1`} - {t('finalShare')}</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
+                <div className="row"><div className="muted">{activeOwnerNames?.[0] || `${t('owner')} 1`} - {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
+                <div className="row"><div className="muted">{activeOwnerNames?.[0] || `${t('owner')} 1`} - {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
 
                 <div style={{ height: '6pt' }}></div>
 
-                <div className="row"><div className="muted">{ownerNames?.[1] || `${t('owner')} 2`} - {t('finalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[1] || `${t('owner')} 2`} - {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[1] || `${t('owner')} 2`} - {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
+                {ownerCount === 2 && (
+                  <>
+                    <div className="row"><div className="muted">{activeOwnerNames?.[1] || `${t('owner')} 2`} - {t('finalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
+                    <div className="row"><div className="muted">{activeOwnerNames?.[1] || `${t('owner')} 2`} - {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
+                    <div className="row"><div className="muted">{activeOwnerNames?.[1] || `${t('owner')} 2`} - {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
+                  </>
+                )}
 
                 <div className="row" style={{ borderTop: '1px solid #ddd', paddingTop: '4pt', marginTop: '8pt' }}>
                   <div className="muted">{t('totalDistributed')}</div>
-                  <div className="value">{formatLKR(results.finalInaya + results.finalShakira)}</div>
+                  <div className="value">{formatLKR(results.finalInaya + (ownerCount === 2 ? results.finalShakira : 0))}</div>
                 </div>
               </div>
             </div>
