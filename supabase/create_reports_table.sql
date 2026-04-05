@@ -37,6 +37,35 @@ create table if not exists saved_files (
   updated_at timestamptz default now()
 );
 
+create table if not exists billing_profiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  trial_limit integer not null default 3,
+  trial_uses integer not null default 0,
+  payment_status text not null default 'trial' check (payment_status in ('trial', 'payment_pending_verification', 'active', 'payment_failed')),
+  full_access_enabled boolean not null default false,
+  last_payment_reference text,
+  last_payment_method text,
+  last_payment_amount numeric(12,2),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists payment_requests (
+  id bigserial primary key,
+  user_id uuid references auth.users(id) on delete cascade default auth.uid(),
+  user_email text,
+  amount_lkr numeric(12,2) not null default 30000,
+  currency text not null default 'lkr',
+  payment_method text not null check (payment_method in ('card', 'cash')),
+  stripe_session_id text,
+  stripe_payment_intent text,
+  status text not null default 'pending' check (status in ('pending', 'paid_pending_verification', 'verified_active', 'rejected', 'failed')),
+  metadata jsonb,
+  admin_notified boolean not null default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 insert into storage.buckets (id, name, public)
 values ('saved-files', 'saved-files', true)
 on conflict (id) do nothing;
@@ -44,6 +73,8 @@ on conflict (id) do nothing;
 alter table profiles enable row level security;
 alter table reports enable row level security;
 alter table saved_files enable row level security;
+alter table billing_profiles enable row level security;
+alter table payment_requests enable row level security;
 
 drop policy if exists "Profiles can read own row" on profiles;
 drop policy if exists "Profiles can insert own row" on profiles;
@@ -55,6 +86,11 @@ drop policy if exists "Saved files can read own rows" on saved_files;
 drop policy if exists "Saved files can insert own rows" on saved_files;
 drop policy if exists "Saved files can update own rows" on saved_files;
 drop policy if exists "Saved files can delete own rows" on saved_files;
+drop policy if exists "Billing profiles can read own row" on billing_profiles;
+drop policy if exists "Billing profiles can insert own row" on billing_profiles;
+drop policy if exists "Billing profiles can update own row" on billing_profiles;
+drop policy if exists "Payment requests can read own rows" on payment_requests;
+drop policy if exists "Payment requests can insert own rows" on payment_requests;
 
 create policy "Profiles can read own row"
   on profiles for select
@@ -96,10 +132,32 @@ create policy "Saved files can delete own rows"
   on saved_files for delete
   using (auth.uid() = user_id);
 
+create policy "Billing profiles can read own row"
+  on billing_profiles for select
+  using (auth.uid() = user_id);
+
+create policy "Billing profiles can insert own row"
+  on billing_profiles for insert
+  with check (auth.uid() = user_id);
+
+create policy "Billing profiles can update own row"
+  on billing_profiles for update
+  using (auth.uid() = user_id);
+
+create policy "Payment requests can read own rows"
+  on payment_requests for select
+  using (auth.uid() = user_id);
+
+create policy "Payment requests can insert own rows"
+  on payment_requests for insert
+  with check (auth.uid() = user_id);
+
 create index if not exists idx_reports_created_at on reports (created_at desc);
 create index if not exists idx_reports_user_id on reports (user_id, created_at desc);
 create index if not exists idx_saved_files_created_at on saved_files (created_at desc);
 create index if not exists idx_saved_files_user_id on saved_files (user_id, created_at desc);
+create index if not exists idx_payment_requests_user_id on payment_requests (user_id, created_at desc);
+create index if not exists idx_payment_requests_status on payment_requests (status, created_at desc);
 
 create policy "Storage files can read own objects"
   on storage.objects for select
@@ -134,9 +192,73 @@ begin
     coalesce(new.raw_user_meta_data ->> 'full_name', new.email)
   )
   on conflict (id) do nothing;
+
+  insert into public.billing_profiles (user_id)
+  values (new.id)
+  on conflict (user_id) do nothing;
+
   return new;
 end;
 $$;
+
+create or replace function public.consume_trial_use(p_user_id uuid)
+returns table (
+  allowed boolean,
+  trial_uses integer,
+  trial_limit integer,
+  remaining integer,
+  full_access_enabled boolean,
+  payment_status text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_profile billing_profiles%rowtype;
+begin
+  if auth.uid() is null or auth.uid() <> p_user_id then
+    raise exception 'Not authorized';
+  end if;
+
+  insert into billing_profiles (user_id)
+  values (p_user_id)
+  on conflict (user_id) do nothing;
+
+  select * into v_profile
+  from billing_profiles
+  where user_id = p_user_id
+  for update;
+
+  if v_profile.full_access_enabled then
+    return query
+      select true, v_profile.trial_uses, v_profile.trial_limit,
+             greatest(0, v_profile.trial_limit - v_profile.trial_uses),
+             v_profile.full_access_enabled, v_profile.payment_status;
+    return;
+  end if;
+
+  if v_profile.trial_uses < v_profile.trial_limit then
+    update billing_profiles
+      set trial_uses = v_profile.trial_uses + 1,
+          updated_at = now()
+      where user_id = p_user_id
+      returning * into v_profile;
+
+    return query
+      select true, v_profile.trial_uses, v_profile.trial_limit,
+             greatest(0, v_profile.trial_limit - v_profile.trial_uses),
+             v_profile.full_access_enabled, v_profile.payment_status;
+    return;
+  end if;
+
+  return query
+    select false, v_profile.trial_uses, v_profile.trial_limit,
+           0, v_profile.full_access_enabled, v_profile.payment_status;
+end;
+$$;
+
+grant execute on function public.consume_trial_use(uuid) to authenticated;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created

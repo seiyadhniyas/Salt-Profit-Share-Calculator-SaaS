@@ -7,6 +7,7 @@ import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFilesFromSupabase, savePdfFileToSupabase } from './api/reports.js'
+import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment } from './api/billing.js'
 import { useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
 
@@ -244,6 +245,26 @@ export default function App(){
       saveError: 'Save error',
       savePdf: '☁️ Save PDF',
       totalDistributedTitle: 'Total Distributed',
+      billingAccess: 'Billing & Access',
+      trialStatus: 'Trial Status',
+      fullVersionActive: 'Full version is active',
+      freeTrialUsed: 'Free trial used',
+      trialRemaining: 'Remaining',
+      activationPending: 'Payment received. Admin verification pending for activation.',
+      stripeFeeGlance: 'Stripe Fee Glance (Sri Lankan Cards)',
+      oneOffPrice: 'One-off Price',
+      estimatedCardFee: 'Estimated Card Fee',
+      estimatedTotal: 'Estimated Total',
+      feeDisclaimer: 'Actual Stripe fees may vary by issuer and card type.',
+      payByCard: 'Pay by Card (Stripe)',
+      submitCashRequest: 'Submit Cash Payment Request',
+      paymentSuccessPending: 'Payment completed. Admin has been notified. Activation will be enabled after verification.',
+      paymentCancelled: 'Payment was cancelled. You can try again any time.',
+      trialExpiredPayPrompt: 'Free trial is over. Please complete the one-off payment to continue premium actions.',
+      premiumAuthRequired: 'Please sign in to use trial and payment features.',
+      paymentRequestSubmitted: 'Cash payment request submitted. Admin has been notified for verification.',
+      checkoutStartFailed: 'Unable to start payment checkout',
+      cashRequestFailed: 'Unable to submit cash payment request',
     },
     ta: {
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
@@ -423,6 +444,26 @@ export default function App(){
       saveError: 'சேமிப்பு பிழை',
       savePdf: '☁️ PDF சேமி',
       totalDistributedTitle: 'மொத்த பகிர்வு',
+      billingAccess: 'கட்டணம் மற்றும் அணுகல்',
+      trialStatus: 'சோதனை நிலை',
+      fullVersionActive: 'முழு பதிப்பு செயல்பாட்டில் உள்ளது',
+      freeTrialUsed: 'இலவச சோதனை பயன்படுத்தியது',
+      trialRemaining: 'மீதமுள்ளது',
+      activationPending: 'கட்டணம் பெறப்பட்டது. செயற்படுத்த நிர்வாக சரிபார்ப்பு நிலுவையில் உள்ளது.',
+      stripeFeeGlance: 'Stripe கட்டண சுருக்கம் (இலங்கை கார்டுகள்)',
+      oneOffPrice: 'ஒருமுறை கட்டணம்',
+      estimatedCardFee: 'கணிக்கப்பட்ட கார்டு கட்டணம்',
+      estimatedTotal: 'கணிக்கப்பட்ட மொத்தம்',
+      feeDisclaimer: 'உண்மையான Stripe கட்டணம் கார்டு மற்றும் வங்கி வழங்குநரின்படி மாறலாம்.',
+      payByCard: 'கார்டு மூலம் கட்டணம் செலுத்து (Stripe)',
+      submitCashRequest: 'பண கட்டண கோரிக்கையை சமர்ப்பிக்கவும்',
+      paymentSuccessPending: 'கட்டணம் வெற்றிகரமாக முடிந்தது. நிர்வாகிக்கு அறிவிக்கப்பட்டது. சரிபார்ப்புக்குப் பிறகு செயற்படுத்தப்படும்.',
+      paymentCancelled: 'கட்டணம் ரத்து செய்யப்பட்டது. எப்போதும் மீண்டும் முயற்சி செய்யலாம்.',
+      trialExpiredPayPrompt: 'இலவச சோதனை முடிந்தது. தொடர ஒருமுறை கட்டணத்தை முடிக்கவும்.',
+      premiumAuthRequired: 'சோதனை மற்றும் கட்டண அம்சங்களை பயன்படுத்த தயவுசெய்து உள்நுழையவும்.',
+      paymentRequestSubmitted: 'பண கட்டண கோரிக்கை சமர்ப்பிக்கப்பட்டது. சரிபார்ப்புக்காக நிர்வாகிக்கு அறிவிக்கப்பட்டது.',
+      checkoutStartFailed: 'கட்டண செயல்முறையை தொடங்க முடியவில்லை',
+      cashRequestFailed: 'பண கட்டண கோரிக்கையை சமர்ப்பிக்க முடியவில்லை',
     }
   }
 
@@ -440,7 +481,12 @@ export default function App(){
   const printRef = useRef()
   const [reports, setReports] = useState([])
   const [savedFiles, setSavedFiles] = useState([])
+  const [billingStatus, setBillingStatus] = useState(null)
+  const [paymentBusy, setPaymentBusy] = useState(false)
   const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
+  const ONE_OFF_PRICE_LKR = 30000
+  const STRIPE_FEE_PERCENT = Number(import.meta.env.VITE_STRIPE_LKR_FEE_PERCENT || 3.4)
+  const STRIPE_FEE_FIXED = Number(import.meta.env.VITE_STRIPE_LKR_FEE_FIXED || 90)
 
   const normalizedOwnerNames = Array.isArray(ownerNames)
     ? ownerNames.map(name => String(name || '').trim()).filter(Boolean)
@@ -451,6 +497,15 @@ export default function App(){
       ? [normalizedOwnerNames[0], '']
       : ['', '']
   const ownerCount = normalizedOwnerNames.length === 1 ? 1 : 2
+  const estimatedStripeFee = ((ONE_OFF_PRICE_LKR * STRIPE_FEE_PERCENT) / 100) + STRIPE_FEE_FIXED
+  const stripeFeePreview = {
+    base: ONE_OFF_PRICE_LKR,
+    fee: estimatedStripeFee,
+    total: ONE_OFF_PRICE_LKR + estimatedStripeFee,
+    baseFormatted: formatLKR(ONE_OFF_PRICE_LKR),
+    feeFormatted: formatLKR(estimatedStripeFee),
+    totalFormatted: formatLKR(ONE_OFF_PRICE_LKR + estimatedStripeFee),
+  }
 
   const loadReports = useCallback(async (activeSession = session) => {
     if (isProdSupabase && !activeSession?.user?.id) {
@@ -495,6 +550,107 @@ export default function App(){
     }
   }, [session])
 
+  const refreshBillingStatus = useCallback(async (activeSession = session) => {
+    try {
+      const resp = await getBillingStatus(activeSession)
+      if (resp?.ok) {
+        setBillingStatus(resp.billing)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }, [session])
+
+  const ensurePremiumAccess = async () => {
+    if (!session?.user?.id) {
+      alert(t('premiumAuthRequired'))
+      handleOpenAuth('signin')
+      return false
+    }
+
+    if (billingStatus?.full_access_enabled) {
+      return true
+    }
+
+    if (billingStatus?.payment_status === 'payment_pending_verification') {
+      alert(t('activationPending'))
+      return false
+    }
+
+    const consumed = await consumeTrialUse(session)
+    if (!consumed?.allowed) {
+      setBillingStatus(prev => ({
+        ...(prev || {}),
+        trial_limit: consumed?.trial_limit ?? prev?.trial_limit ?? 3,
+        trial_uses: consumed?.trial_uses ?? prev?.trial_uses ?? 3,
+        full_access_enabled: consumed?.full_access_enabled ?? false,
+        payment_status: consumed?.payment_status ?? 'trial',
+      }))
+      alert(t('trialExpiredPayPrompt'))
+      return false
+    }
+
+    setBillingStatus(prev => ({
+      ...(prev || {}),
+      trial_limit: consumed?.trial_limit ?? prev?.trial_limit ?? 3,
+      trial_uses: consumed?.trial_uses ?? prev?.trial_uses ?? 0,
+      full_access_enabled: consumed?.full_access_enabled ?? false,
+      payment_status: consumed?.payment_status ?? 'trial',
+    }))
+
+    return true
+  }
+
+  const handleStartCardPayment = async () => {
+    if (!session?.user?.id) {
+      alert(t('premiumAuthRequired'))
+      handleOpenAuth('signin')
+      return
+    }
+
+    try {
+      setPaymentBusy(true)
+      const resp = await createStripeCheckoutSession({
+        session,
+        origin: `${window.location.origin}${window.location.pathname}`,
+        amountLkr: ONE_OFF_PRICE_LKR,
+      })
+
+      if (resp?.checkoutUrl) {
+        window.location.href = resp.checkoutUrl
+        return
+      }
+
+      throw new Error(t('checkoutStartFailed'))
+    } catch (error) {
+      alert(`${t('checkoutStartFailed')}: ${error?.message || error}`)
+    } finally {
+      setPaymentBusy(false)
+    }
+  }
+
+  const handleRequestCashPayment = async () => {
+    if (!session?.user?.id) {
+      alert(t('premiumAuthRequired'))
+      handleOpenAuth('signin')
+      return
+    }
+
+    try {
+      setPaymentBusy(true)
+      await requestCashPayment({
+        session,
+        amountLkr: ONE_OFF_PRICE_LKR,
+      })
+      alert(t('paymentRequestSubmitted'))
+      await refreshBillingStatus(session)
+    } catch (error) {
+      alert(`${t('cashRequestFailed')}: ${error?.message || error}`)
+    } finally {
+      setPaymentBusy(false)
+    }
+  }
+
   useEffect(() => {
     if (!supabase) {
       return undefined
@@ -524,7 +680,28 @@ export default function App(){
   useEffect(() => {
     loadReports(session)
     loadSavedFiles(session)
-  }, [session, loadReports, loadSavedFiles])
+    refreshBillingStatus(session)
+  }, [session, loadReports, loadSavedFiles, refreshBillingStatus])
+
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const payment = url.searchParams.get('payment')
+    const activation = url.searchParams.get('activation')
+
+    if (payment === 'success') {
+      alert(activation === 'pending' ? t('paymentSuccessPending') : t('reportSavedToSupabase'))
+      url.searchParams.delete('payment')
+      url.searchParams.delete('activation')
+      window.history.replaceState({}, '', url.toString())
+      refreshBillingStatus(session)
+    }
+
+    if (payment === 'cancelled') {
+      alert(t('paymentCancelled'))
+      url.searchParams.delete('payment')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [session, refreshBillingStatus])
 
   // load last from localStorage - DISABLED to prevent auto-calculation issues
   // Each new session should start fresh with empty inputs
@@ -600,8 +777,8 @@ export default function App(){
 
   const savePdfToStorage = async () => {
     if (!results) return alert(t('noResultsToSave'))
-    if (isProdSupabase && !session?.user?.id) {
-      handleOpenAuth('signin')
+    const allowed = await ensurePremiumAccess()
+    if (!allowed) {
       return
     }
 
@@ -644,8 +821,8 @@ export default function App(){
 
   const saveCurrentReport = async () => {
     if (!results) return alert(t('noResultsToSave'))
-    if (isProdSupabase && !session?.user?.id) {
-      handleOpenAuth('signin')
+    const allowed = await ensurePremiumAccess()
+    if (!allowed) {
       return
     }
 
@@ -714,8 +891,14 @@ export default function App(){
   }
 
   const handleLoadReportsClick = async () => {
-    if (isProdSupabase && !session?.user?.id) {
+    if (!session?.user?.id) {
+      alert(t('premiumAuthRequired'))
       handleOpenAuth('signin')
+      return
+    }
+
+    if (!billingStatus?.full_access_enabled && billingStatus?.payment_status === 'payment_pending_verification') {
+      alert(t('activationPending'))
       return
     }
 
@@ -1025,6 +1208,11 @@ export default function App(){
                   onOwnerNamesChange={setOwnerNames}
                   contractorSharePercentage={contractorSharePercentage}
                   onContractorSharePercentageChange={setContractorSharePercentage}
+                  billingStatus={billingStatus}
+                  onStartCardPayment={handleStartCardPayment}
+                  onRequestCashPayment={handleRequestCashPayment}
+                  stripeFeePreview={stripeFeePreview}
+                  paymentBusy={paymentBusy}
                 />
               </div>
             </aside>

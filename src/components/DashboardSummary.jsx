@@ -44,6 +44,11 @@ export default function DashboardSummary({
   contractorSharePercentage = 50,
   onContractorSharePercentageChange,
   t,
+  billingStatus,
+  onStartCardPayment,
+  onRequestCashPayment,
+  stripeFeePreview,
+  paymentBusy,
 }) {
   const tr = (key, fallback) => (t ? t(key) : fallback)
   const signedIn = Boolean(session?.user)
@@ -62,6 +67,11 @@ export default function DashboardSummary({
   const [reportsOpen, setReportsOpen] = useState(false)
   const [newLocation, setNewLocation] = useState('')
   const fileRows = Array.isArray(savedFiles) ? savedFiles : []
+  const trialLimit = Number(billingStatus?.trial_limit || 3)
+  const trialUses = Number(billingStatus?.trial_uses || 0)
+  const trialRemaining = Math.max(0, trialLimit - trialUses)
+  const fullAccessEnabled = Boolean(billingStatus?.full_access_enabled)
+  const paymentStatus = billingStatus?.payment_status || 'trial'
   const ownerNamesCount = Array.isArray(ownerNames)
     ? ownerNames.map(name => String(name || '').trim()).filter(Boolean).length
     : 0
@@ -95,6 +105,67 @@ export default function DashboardSummary({
       </div>
 
       <div className="grid gap-4 p-6 md:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl md:col-span-2">
+          <div className="inline-flex rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            {tr('billingAccess', 'Billing & Access')}
+          </div>
+          <div className="mt-3 grid gap-4 md:grid-cols-2">
+            <div className="rounded-xl bg-indigo-50 p-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-indigo-700">{tr('trialStatus', 'Trial Status')}</div>
+              <div className="mt-2 text-sm text-slate-800">
+                {fullAccessEnabled
+                  ? tr('fullVersionActive', 'Full version is active')
+                  : `${tr('freeTrialUsed', 'Free trial used')}: ${trialUses}/${trialLimit}`}
+              </div>
+              {!fullAccessEnabled && (
+                <div className="mt-1 text-sm font-semibold text-indigo-900">
+                  {tr('trialRemaining', 'Remaining')}: {trialRemaining}
+                </div>
+              )}
+              {!fullAccessEnabled && paymentStatus === 'payment_pending_verification' && (
+                <div className="mt-2 rounded-lg bg-amber-100 px-2 py-1 text-xs text-amber-800">
+                  {tr('activationPending', 'Payment received. Admin verification pending for activation.')}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-xl bg-slate-50 p-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-slate-700">{tr('stripeFeeGlance', 'Stripe Fee Glance (Sri Lankan Cards)')}</div>
+              <div className="mt-2 text-sm text-slate-700">
+                {tr('oneOffPrice', 'One-off Price')}: {stripeFeePreview?.baseFormatted || 'LKR 30,000.00'}
+              </div>
+              <div className="text-sm text-slate-700">
+                {tr('estimatedCardFee', 'Estimated Card Fee')}: {stripeFeePreview?.feeFormatted || 'LKR 0.00'}
+              </div>
+              <div className="text-sm font-semibold text-slate-900">
+                {tr('estimatedTotal', 'Estimated Total')}: {stripeFeePreview?.totalFormatted || 'LKR 30,000.00'}
+              </div>
+              <div className="mt-1 text-xs text-slate-500">{tr('feeDisclaimer', 'Actual Stripe fees may vary by issuer and card type.')}</div>
+            </div>
+          </div>
+
+          {!fullAccessEnabled && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onStartCardPayment}
+                disabled={paymentBusy}
+                className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {paymentBusy ? tr('pleaseWait', 'Please wait...') : tr('payByCard', 'Pay by Card (Stripe)')}
+              </button>
+              <button
+                type="button"
+                onClick={onRequestCashPayment}
+                disabled={paymentBusy}
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {tr('submitCashRequest', 'Submit Cash Payment Request')}
+              </button>
+            </div>
+          )}
+        </div>
+
         <StatCard
           title={tr('account', 'Account')}
           value={signedIn ? displayName : tr('notSignedIn', 'Not signed in')}
