@@ -23,6 +23,8 @@ export default function DashboardSummary({
   session,
   reports,
   savedFiles,
+  inputs,
+  results,
   filteredReports,
   pnlSummary,
   reportFromDate,
@@ -36,6 +38,7 @@ export default function DashboardSummary({
   onLoadSavedFile,
   customLocations = [],
   onAddLocation,
+  onDeleteLocation,
   ownerNames = ['Owner 1', 'Owner 2'],
   onOwnerNamesChange,
   contractorSharePercentage = 50,
@@ -46,11 +49,14 @@ export default function DashboardSummary({
   const reportsCount = Array.isArray(reports) ? reports.length : 0
   const lastReportDate = reportsCount > 0 ? (reports[0]?.created_at || 'Recently') : 'No reports yet'
   const latestPayload = reports[0]?.payload || reports[0]?.inserted?.[0]?.payload || {}
-  const latestInputs = latestPayload.inputs || {}
   const latestResults = latestPayload.results || {}
+  const liveNetBags = Number(results?.netBags) || 0
+  const liveInitialPrice = Number(results?.initialPrice) || 0
   const latestNetBags = Number(latestResults.netBags) || 0
-  const latestSaltWeight = latestNetBags * 50
   const latestInitialPrice = Number(latestResults.initialPrice) || 0
+  const snapshotNetBags = liveNetBags > 0 ? liveNetBags : latestNetBags
+  const snapshotInitialPrice = liveInitialPrice > 0 ? liveInitialPrice : latestInitialPrice
+  const snapshotSaltWeight = snapshotNetBags * 50
   const [reportsOpen, setReportsOpen] = useState(false)
   const [newLocation, setNewLocation] = useState('')
   const fileRows = Array.isArray(savedFiles) ? savedFiles : []
@@ -92,8 +98,8 @@ export default function DashboardSummary({
         />
         <StatCard
           title="Production Snapshot"
-          value={`${latestNetBags} bags`}
-          note={`Weight: ${latestSaltWeight} kg • Initial price: LKR ${latestInitialPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          value={`${snapshotNetBags} bags`}
+          note={`Weight: ${snapshotSaltWeight} kg • Initial price: LKR ${snapshotInitialPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           accent="slate"
         />
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
@@ -109,7 +115,7 @@ export default function DashboardSummary({
                 onChange={(e) => setNewLocation(e.target.value)}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter' && newLocation.trim() && onAddLocation) {
-                    onAddLocation(newLocation.trim())
+                    onAddLocation(newLocation.trim(), null)
                     setNewLocation('')
                   }
                 }}
@@ -119,7 +125,7 @@ export default function DashboardSummary({
               <button
                 onClick={() => {
                   if (newLocation.trim() && onAddLocation) {
-                    onAddLocation(newLocation.trim())
+                    onAddLocation(newLocation.trim(), null)
                     setNewLocation('')
                   }
                 }}
@@ -129,9 +135,21 @@ export default function DashboardSummary({
               </button>
             </div>
             {Array.isArray(customLocations) && customLocations.length > 0 && (
-              <div className="text-xs text-slate-600">
+              <div className="space-y-2">
                 {customLocations.map(loc => (
-                  <span key={loc} className="inline-block bg-slate-100 rounded px-2 py-1 mr-2 mb-1">{loc}</span>
+                  <div key={loc} className="flex items-center justify-between gap-2 bg-slate-100 rounded px-3 py-2">
+                    <span className="text-xs text-slate-700 font-medium break-words flex-1">{loc}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onDeleteLocation && onDeleteLocation(loc)
+                      }}
+                      className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-semibold transition flex-shrink-0"
+                      title="Delete location"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -143,7 +161,7 @@ export default function DashboardSummary({
           </div>
           <div className="mt-3">
             <div className="text-sm text-slate-600 mb-2">Contractor share percentage</div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
               <input
                 type="range"
                 min="0"
@@ -153,8 +171,8 @@ export default function DashboardSummary({
                 onChange={(e) => onContractorSharePercentageChange && onContractorSharePercentageChange(Number(e.target.value))}
                 className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
               />
-              <div className="text-sm font-semibold text-slate-900 min-w-fit">
-                {contractorSharePercentage}% Contractor • {100 - contractorSharePercentage}% Owners
+              <div className="text-xs lg:text-sm font-semibold text-slate-900 text-center lg:text-right lg:whitespace-nowrap">
+                {contractorSharePercentage}% Contractor : {100 - contractorSharePercentage}% Owners
               </div>
             </div>
             <div className="text-xs text-slate-500 mt-2">
@@ -170,26 +188,40 @@ export default function DashboardSummary({
           </div>
           <div className="mt-3">
             <div className="text-sm text-slate-600 mb-3">Customize your partners' names to display in reports</div>
-            <div className="grid gap-3 grid-cols-2">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
               {[0, 1].map(idx => (
-                <label key={idx} className="block">
+                <div key={idx} className="block">
                   <div className="text-xs font-semibold text-slate-700 mb-2">Owner {idx + 1}</div>
-                  <input
-                    type="text"
-                    value={ownerNames?.[idx] || `Owner ${idx + 1}`}
-                    onChange={(e) => {
-                      const updated = [...(ownerNames || ['Owner 1', 'Owner 2'])]
-                      updated[idx] = e.target.value || `Owner ${idx + 1}`
-                      onOwnerNamesChange && onOwnerNamesChange(updated)
-                    }}
-                    placeholder={`Owner ${idx + 1}`}
-                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
-                  />
-                </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={ownerNames?.[idx] ?? ''}
+                      onChange={(e) => {
+                        const updated = [...(ownerNames || ['Owner 1', 'Owner 2'])]
+                        updated[idx] = e.target.value
+                        onOwnerNamesChange && onOwnerNamesChange(updated)
+                      }}
+                      placeholder={`Owner ${idx + 1}`}
+                      className="flex-1 border border-slate-300 rounded px-3 py-2 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = [...(ownerNames || ['Owner 1', 'Owner 2'])]
+                        updated[idx] = ''
+                        onOwnerNamesChange && onOwnerNamesChange(updated)
+                      }}
+                      className="px-2 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-semibold transition"
+                      title="Clear owner name"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
             {ownerNames && ownerNames[0] && ownerNames[1] && (
-              <div className="mt-3 text-xs text-slate-600">
+              <div className="mt-3 text-xs text-slate-600 break-words">
                 Reports will show: <span className="font-semibold text-slate-900">{ownerNames[0]} & {ownerNames[1]}</span>
               </div>
             )}

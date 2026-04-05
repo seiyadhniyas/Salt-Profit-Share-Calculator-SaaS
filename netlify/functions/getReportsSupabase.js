@@ -17,7 +17,10 @@ exports.handler = async function(event) {
   try {
     const selectUrl = new URL('/rest/v1/reports', SUPABASE_URL)
     const userId = event.queryStringParameters && event.queryStringParameters.userId
-    const query = userId ? `?select=*&user_id=eq.${encodeURIComponent(userId)}` : '?select=*'
+    if (!userId) {
+      return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'userId is required' }) }
+    }
+    const query = `?select=*&user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc`
     const res = await fetch(selectUrl.toString() + query, {
       method: 'GET',
       headers: {

@@ -16,10 +16,13 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body || '{}')
+    if (!body.userId) {
+      return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'userId is required' }) }
+    }
     // expect payload: { payload, userId, userEmail }
     const payload = body.payload || body
     const record = {
-      user_id: body.userId || null,
+      user_id: body.userId,
       user_email: body.userEmail || null,
       payload,
       created_at: new Date().toISOString()

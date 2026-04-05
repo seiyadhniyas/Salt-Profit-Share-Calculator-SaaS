@@ -248,6 +248,7 @@ export default function App(){
       }
     } catch (e) {
       console.error(e)
+      setReports([])
     }
   }, [session])
 
@@ -301,17 +302,18 @@ export default function App(){
     loadSavedFiles(session)
   }, [session, loadReports, loadSavedFiles])
 
-  // load last from localStorage
-  useEffect(()=>{
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if(raw){
-        setInputs(JSON.parse(raw))
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, [])
+  // load last from localStorage - DISABLED to prevent auto-calculation issues
+  // Each new session should start fresh with empty inputs
+  // useEffect(()=>{
+  //   try {
+  //     const raw = localStorage.getItem(STORAGE_KEY)
+  //     if(raw){
+  //       setInputs(JSON.parse(raw))
+  //     }
+  //   } catch (e) {
+  //     // ignore
+  //   }
+  // }, [])
 
   // compute on every input change or when contractor share percentage changes
   useEffect(()=>{
@@ -417,7 +419,12 @@ export default function App(){
     }
 
     try {
-      const payload = { inputs, results }
+      const payload = {
+        inputs,
+        results,
+        ownerNames,
+        contractorSharePercentage,
+      }
       if (isProdSupabase) {
         const resp = await saveReportToSupabase(payload, session)
         if (resp && resp.ok) {
@@ -464,6 +471,12 @@ export default function App(){
     try {
       const payload = report.payload || (report.inserted && report.inserted[0] && report.inserted[0].payload) || report
       if (payload && payload.inputs) setInputs(prev => ({ ...prev, ...payload.inputs }))
+      if (payload && Array.isArray(payload.ownerNames) && payload.ownerNames.length === 2) {
+        setOwnerNames(payload.ownerNames)
+      }
+      if (payload && typeof payload.contractorSharePercentage === 'number') {
+        setContractorSharePercentage(payload.contractorSharePercentage)
+      }
     } catch (e) {
       console.error(e)
     }
@@ -747,6 +760,8 @@ export default function App(){
                   session={session}
                   reports={reports}
                   savedFiles={savedFiles}
+                  inputs={inputs}
+                  results={results}
                   filteredReports={filteredReports}
                   pnlSummary={pnlSummary}
                   reportFromDate={reportFromDate}
@@ -762,7 +777,14 @@ export default function App(){
                   onLoadReport={loadAndApplyReport}
                   onLoadSavedFile={handleOpenSavedFile}
                   customLocations={customLocations}
-                  onAddLocation={(location) => setCustomLocations(prev => prev.includes(location) ? prev : [...prev, location])}
+                  onAddLocation={(location) => {
+                    if (location) {
+                      setCustomLocations(prev => prev.includes(location) ? prev : [...prev, location])
+                    }
+                  }}
+                  onDeleteLocation={(locationToDelete) => {
+                    setCustomLocations(prev => prev.filter(loc => loc !== locationToDelete))
+                  }}
                   ownerNames={ownerNames}
                   onOwnerNamesChange={setOwnerNames}
                   contractorSharePercentage={contractorSharePercentage}

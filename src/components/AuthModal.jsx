@@ -55,24 +55,39 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
         }
         onClose?.()
       } else {
+        // Signup flow with email confirmation
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+            data: {},
           },
         })
+        
         if (signUpError) throw signUpError
 
-        if (data?.session?.user) {
-          onSuccess?.(data.session.user)
-          onClose?.()
-        } else {
-          setMessage('Account created. Check your email to confirm the account, then sign in.')
+        // After successful signup
+        if (data?.user?.id) {
+          // Check if session was created (no email confirmation needed)
+          if (data?.session?.user) {
+            onSuccess?.(data.session.user)
+            onClose?.()
+          } else {
+            // Email confirmation is required
+            setMessage(
+              'Account created successfully! \n\n' +
+              'A confirmation email has been sent to ' + form.email + '\n\n' +
+              'Please click the link in the email to verify your account, then sign in with your credentials.'
+            )
+            // Clear form for next attempt
+            setForm(initialForm)
+          }
         }
       }
     } catch (authError) {
-      setError(authError?.message || 'Authentication failed.')
+      console.error('Auth error:', authError)
+      setError(authError?.message || 'Authentication failed. Please try again.')
     } finally {
       setLoading(false)
     }
