@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react'
 
-function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2 }) {
+function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip }) {
   // Format display to show specified decimal places
   const displayValue = value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
   
   return (
     <label className="block mb-3">
-      <div className="text-base font-medium text-gray-700 mb-1">{label}</div>
+      <div className="flex items-center gap-2 mb-1">
+        <div className="text-base font-medium text-gray-700">{label}</div>
+        {tooltip && (
+          <div className="relative group">
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-500 border border-gray-300 rounded-full cursor-help hover:text-gray-700 hover:border-gray-500 transition">!</span>
+            <div className="hidden group-hover:block absolute z-10 pointer-events-none bg-gray-900 text-white text-xs rounded px-3 py-2 max-w-xs break-words md:left-0 md:bottom-full md:mb-2 md:whitespace-normal left-1/2 transform -translate-x-1/2 top-full mt-2 md:transform-none md:-translate-x-0">
+              {tooltip}
+            </div>
+          </div>
+        )}
+      </div>
       <input
         name={name}
         type="number"
@@ -173,8 +183,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 {t('income')}</h4>
-            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} />
-            <div className="text-xs text-gray-500 mt-1">{t ? t('cashAutoHint') : 'Auto-filled from Net Bags × Price per Bag; edit to override'}</div>
+            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} tooltip={t ? t('cashAutoHint') : 'Auto-filled from Net Bags × Price per Bag; edit to override'} />
             <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} decimals={2} />
           </div>
         </div>

@@ -54,6 +54,7 @@ export default function DashboardSummary({
   onRefreshPendingPaymentRequests,
   onActivatePaymentRequest,
   adminActionBusy,
+  onOpenAdminAuth,
 }) {
   const tr = (key, fallback) => (t ? t(key) : fallback)
   const signedIn = Boolean(session?.user)
@@ -123,13 +124,22 @@ export default function DashboardSummary({
               {tr('signOut', 'Sign out')}
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={onOpenAuth}
-              className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-            >
-              {tr('signInRegister', 'Sign in / Register')}
-            </button>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onOpenAuth}
+                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+              >
+                {tr('signInRegister', 'Sign in / Register')}
+              </button>
+              <button
+                type="button"
+                onClick={onOpenAdminAuth}
+                className="rounded-full border border-amber-300 bg-amber-100 px-5 py-2.5 text-sm font-semibold text-amber-900 transition hover:bg-amber-200"
+              >
+                👤 {tr('adminAccess', 'Admin Access')}
+              </button>
+            </div>
           )}
         </div>
 

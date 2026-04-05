@@ -3,6 +3,7 @@ import InputSection from './components/InputSection.jsx'
 import ResultSection from './components/ResultSection.jsx'
 import DashboardSummary from './components/DashboardSummary.jsx'
 import AuthModal from './components/AuthModal.jsx'
+import AdminAuthModal from './components/AdminAuthModal.jsx'
 import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -282,6 +283,10 @@ export default function App(){
       adminNoteRequired: 'Admin note is required before activation.',
       cancel: 'Cancel',
       confirmActivate: 'Confirm & Activate',
+      adminAuthRequired: 'Admin Authentication',
+      adminAuthSuccess: 'Authentication Successful',
+      adminAccess: 'Admin Access',
+      adminLoginPrompt: 'Sign in with admin credentials to access the admin dashboard.',
     },
     ta: {
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
@@ -498,6 +503,10 @@ export default function App(){
       adminNoteRequired: 'செயற்படுத்துவதற்கு முன் நிர்வாக குறிப்பு கட்டாயம்.',
       cancel: 'ரத்து செய்',
       confirmActivate: 'உறுதி செய்து செயற்படுத்து',
+      adminAuthRequired: 'நிர்வாக அங்கீகாரம்',
+      adminAuthSuccess: 'அங்கீகாரம் வெற்றிகரமாக',
+      adminAccess: 'நிர்வாக அணுகல்',
+      adminLoginPrompt: 'நிர்வாக டாஷ்போர்டைக் அணுக நிர்வாக நற்சான்றுகளில் உள்நுழையவும்.',
     }
   }
 
@@ -508,6 +517,7 @@ export default function App(){
   const [session, setSession] = useState(null)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState('signin')
+  const [adminAuthModalOpen, setAdminAuthModalOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [reportFromDate, setReportFromDate] = useState('')
   const [reportToDate, setReportToDate] = useState('')
@@ -1272,8 +1282,7 @@ export default function App(){
             <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-slate-200 bg-white shadow-2xl">
               <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">{t('menu')}</p>
-                  <h2 className="mt-1 text-lg font-bold text-slate-900">{t('memberDashboard')}</h2>
+                  <h2 className="text-lg font-bold text-slate-900">{t('memberDashboard')}</h2>
                 </div>
                 <button
                   type="button"
@@ -1323,6 +1332,7 @@ export default function App(){
                   onRequestCashPayment={handleRequestCashPayment}
                   stripeFeePreview={stripeFeePreview}
                   paymentBusy={paymentBusy}
+                  onOpenAdminAuth={() => setAdminAuthModalOpen(true)}
                 />
               </div>
             </aside>
@@ -1336,6 +1346,15 @@ export default function App(){
           onClose={() => setAuthModalOpen(false)}
           onModeChange={setAuthMode}
           onSuccess={() => setAuthModalOpen(false)}
+        />
+
+        <AdminAuthModal
+          open={adminAuthModalOpen}
+          t={t}
+          onClose={() => setAdminAuthModalOpen(false)}
+          onSuccess={() => {
+            setAdminAuthModalOpen(false)
+          }}
         />
       </div>
     </div>
