@@ -7,7 +7,8 @@ const initialForm = {
   confirmPassword: '',
 }
 
-export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess }) {
+export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess, t }) {
+  const tr = (key, fallback) => (t ? t(key) : fallback)
   const [form, setForm] = useState(initialForm)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -33,12 +34,12 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
     setMessage('')
 
     if (!isSupabaseConfigured || !supabase) {
-      setError('Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY to your env file.')
+      setError(tr('authSupabaseMissing', 'Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY to your env file.'))
       return
     }
 
     if (mode === 'signup' && form.password !== form.confirmPassword) {
-      setError('Passwords do not match.')
+      setError(tr('authPasswordsMismatch', 'Passwords do not match.'))
       return
     }
 
@@ -76,9 +77,9 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
           } else {
             // Email confirmation is required
             setMessage(
-              'Account created successfully! \n\n' +
-              'A confirmation email has been sent to ' + form.email + '\n\n' +
-              'Please click the link in the email to verify your account, then sign in with your credentials.'
+              tr('authAccountCreated', 'Account created successfully!') + '\n\n' +
+              tr('authConfirmationEmailSent', 'A confirmation email has been sent to') + ' ' + form.email + '\n\n' +
+              tr('authVerifyThenSignIn', 'Please click the link in the email to verify your account, then sign in with your credentials.')
             )
             // Clear form for next attempt
             setForm(initialForm)
@@ -87,7 +88,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
       }
     } catch (authError) {
       console.error('Auth error:', authError)
-      setError(authError?.message || 'Authentication failed. Please try again.')
+      setError(authError?.message || tr('authFailedTryAgain', 'Authentication failed. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -98,15 +99,15 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
       <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Member Access</p>
-            <h2 className="mt-1 text-xl font-bold text-slate-900">{mode === 'signin' ? 'Sign in' : 'Create account'}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">{tr('memberAccess', 'Member Access')}</p>
+            <h2 className="mt-1 text-xl font-bold text-slate-900">{mode === 'signin' ? tr('signIn', 'Sign in') : tr('createAccount', 'Create account')}</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full px-3 py-1 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           >
-            Close
+            {tr('close', 'Close')}
           </button>
         </div>
 
@@ -117,33 +118,33 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               onClick={() => onModeChange?.('signin')}
               className={`rounded-xl px-3 py-2 transition ${mode === 'signin' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'}`}
             >
-              Sign in
+              {tr('signIn', 'Sign in')}
             </button>
             <button
               type="button"
               onClick={() => onModeChange?.('signup')}
               className={`rounded-xl px-3 py-2 transition ${mode === 'signup' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'}`}
             >
-              Register
+              {tr('register', 'Register')}
             </button>
           </div>
         </div>
 
         <form onSubmit={submit} className="space-y-4 px-6 py-5">
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-slate-700">Email</span>
+            <span className="mb-1 block text-sm font-medium text-slate-700">{tr('email', 'Email')}</span>
             <input
               type="email"
               required
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder="you@example.com"
+              placeholder={tr('emailPlaceholder', 'you@example.com')}
             />
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-slate-700">Password</span>
+            <span className="mb-1 block text-sm font-medium text-slate-700">{tr('password', 'Password')}</span>
             <input
               type="password"
               required
@@ -151,13 +152,13 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               value={form.password}
               onChange={(e) => updateField('password', e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder="At least 6 characters"
+              placeholder={tr('passwordPlaceholder', 'At least 6 characters')}
             />
           </label>
 
           {mode === 'signup' && (
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-slate-700">Confirm Password</span>
+              <span className="mb-1 block text-sm font-medium text-slate-700">{tr('confirmPassword', 'Confirm Password')}</span>
               <input
                 type="password"
                 required
@@ -165,7 +166,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
                 value={form.confirmPassword}
                 onChange={(e) => updateField('confirmPassword', e.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                placeholder="Repeat password"
+                placeholder={tr('confirmPasswordPlaceholder', 'Repeat password')}
               />
             </label>
           )}
@@ -184,7 +185,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
 
           {!isSupabaseConfigured && (
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              Supabase is not configured locally yet. Create a <span className="font-semibold">.env.local</span> from the example file.
+              {tr('supabaseNotConfigured', 'Supabase is not configured locally yet. Create a')} <span className="font-semibold">.env.local</span> {tr('supabaseNotConfiguredSuffix', 'from the example file.')}
             </div>
           )}
 
@@ -193,11 +194,11 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
             disabled={loading}
             className="w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? 'Please wait...' : mode === 'signin' ? 'Sign in to dashboard' : 'Create account'}
+            {loading ? tr('pleaseWait', 'Please wait...') : mode === 'signin' ? tr('signInToDashboard', 'Sign in to dashboard') : tr('createAccount', 'Create account')}
           </button>
 
           <p className="text-xs leading-5 text-slate-500">
-            This dashboard is designed for lifetime members of the Saltern Welfare Society. Calculator logic stays unchanged after sign in.
+            {tr('authFooterNote', 'This dashboard is designed for lifetime members of the Saltern Welfare Society. Calculator logic stays unchanged after sign in.')}
           </p>
         </form>
       </div>

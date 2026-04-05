@@ -20,7 +20,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   )
 }
 
-export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['Owner 1', 'Owner 2'] }) {
+export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''] }) {
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
 
   const onChange = (name, val) => {
@@ -52,7 +52,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
   const addExpense = () => {
     const id = Date.now()
-    const next = [...(inputs.extraExpenses || []), { id, label: 'Expense', amount: 0 }]
+    const next = [...(inputs.extraExpenses || []), { id, label: t ? t('expenseItemDefaultLabel') : 'Expense', amount: 0 }]
     setInput(prev => ({ ...prev, extraExpenses: next }))
   }
 
@@ -83,7 +83,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
             <div className="text-sm font-medium text-gray-700 mb-1">{t('locationDay')}</div>
             {Array.isArray(customLocations) && customLocations.length > 0 ? (
               <select name="location" value={inputs.location || ''} onChange={(e) => onChange('location', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-base">
-                <option value="">Select a location</option>
+                <option value="">{t ? t('selectLocation') : 'Select a location'}</option>
                 {customLocations.map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
                 ))}
@@ -93,7 +93,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 type="text"
                 value=""
                 disabled
-                placeholder="Add land name in Dashboard"
+                placeholder={t ? t('addLandNameInDashboard') : 'Add land name in Dashboard'}
                 className="w-full border border-gray-300 rounded px-3 py-2 text-base bg-gray-50 text-gray-500 cursor-not-allowed"
               />
             )}
@@ -165,7 +165,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 value={inputs.otherExpensesReason || ''}
                 onChange={(e) => onChange('otherExpensesReason', e.target.value)}
                 className="w-full border border-gray-300 rounded px-3 py-2 text-base"
-                placeholder="Brief reason for other expenses"
+                placeholder={t ? t('otherExpensesReasonPlaceholder') : 'Brief reason for other expenses'}
               />
             </label>
           </div>
@@ -229,8 +229,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
           {inputs.bothOwnersHaveLoans && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <NumberInput label={`Loan (${ownerNames?.[0] || 'Owner 1'}) - LKR`} name="loanInaya" value={inputs.loanInaya} onChange={onChange} decimals={2} />
-              <NumberInput label={`Loan (${ownerNames?.[1] || 'Owner 2'}) - LKR`} name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
+              <NumberInput label={`${t ? t('loan') : 'Loan'} (${ownerNames?.[0] || `${t ? t('owner') : 'Owner'} 1`}) - LKR`} name="loanInaya" value={inputs.loanInaya} onChange={onChange} decimals={2} />
+              <NumberInput label={`${t ? t('loan') : 'Loan'} (${ownerNames?.[1] || `${t ? t('owner') : 'Owner'} 2`}) - LKR`} name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
             </div>
           )}
 

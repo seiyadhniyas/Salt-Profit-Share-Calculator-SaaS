@@ -40,8 +40,8 @@ export default function App(){
   const [ownerNames, setOwnerNames] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('ownerNames') || '[]')
-      return Array.isArray(saved) && saved.length === 2 ? saved : ['Owner 1', 'Owner 2']
-    } catch { return ['Owner 1', 'Owner 2'] }
+      return Array.isArray(saved) && saved.length === 2 ? saved : ['', '']
+    } catch { return ['', ''] }
   })
   const [contractorSharePercentage, setContractorSharePercentage] = useState(() => {
     try {
@@ -137,6 +137,112 @@ export default function App(){
       shakiraZakat: 'Shakira Zakat (5%)',
       inayaAfterZakat: 'Inaya After Zakat',
       shakiraAfterZakat: 'Shakira After Zakat',
+      dashboard: 'Dashboard',
+      openDashboardMenu: 'Open dashboard menu',
+      closeDashboardMenu: 'Close dashboard menu',
+      menu: 'Menu',
+      memberDashboard: 'Member Dashboard',
+      signOut: 'Sign out',
+      signInRegister: 'Sign in / Register',
+      dashboardSubtitle: 'Quick producer summary for salt calculations, report sync, and saved performance snapshots.',
+      account: 'Account',
+      guestMember: 'Guest member',
+      notSignedIn: 'Not signed in',
+      connectedSupabaseAuth: 'Connected through Supabase Auth',
+      popupAuthReady: 'Popup auth is ready when you need it',
+      bagsUnit: 'bags',
+      weightLabel: 'Weight',
+      initialPriceLabel: 'Initial price',
+      workLocations: 'Work Locations',
+      workLocationsHelp: 'Add your work locations here to use them in reports',
+      enterLocationName: 'Enter location name',
+      add: 'Add',
+      deleteLocation: 'Delete location',
+      profitShare: 'Profit Share',
+      contractorSharePercentage: 'Contractor share percentage',
+      contractor: 'Contractor',
+      owners: 'Owners',
+      splitStandard: '50/50 split (standard)',
+      contractorGetsMore: 'Contractor gets more',
+      ownersGetMore: 'Owners get more',
+      ownerNames: 'Owner Names',
+      ownerNamesHelp: "Customize your partners' names to display in reports",
+      owner: 'Owner',
+      clearOwnerName: 'Clear owner name',
+      reportsWillShow: 'Reports will show',
+      reports: 'Reports',
+      noOwnersSet: 'No owners set',
+      recently: 'Recently',
+      noReportsYet: 'No reports yet',
+      lastSync: 'Last sync',
+      saveReportToPopulate: 'Save a report to populate the list',
+      hideDetails: 'Hide details',
+      showDetails: 'Show details',
+      clear: 'Clear',
+      grossMargin: 'Gross margin',
+      billNumberShort: 'Bill #',
+      savedFiles: 'Saved Files',
+      noSavedFilesYet: 'No saved files yet.',
+      created: 'Created',
+      size: 'Size',
+      action: 'Action',
+      unnamedFile: 'Unnamed file',
+      open: 'Open',
+      file: 'File',
+      id: 'ID',
+      memberAccess: 'Member Access',
+      signIn: 'Sign in',
+      createAccount: 'Create account',
+      close: 'Close',
+      register: 'Register',
+      email: 'Email',
+      emailPlaceholder: 'you@example.com',
+      password: 'Password',
+      passwordPlaceholder: 'At least 6 characters',
+      confirmPassword: 'Confirm Password',
+      confirmPasswordPlaceholder: 'Repeat password',
+      supabaseNotConfigured: 'Supabase is not configured locally yet. Create a',
+      supabaseNotConfiguredSuffix: 'from the example file.',
+      pleaseWait: 'Please wait...',
+      signInToDashboard: 'Sign in to dashboard',
+      authFooterNote: 'This dashboard is designed for lifetime members of the Saltern Welfare Society. Calculator logic stays unchanged after sign in.',
+      authSupabaseMissing: 'Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY to your env file.',
+      authPasswordsMismatch: 'Passwords do not match.',
+      authAccountCreated: 'Account created successfully!',
+      authConfirmationEmailSent: 'A confirmation email has been sent to',
+      authVerifyThenSignIn: 'Please click the link in the email to verify your account, then sign in with your credentials.',
+      authFailedTryAgain: 'Authentication failed. Please try again.',
+      expenseItemDefaultLabel: 'Expense',
+      selectLocation: 'Select a location',
+      addLandNameInDashboard: 'Add land name in Dashboard',
+      otherExpensesReasonPlaceholder: 'Brief reason for other expenses',
+      packedMinusDeducted: 'Packed - Deducted',
+      netTimesPricePerBag: 'Net × Price/Bag',
+      contractorSpentFormula: 'Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses',
+      contractorShareOwnersFormula: 'InitialPrice/2 + Spent',
+      contractorShareContractorFormula: '(InitialPrice - Spent)/2',
+      grandTotalOwnersFormula: 'InitialPrice - TotalLoan',
+      grandTotalContractorFormula: 'InitialPrice - Spent - TotalLoan',
+      ownerPoolOwnersFormula: 'GrandTotal - ContractorShare',
+      ownerPoolContractorFormula: '(GrandTotal + TotalLoan)/2',
+      societyServiceCharge: 'Society Service Charge',
+      societyServiceReserved30: 'Society Service Reserved 30%',
+      finalShare: 'Final Share',
+      loan: 'Loan',
+      lossDetected: 'Loss detected',
+      zakatLabel: 'Zakat (5%)',
+      afterZakatLabel: 'After Zakat',
+      noResultsToSave: 'No results to save',
+      couldNotCreatePdf: 'Could not create PDF',
+      pdfSavedToSupabaseStorage: 'PDF saved to Supabase Storage',
+      pdfSaveFailed: 'PDF save failed',
+      pdfSaveError: 'PDF save error',
+      reportSavedToSupabase: 'Report saved to Supabase',
+      saveFailed: 'Save failed',
+      reportSavedLocalDemo: 'Report saved (local demo)',
+      saveError: 'Save error',
+      savePdf: '☁️ Save PDF',
+      totalDistributedTitle: 'Total Distributed',
     },
     ta: {
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
@@ -209,6 +315,112 @@ export default function App(){
       shakiraZakat: 'ஷாக்கீராவின் ஜக்கத் (5%)',
       inayaAfterZakat: 'ஜக்கத்திற்குப் பிறகு இனாயா',
       shakiraAfterZakat: 'ஜக்கத்திற்குப் பிறகு ஷாக்கீரா',
+      dashboard: 'டாஷ்போர்டு',
+      openDashboardMenu: 'டாஷ்போர்டு மெனுவை திற',
+      closeDashboardMenu: 'டாஷ்போர்டு மெனுவை மூடு',
+      menu: 'மெனு',
+      memberDashboard: 'உறுப்பினர் டாஷ்போர்டு',
+      signOut: 'வெளியேறு',
+      signInRegister: 'உள்நுழை / பதிவு செய்',
+      dashboardSubtitle: 'உப்பு கணக்கீடுகள், அறிக்கை ஒத்திசைவு மற்றும் சேமிக்கப்பட்ட செயல்திறன் சுருக்கங்களை விரைவாக பாருங்கள்.',
+      account: 'கணக்கு',
+      guestMember: 'விருந்தினர் உறுப்பினர்',
+      notSignedIn: 'உள்நுழையவில்லை',
+      connectedSupabaseAuth: 'Supabase அங்கீகாரத்துடன் இணைக்கப்பட்டது',
+      popupAuthReady: 'தேவைப்படும் போது பாப்அப் உள்நுழைவு தயார்',
+      bagsUnit: 'பைகள்',
+      weightLabel: 'எடை',
+      initialPriceLabel: 'ஆரம்ப விலை',
+      workLocations: 'வேலை இடங்கள்',
+      workLocationsHelp: 'அறிக்கைகளில் பயன்படுத்த வேலை இடங்களை இங்கே சேர்க்கவும்',
+      enterLocationName: 'இடப் பெயரை உள்ளிடவும்',
+      add: 'சேர்',
+      deleteLocation: 'இடத்தை நீக்கு',
+      profitShare: 'இலாப பங்கு',
+      contractorSharePercentage: 'ஒப்பந்ததாரர் பங்கு சதவீதம்',
+      contractor: 'ஒப்பந்ததாரர்',
+      owners: 'உரிமையாளர்கள்',
+      splitStandard: '50/50 பகிர்வு (தரநிலை)',
+      contractorGetsMore: 'ஒப்பந்ததாரருக்கு அதிக பங்கு',
+      ownersGetMore: 'உரிமையாளர்களுக்கு அதிக பங்கு',
+      ownerNames: 'உரிமையாளர் பெயர்கள்',
+      ownerNamesHelp: 'அறிக்கைகளில் காட்டப் பங்குதாரர் பெயர்களை தனிப்பயனாக்கவும்',
+      owner: 'உரிமையாளர்',
+      clearOwnerName: 'உரிமையாளர் பெயரை அழி',
+      reportsWillShow: 'அறிக்கையில் காட்டப்படும் பெயர்கள்',
+      reports: 'அறிக்கைகள்',
+      noOwnersSet: 'உரிமையாளர் பெயர்கள் அமைக்கப்படவில்லை',
+      recently: 'அண்மையில்',
+      noReportsYet: 'இன்னும் அறிக்கைகள் இல்லை',
+      lastSync: 'கடைசி ஒத்திசைவு',
+      saveReportToPopulate: 'பட்டியலை நிரப்ப ஒரு அறிக்கையை சேமிக்கவும்',
+      hideDetails: 'விவரங்களை மறை',
+      showDetails: 'விவரங்களை காட்டு',
+      clear: 'அழி',
+      grossMargin: 'மொத்த மார்ஜின்',
+      billNumberShort: 'பில் #',
+      savedFiles: 'சேமித்த கோப்புகள்',
+      noSavedFilesYet: 'இன்னும் சேமித்த கோப்புகள் இல்லை.',
+      created: 'உருவாக்கப்பட்டது',
+      size: 'அளவு',
+      action: 'செயல்',
+      unnamedFile: 'பெயரற்ற கோப்பு',
+      open: 'திற',
+      file: 'கோப்பு',
+      id: 'அடையாளம்',
+      memberAccess: 'உறுப்பினர் அணுகல்',
+      signIn: 'உள்நுழை',
+      createAccount: 'கணக்கு உருவாக்கு',
+      close: 'மூடு',
+      register: 'பதிவு செய்',
+      email: 'மின்னஞ்சல்',
+      emailPlaceholder: 'you@example.com',
+      password: 'கடவுச்சொல்',
+      passwordPlaceholder: 'குறைந்தது 6 எழுத்துகள்',
+      confirmPassword: 'கடவுச்சொல் உறுதிப்படுத்து',
+      confirmPasswordPlaceholder: 'கடவுச்சொல்லை மீண்டும் உள்ளிடவும்',
+      supabaseNotConfigured: 'Supabase இன்னும் உள்ளூராக அமைக்கப்படவில்லை. எடுத்துக்காட்டு கோப்பில் இருந்து',
+      supabaseNotConfiguredSuffix: 'எனும் கோப்பை உருவாக்கவும்.',
+      pleaseWait: 'தயவு செய்து காத்திருக்கவும்...',
+      signInToDashboard: 'டாஷ்போர்டுக்கு உள்நுழை',
+      authFooterNote: 'இந்த டாஷ்போர்டு உப்பு நில நலச் சங்கத்தின் வாழ்நாள் உறுப்பினர்களுக்காக வடிவமைக்கப்பட்டது. உள்நுழைந்த பிறகும் கணக்கீட்டு தர்க்கம் மாறாது.',
+      authSupabaseMissing: 'Supabase விவரங்கள் இல்லை. env கோப்பில் VITE_SUPABASE_URL மற்றும் VITE_SUPABASE_ANON_KEY அல்லது VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY சேர்க்கவும்.',
+      authPasswordsMismatch: 'கடவுச்சொற்கள் பொருந்தவில்லை.',
+      authAccountCreated: 'கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது!',
+      authConfirmationEmailSent: 'உறுதிப்படுத்தும் மின்னஞ்சல் அனுப்பப்பட்டது:',
+      authVerifyThenSignIn: 'மின்னஞ்சலில் உள்ள இணைப்பை அழுத்தி கணக்கை உறுதி செய்து பின்னர் உள்நுழைக.',
+      authFailedTryAgain: 'அங்கீகாரம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.',
+      expenseItemDefaultLabel: 'செலவு',
+      selectLocation: 'இடத்தை தேர்வு செய்க',
+      addLandNameInDashboard: 'டாஷ்போர்டில் நிலப் பெயரை சேர்க்கவும்',
+      otherExpensesReasonPlaceholder: 'பிற செலவுக்கான சுருக்கமான காரணம்',
+      packedMinusDeducted: 'நிரப்பியது - கழிக்கப்பட்டது',
+      netTimesPricePerBag: 'நிகரம் × பை விலை',
+      contractorSpentFormula: 'பேக்கிங் கூலி × மொத்தப் பைகள் + பைச் செலவு × பைகள் + பிற செலவுகள்',
+      contractorShareOwnersFormula: 'ஆரம்பவிலை/2 + செலவு',
+      contractorShareContractorFormula: '(ஆரம்பவிலை - செலவு)/2',
+      grandTotalOwnersFormula: 'ஆரம்பவிலை - மொத்தகடன்',
+      grandTotalContractorFormula: 'ஆரம்பவிலை - செலவு - மொத்தகடன்',
+      ownerPoolOwnersFormula: 'மொத்தம் - ஒப்பந்ததாரர் பங்கு',
+      ownerPoolContractorFormula: '(மொத்தம் + மொத்தகடன்)/2',
+      societyServiceCharge: 'சங்க சேவை கட்டணம்',
+      societyServiceReserved30: 'சங்க சேவை ஒதுக்கீடு 30%',
+      finalShare: 'இறுதி பங்கு',
+      loan: 'கடன்',
+      lossDetected: 'இழப்பு கண்டறியப்பட்டது',
+      zakatLabel: 'ஜக்கத் (5%)',
+      afterZakatLabel: 'ஜக்கத்துக்குப் பிறகு',
+      noResultsToSave: 'சேமிக்க முடிவுகள் இல்லை',
+      couldNotCreatePdf: 'PDF உருவாக்க முடியவில்லை',
+      pdfSavedToSupabaseStorage: 'PDF Supabase சேமிப்பகத்தில் சேமிக்கப்பட்டது',
+      pdfSaveFailed: 'PDF சேமிப்பு தோல்வி',
+      pdfSaveError: 'PDF சேமிப்பு பிழை',
+      reportSavedToSupabase: 'அறிக்கை Supabase-ல் சேமிக்கப்பட்டது',
+      saveFailed: 'சேமித்தல் தோல்வி',
+      reportSavedLocalDemo: 'அறிக்கை சேமிக்கப்பட்டது (உள்ளூர் டெமோ)',
+      saveError: 'சேமிப்பு பிழை',
+      savePdf: '☁️ PDF சேமி',
+      totalDistributedTitle: 'மொத்த பகிர்வு',
     }
   }
 
@@ -368,7 +580,7 @@ export default function App(){
   }
 
   const savePdfToStorage = async () => {
-    if (!results) return alert('No results to save')
+    if (!results) return alert(t('noResultsToSave'))
     if (isProdSupabase && !session?.user?.id) {
       handleOpenAuth('signin')
       return
@@ -377,7 +589,7 @@ export default function App(){
     try {
       const pdfBlob = await createPrintablePdfBlob()
       if (!pdfBlob) {
-        alert('Could not create PDF')
+        alert(t('couldNotCreatePdf'))
         return
       }
 
@@ -393,11 +605,11 @@ export default function App(){
           fileName,
         })
         if (resp && resp.ok) {
-          alert('PDF saved to Supabase Storage')
+          alert(t('pdfSavedToSupabaseStorage'))
           await loadSavedFiles(session)
           return
         }
-        alert('PDF save failed')
+        alert(t('pdfSaveFailed'))
         return
       }
 
@@ -407,12 +619,12 @@ export default function App(){
         handleOpenAuth('signin')
         return
       }
-      alert('PDF save error: ' + (e.message || e))
+      alert(`${t('pdfSaveError')}: ${e.message || e}`)
     }
   }
 
   const saveCurrentReport = async () => {
-    if (!results) return alert('No results to save')
+    if (!results) return alert(t('noResultsToSave'))
     if (isProdSupabase && !session?.user?.id) {
       handleOpenAuth('signin')
       return
@@ -428,28 +640,28 @@ export default function App(){
       if (isProdSupabase) {
         const resp = await saveReportToSupabase(payload, session)
         if (resp && resp.ok) {
-          alert('Report saved to Supabase')
+          alert(t('reportSavedToSupabase'))
           await loadReports(session)
           await loadSavedFiles(session)
           return
         }
-        alert('Save failed')
+        alert(t('saveFailed'))
         return
       }
 
       // local/demo fallback when Supabase is not configured
       const resp2 = await saveReport(payload)
       if (resp2 && resp2.ok) {
-        alert('Report saved (local demo)')
+        alert(t('reportSavedLocalDemo'))
       } else {
-        alert('Save failed')
+        alert(t('saveFailed'))
       }
     } catch (e) {
       if (String(e?.message || '').toLowerCase().includes('auth')) {
         handleOpenAuth('signin')
         return
       }
-      alert('Save error: ' + (e.message || e))
+      alert(`${t('saveError')}: ${e.message || e}`)
     }
   }
 
@@ -578,10 +790,10 @@ export default function App(){
             type="button"
             onClick={() => setMenuOpen(true)}
             className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1.25 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-5 sm:top-4 sm:px-3 sm:py-1.5"
-            aria-label="Open dashboard menu"
+            aria-label={t('openDashboardMenu')}
           >
             <span className="text-lg leading-none">☰</span>
-            <span className="hidden sm:inline">Dashboard</span>
+            <span className="hidden sm:inline">{t('dashboard')}</span>
           </button>
 
           <div className="mx-auto max-w-3xl text-center">
@@ -658,7 +870,7 @@ export default function App(){
               <div style={{ width: '100%', maxWidth: 540, margin: '0 auto' }}>
               <div className="section">
                 <h2>{t('documentDetails')}</h2>
-                <div className="row"><div className="muted">{t('locationLabel') || 'Location'}</div><div className="value">{inputs.location === 'puthoor-2' ? 'Puthoor 2 (N & S)' : inputs.location}</div></div>
+                <div className="row"><div className="muted">{t('locationLabel') || 'Location'}</div><div className="value">{inputs.location || '-'}</div></div>
                 <div className="row"><div className="muted">{t('date')}</div><div className="value">{inputs.date || '-'}</div></div>
                 <div className="row"><div className="muted">{t('buyerName')}</div><div className="value">{inputs.buyerName || '-'}</div></div>
                 <div className="row"><div className="muted">{t('billNumber')}</div><div className="value">{inputs.billNumber || '-'}</div></div>
@@ -696,16 +908,16 @@ export default function App(){
               </div>
 
               <div className="section">
-                <h2>Total Distributed</h2>
-                <div className="row"><div className="muted">{ownerNames?.[0] || 'Owner 1'} - Final Share</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[0] || 'Owner 1'} - Zakat (5%)</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[0] || 'Owner 1'} - After Zakat</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
+                <h2>{t('totalDistributedTitle')}</h2>
+                <div className="row"><div className="muted">{ownerNames?.[0] || `${t('owner')} 1`} - {t('finalShare')}</div><div className="value">{formatLKR(results.finalInaya)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[0] || `${t('owner')} 1`} - {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[0] || `${t('owner')} 1`} - {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
 
                 <div style={{ height: '6pt' }}></div>
 
-                <div className="row"><div className="muted">{ownerNames?.[1] || 'Owner 2'} - Final Share</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[1] || 'Owner 2'} - Zakat (5%)</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
-                <div className="row"><div className="muted">{ownerNames?.[1] || 'Owner 2'} - After Zakat</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[1] || `${t('owner')} 2`} - {t('finalShare')}</div><div className="value">{formatLKR(results.finalShakira)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[1] || `${t('owner')} 2`} - {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
+                <div className="row"><div className="muted">{ownerNames?.[1] || `${t('owner')} 2`} - {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
 
                 <div className="row" style={{ borderTop: '1px solid #ddd', paddingTop: '4pt', marginTop: '8pt' }}>
                   <div className="muted">{t('totalDistributed')}</div>
@@ -723,7 +935,7 @@ export default function App(){
             {t('downloadPDF')}
           </button>
           <button onClick={savePdfToStorage} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded">
-            ☁️ Save PDF
+            {t('savePdf')}
           </button>
           <button onClick={saveCurrentReport} className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded">
             {t('save')}
@@ -738,21 +950,21 @@ export default function App(){
             <button
               type="button"
               className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
-              aria-label="Close dashboard menu"
+              aria-label={t('closeDashboardMenu')}
               onClick={() => setMenuOpen(false)}
             />
             <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-slate-200 bg-white shadow-2xl">
               <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Menu</p>
-                  <h2 className="mt-1 text-lg font-bold text-slate-900">Member Dashboard</h2>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">{t('menu')}</p>
+                  <h2 className="mt-1 text-lg font-bold text-slate-900">{t('memberDashboard')}</h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
                   className="rounded-full px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
                 >
-                  Close
+                  {t('close')}
                 </button>
               </div>
               <div className="p-4">
@@ -762,6 +974,7 @@ export default function App(){
                   savedFiles={savedFiles}
                   inputs={inputs}
                   results={results}
+                  t={t}
                   filteredReports={filteredReports}
                   pnlSummary={pnlSummary}
                   reportFromDate={reportFromDate}
@@ -798,6 +1011,7 @@ export default function App(){
         <AuthModal
           open={authModalOpen}
           mode={authMode}
+          t={t}
           onClose={() => setAuthModalOpen(false)}
           onModeChange={setAuthMode}
           onSuccess={() => setAuthModalOpen(false)}

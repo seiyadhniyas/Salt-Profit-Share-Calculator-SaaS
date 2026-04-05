@@ -23,11 +23,11 @@ function StatRow({label, value, isNegative}){
   )
 }
 
-export default function ResultSection({results, t, ownerNames = ['Owner 1', 'Owner 2']}){
+export default function ResultSection({results, t, ownerNames = ['', '']}){
   if(!results) return null
   
-  const owner1Name = (ownerNames && ownerNames[0]) || 'Owner 1'
-  const owner2Name = (ownerNames && ownerNames[1]) || 'Owner 2'
+  const owner1Name = (ownerNames && ownerNames[0]) || `${t ? t('owner') : 'Owner'} 1`
+  const owner2Name = (ownerNames && ownerNames[1]) || `${t ? t('owner') : 'Owner'} 2`
 
   return (
     <div className="mt-6">
@@ -36,30 +36,30 @@ export default function ResultSection({results, t, ownerNames = ['Owner 1', 'Own
         <div className="shadow-xl rounded-2xl p-5" style={{ backgroundColor: '#fff0f0' }}>
           <h3 className="text-lg font-bold text-gray-800 mb-4">{t ? t('calculationBreakdown') : 'Calculation Breakdown'}</h3>
           <div className="space-y-1">
-            <StatRow label={t ? t('netBags') + ' (Packed - Deducted)' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
-            <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (Net × Price/Bag)'} value={formatLKR(results.initialPrice)} isNegative={false} />
+            <StatRow label={t ? t('netBags') + ' (' + t('packedMinusDeducted') + ')' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
+            <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (' + (t ? t('netTimesPricePerBag') : 'Net × Price/Bag') + ')'} value={formatLKR(results.initialPrice)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses)'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
+            <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (' + (t ? t('contractorSpentFormula') : 'Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses') + ')'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
             <StatRow
-              label={(t ? t('contractorShare') : 'Contractor Share') + (results.expensePayment === 'owners' ? ' (InitialPrice/2 + Spent)' : ' (InitialPrice - Spent)/2')}
+              label={(t ? t('contractorShare') : 'Contractor Share') + (results.expensePayment === 'owners' ? ` (${t ? t('contractorShareOwnersFormula') : 'InitialPrice/2 + Spent'})` : ` (${t ? t('contractorShareContractorFormula') : '(InitialPrice - Spent)/2'})`)}
               value={formatLKR(results.contractorShare)}
               isNegative={false}
             />
             <div className="my-2 border-t"></div>
             <StatRow
-              label={(t ? t('grandTotalReceived') : 'Grand Total Received') + (results.expensePayment === 'owners' ? ' (InitialPrice - TotalLoan)' : ' (InitialPrice - Spent - TotalLoan)')}
+              label={(t ? t('grandTotalReceived') : 'Grand Total Received') + (results.expensePayment === 'owners' ? ` (${t ? t('grandTotalOwnersFormula') : 'InitialPrice - TotalLoan'})` : ` (${t ? t('grandTotalContractorFormula') : 'InitialPrice - Spent - TotalLoan'})`)}
               value={formatLKR(results.grandTotalReceived)}
               isNegative={false}
             />
             <StatRow
-              label={(t ? t('ownerPool') : 'Owners Group Amount') + (results.expensePayment === 'owners' ? ' (GrandTotal - ContractorShare)' : ' (GrandTotal + TotalLoan)/2')}
+              label={(t ? t('ownerPool') : 'Owners Group Amount') + (results.expensePayment === 'owners' ? ` (${t ? t('ownerPoolOwnersFormula') : 'GrandTotal - ContractorShare'})` : ` (${t ? t('ownerPoolContractorFormula') : '(GrandTotal + TotalLoan)/2'})`)}
               value={formatLKR(results.ownerPool)}
               isNegative={results.highlights.ownerPoolNegative}
             />
             <StatRow label={t ? (t('perOwnerShare') + ' (' + t('ownerPool') + '/2)') : 'Per Owner Share (Owners Group Amount/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label="Society Service Charge (Net Bags × 100)" value={formatLKR(results.netBags * 100)} isNegative={false} />
-            <StatRow label="Society Service Reserved 30%" value={formatLKR((results.netBags * 100) * 0.30)} isNegative={false} />
+            <StatRow label={t ? `${t('societyServiceCharge')} (${t('netBags')} × 100)` : 'Society Service Charge (Net Bags × 100)'} value={formatLKR(results.netBags * 100)} isNegative={false} />
+            <StatRow label={t ? t('societyServiceReserved30') : 'Society Service Reserved 30%'} value={formatLKR((results.netBags * 100) * 0.30)} isNegative={false} />
           </div>
         </div>
 
@@ -69,31 +69,31 @@ export default function ResultSection({results, t, ownerNames = ['Owner 1', 'Own
           <div className="space-y-3">
             <div className="rounded-lg p-4" style={{ backgroundColor: '#b1ecff' }}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">{owner1Name} - Final Share</span>
+                <span className="text-sm font-medium text-gray-700">{owner1Name} - {t ? t('finalShare') : 'Final Share'}</span>
                 {results.loanInaya > 0 && (
-                  <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">Loan: {formatLKR(results.loanInaya)}</span>
+                  <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">{t ? t('loan') : 'Loan'}: {formatLKR(results.loanInaya)}</span>
                 )}
               </div>
               <div className={`text-2xl font-bold ${results.highlights.finalInayaNegative ? 'text-red-600' : 'text-blue-600'}`}>
                 {formatLKR(results.finalInaya)}
               </div>
               {results.highlights.finalInayaNegative && (
-                <p className="text-xs text-red-600 mt-2">⚠️ Loss detected</p>
+                <p className="text-xs text-red-600 mt-2">⚠️ {t ? t('lossDetected') : 'Loss detected'}</p>
               )}
             </div>
 
             <div className="rounded-lg p-4" style={{ backgroundColor: '#bcfaea' }}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">{owner2Name} - Final Share</span>
+                <span className="text-sm font-medium text-gray-700">{owner2Name} - {t ? t('finalShare') : 'Final Share'}</span>
                 {results.loanShakira > 0 && (
-                  <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">Loan: {formatLKR(results.loanShakira)}</span>
+                  <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">{t ? t('loan') : 'Loan'}: {formatLKR(results.loanShakira)}</span>
                 )}
               </div>
               <div className={`text-2xl font-bold ${results.highlights.finalShakiraNegative ? 'text-red-600' : 'text-green-600'}`}>
                 {formatLKR(results.finalShakira)}
               </div>
               {results.highlights.finalShakiraNegative && (
-                <p className="text-xs text-red-600 mt-2">⚠️ Loss detected</p>
+                <p className="text-xs text-red-600 mt-2">⚠️ {t ? t('lossDetected') : 'Loss detected'}</p>
               )}
             </div>
 
@@ -105,19 +105,19 @@ export default function ResultSection({results, t, ownerNames = ['Owner 1', 'Own
               <div className="my-2 border-t"></div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-xs text-gray-600">{owner1Name} Zakat (5%)</div>
+                  <div className="text-xs text-gray-600">{owner1Name} {t ? t('zakatLabel') : 'Zakat (5%)'}</div>
                   <div className="font-semibold">{formatLKR(results.zakatInaya)}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-600">{owner1Name} After Zakat</div>
+                  <div className="text-xs text-gray-600">{owner1Name} {t ? t('afterZakatLabel') : 'After Zakat'}</div>
                   <div className="font-semibold">{formatLKR(results.finalInayaAfterZakat)}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-600">{owner2Name} Zakat (5%)</div>
+                  <div className="text-xs text-gray-600">{owner2Name} {t ? t('zakatLabel') : 'Zakat (5%)'}</div>
                   <div className="font-semibold">{formatLKR(results.zakatShakira)}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-600">{owner2Name} After Zakat</div>
+                  <div className="text-xs text-gray-600">{owner2Name} {t ? t('afterZakatLabel') : 'After Zakat'}</div>
                   <div className="font-semibold">{formatLKR(results.finalShakiraAfterZakat)}</div>
                 </div>
               </div>
