@@ -57,6 +57,9 @@ export default function ResultSection({results, t, ownerNames = ['Owner 1', 'Own
               isNegative={results.highlights.ownerPoolNegative}
             />
             <StatRow label={t ? (t('perOwnerShare') + ' (' + t('ownerPool') + '/2)') : 'Per Owner Share (Owners Group Amount/2)'} value={formatLKR(results.generalSharePerOwner)} isNegative={false} />
+            <div className="my-2 border-t"></div>
+            <StatRow label="Society Service Charge (Net Bags × 100)" value={formatLKR(results.netBags * 100)} isNegative={false} />
+            <StatRow label="Society Service Reserved 30%" value={formatLKR((results.netBags * 100) * 0.30)} isNegative={false} />
           </div>
         </div>
 

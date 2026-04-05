@@ -20,7 +20,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   )
 }
 
-export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [] }) {
+export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['Owner 1', 'Owner 2'] }) {
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
 
   const onChange = (name, val) => {
@@ -168,38 +168,6 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 placeholder="Brief reason for other expenses"
               />
             </label>
-
-            <div className="block mb-3">
-              <div className="text-sm font-medium text-gray-700 mb-2">{t('expenseResponsibility')}</div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <label className="inline-flex items-center">
-                  <input type="radio" name="expensePayment" value="owners" checked={(inputs.expensePayment || 'owners') === 'owners'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
-                  <span className="text-sm">{t('expenseOwners')}
-                  </span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input type="radio" name="expensePayment" value="contractor" checked={(inputs.expensePayment || 'owners') === 'contractor'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
-                  <span className="text-sm">{t('expenseContractor')}</span>
-                </label>
-              </div>
-            </div>
-            <div className="mt-2">
-              <button type="button" onClick={addExpense} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded text-sm hover:bg-blue-100">
-                {t('addExpenses')}
-              </button>
-            </div>
-
-            {(inputs.extraExpenses || []).length > 0 && (
-              <div className="mt-3 space-y-2">
-                {(inputs.extraExpenses || []).map(exp => (
-                    <div key={exp.id} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    <input className="flex-1 border border-gray-300 rounded px-3 py-2 text-base" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value)} />
-                    <input type="number" step="any" className="w-full sm:w-28 border border-gray-300 rounded px-3 py-2 text-base" value={exp.amount === 0 ? '' : Number(exp.amount).toFixed(2)} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
-                    <button type="button" onClick={() => removeExpense(exp.id)} className="text-sm text-red-600">{t('remove') || 'Remove'}</button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
           <div>
@@ -207,6 +175,41 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
             <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} />
             <div className="text-xs text-gray-500 mt-1">{t ? t('cashAutoHint') : 'Auto-filled from Net Bags × Price per Bag; edit to override'}</div>
             <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} decimals={2} />
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div className="block mb-3">
+              <div className="text-sm font-medium text-gray-700 mb-2">{t('expenseResponsibility')}</div>
+              <div className="flex flex-col gap-3">
+                <label className="inline-flex items-center">
+                  <input type="radio" name="expensePayment" value="owners" checked={(inputs.expensePayment || 'owners') === 'owners'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
+                  <span className="text-sm">{t('expenseOwners')}</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input type="radio" name="expensePayment" value="contractor" checked={(inputs.expensePayment || 'owners') === 'contractor'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
+                  <span className="text-sm">{t('expenseContractor')}</span>
+                </label>
+              </div>
+            </div>
+            <div className="mt-3">
+              <button type="button" onClick={addExpense} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded text-sm hover:bg-blue-100 w-fit">
+                {t('addExpenses')}
+              </button>
+            </div>
+
+            {(inputs.extraExpenses || []).length > 0 && (
+              <div className="mt-3 space-y-2">
+                {(inputs.extraExpenses || []).map(exp => (
+                  <div key={exp.id} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <input className="flex-1 border border-gray-300 rounded px-3 py-2 text-base" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value)} />
+                    <input type="number" step="any" className="w-full sm:w-28 border border-gray-300 rounded px-3 py-2 text-base" value={exp.amount === 0 ? '' : Number(exp.amount).toFixed(2)} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
+                    <button type="button" onClick={() => removeExpense(exp.id)} className="text-sm text-red-600">{t('remove') || 'Remove'}</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -226,8 +229,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
           {inputs.bothOwnersHaveLoans && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <NumberInput label="Loan (Inaya) - LKR" name="loanInaya" value={inputs.loanInaya} onChange={onChange} decimals={2} />
-              <NumberInput label="Loan (Shakira) - LKR" name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
+              <NumberInput label={`Loan (${ownerNames?.[0] || 'Owner 1'}) - LKR`} name="loanInaya" value={inputs.loanInaya} onChange={onChange} decimals={2} />
+              <NumberInput label={`Loan (${ownerNames?.[1] || 'Owner 2'}) - LKR`} name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
             </div>
           )}
 
