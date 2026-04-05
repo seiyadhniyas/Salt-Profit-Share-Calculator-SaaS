@@ -1168,7 +1168,7 @@ export default function App(){
   })
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-xs lg:text-sm' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
         <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-4 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:px-6 sm:pb-6 sm:pt-5">
           <div className="absolute left-3 top-3 sm:left-5 sm:top-4">
@@ -1193,10 +1193,10 @@ export default function App(){
           </button>
 
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-3xl font-bold leading-tight text-gray-800 sm:text-4xl lg:text-5xl">
+            <h1 className={`font-bold leading-tight text-gray-800 ${lang === 'ta' ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
               {t('title')}
             </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base">
+            <p className={`mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base ${lang === 'ta' ? 'text-xs sm:text-sm' : ''}`}>
               {t('subtitle')}
             </p>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { formatLKR } from '../utils/calculations.jsx'
 
-function StatCard({ title, value, note, accent = 'slate' }) {
+function StatCard({ title, value, note, accent = 'slate', isTamil }) {
   const accentMap = {
     slate: 'from-slate-900 to-slate-700',
     blue: 'from-blue-600 to-cyan-500',
@@ -10,11 +10,11 @@ function StatCard({ title, value, note, accent = 'slate' }) {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-      <div className={`inline-flex rounded-full bg-gradient-to-r ${accentMap[accent]} px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white`}>
+      <div className={`inline-flex rounded-full bg-gradient-to-r ${accentMap[accent]} px-3 py-1 ${isTamil ? 'text-[0.6rem]' : 'text-xs'} font-semibold uppercase tracking-[0.05em] text-white`}>
         {title}
       </div>
-      <div className="mt-3 text-2xl font-bold text-slate-900">{value}</div>
-      {note && <div className="mt-1 text-sm text-slate-500">{note}</div>}
+      <div className={`mt-3 ${isTamil ? 'text-lg' : 'text-2xl'} font-bold text-slate-900 break-words`}>{value}</div>
+      {note && <div className={`mt-1 ${isTamil ? 'text-[0.65rem] leading-tight' : 'text-sm'} text-slate-500`}>{note}</div>}
     </div>
   )
 }
@@ -57,6 +57,7 @@ export default function DashboardSummary({
   onOpenAdminAuth,
 }) {
   const tr = (key, fallback) => (t ? t(key) : fallback)
+  const isTamil = (t && t('lang') === 'ta') || (typeof t === 'function' && t('title') === 'உப்பு இலாப பகிர்வு கணக்கீடு')
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || tr('guestMember', 'Guest member')
   const reportsCount = Array.isArray(reports) ? reports.length : 0
@@ -112,30 +113,30 @@ export default function DashboardSummary({
   }
 
   return (
-    <section className="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
+    <section className={`mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl ${t ? 'text-xs md:text-sm' : ''}`}>
       <div className="flex flex-col gap-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-700 px-6 py-5 text-white">
         <div className="flex flex-wrap items-center justify-end gap-3">
           {signedIn ? (
             <button
               type="button"
               onClick={onSignOut}
-              className="rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
+              className={`rounded-full border border-white/20 bg-white/10 px-5 py-2.5 ${isTamil ? 'text-xs' : 'text-sm'} font-semibold text-white transition hover:bg-white/20`}
             >
               {tr('signOut', 'Sign out')}
             </button>
           ) : (
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 justify-end">
               <button
                 type="button"
                 onClick={onOpenAuth}
-                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+                className={`rounded-full bg-white px-3 py-1.5 ${isTamil ? 'text-[10px]' : 'text-sm'} font-semibold text-slate-900 transition hover:bg-slate-100`}
               >
                 {tr('signInRegister', 'Sign in / Register')}
               </button>
               <button
                 type="button"
                 onClick={onOpenAdminAuth}
-                className="rounded-full border border-amber-300 bg-amber-100 px-5 py-2.5 text-sm font-semibold text-amber-900 transition hover:bg-amber-200"
+                className={`rounded-full border border-amber-300 bg-amber-100 px-3 py-1.5 ${isTamil ? 'text-[10px]' : 'text-sm'} font-semibold text-amber-900 transition hover:bg-amber-200`}
               >
                 👤 {tr('adminAccess', 'Admin Access')}
               </button>
@@ -261,7 +262,7 @@ export default function DashboardSummary({
                 type="button"
                 onClick={onStartCardPayment}
                 disabled={paymentBusy}
-                className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className={`rounded-full bg-indigo-600 px-4 py-2 ${isTamil ? 'text-xs' : 'text-sm'} font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60`}
               >
                 {paymentBusy ? tr('pleaseWait', 'Please wait...') : tr('payByCard', 'Pay by Card (Stripe)')}
               </button>
@@ -269,7 +270,7 @@ export default function DashboardSummary({
                 type="button"
                 onClick={onRequestCashPayment}
                 disabled={paymentBusy}
-                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className={`rounded-full border border-slate-300 bg-white px-4 py-2 ${isTamil ? 'text-xs' : 'text-sm'} font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60`}
               >
                 {tr('submitCashRequest', 'Submit Cash Payment Request')}
               </button>
@@ -282,12 +283,14 @@ export default function DashboardSummary({
           value={signedIn ? displayName : tr('notSignedIn', 'Not signed in')}
           note={signedIn ? tr('connectedSupabaseAuth', 'Connected through Supabase Auth') : tr('popupAuthReady', 'Popup auth is ready when you need it')}
           accent="blue"
+          isTamil={isTamil}
         />
         <StatCard
           title={tr('productionSnapshot', 'Production Snapshot')}
           value={`${snapshotNetBags} ${tr('bagsUnit', 'bags')}`}
           note={`${tr('weightLabel', 'Weight')}: ${snapshotSaltWeight} kg • ${tr('initialPriceLabel', 'Initial price')}: LKR ${snapshotInitialPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           accent="slate"
+          isTamil={isTamil}
         />
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
           <div className="inline-flex rounded-full bg-gradient-to-r from-purple-600 to-pink-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
