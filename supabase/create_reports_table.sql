@@ -25,6 +25,10 @@ create table if not exists profiles (
   company_name text,
   phone text,
   is_admin boolean not null default false,
+  owner_names text[] default array['', ''],
+  custom_locations text[] default array[]::text[],
+  contractor_share_percentage numeric(5,2) default 50.00,
+  owner_count integer default 2,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );

@@ -57,6 +57,71 @@ export default function App(){
     } catch { return 2 }
   })
 
+  const [session, setSession] = useState(null)
+
+  // Auth & Profile Sync
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Load profile settings from Supabase
+  useEffect(() => {
+    async function loadProfile() {
+      if (!session?.user?.id) return
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('owner_names, custom_locations, contractor_share_percentage, owner_count')
+        .eq('id', session.user.id)
+        .single()
+
+      if (data && !error) {
+        if (data.owner_names) setOwnerNames(data.owner_names)
+        if (data.custom_locations) setCustomLocations(data.custom_locations)
+        if (data.contractor_share_percentage) setContractorSharePercentage(Number(data.contractor_share_percentage))
+        if (data.owner_count) setOwnerCount(Number(data.owner_count))
+      } else if (error && error.code === 'PGRST116') {
+        // Profile doesn't exist, create it with current state
+        await supabase.from('profiles').insert([{
+          id: session.user.id,
+          owner_names: ownerNames,
+          custom_locations: customLocations,
+          contractor_share_percentage: contractorSharePercentage,
+          owner_count: ownerCount
+        }])
+      }
+    }
+    loadProfile()
+  }, [session])
+
+  // Sync back to Supabase on changes
+  useEffect(() => {
+    const syncTimeout = setTimeout(async () => {
+      if (!session?.user?.id) return
+      
+      await supabase
+        .from('profiles')
+        .update({
+          owner_names: ownerNames,
+          custom_locations: customLocations,
+          contractor_share_percentage: contractorSharePercentage,
+          owner_count: ownerCount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', session.user.id)
+    }, 1000) // Debounce 1s
+
+    return () => clearTimeout(syncTimeout)
+  }, [ownerNames, customLocations, contractorSharePercentage, ownerCount, session])
+
     // Disaster Recovery state
     const [showDisasterRecovery, setShowDisasterRecovery] = useState(false)
     const [disasterRecovery, setDisasterRecovery] = useState({
@@ -571,7 +636,6 @@ export default function App(){
 
   const [inputs, setInputs] = useState(defaultInputs)
   const [results, setResults] = useState(null)
-  const [session, setSession] = useState(null)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState('signin')
   const [adminAuthModalOpen, setAdminAuthModalOpen] = useState(false)
