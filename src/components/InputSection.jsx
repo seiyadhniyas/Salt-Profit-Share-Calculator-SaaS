@@ -11,7 +11,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
         {tooltip && (
           <div className="relative group">
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-500 border border-gray-300 rounded-full cursor-help hover:text-gray-700 hover:border-gray-500 transition">!</span>
-            <div className="hidden group-hover:block absolute z-10 pointer-events-none bg-gray-900 text-white text-xs rounded px-3 py-2 max-w-xs break-words md:left-0 md:bottom-full md:mb-2 md:whitespace-normal left-1/2 transform -translate-x-1/2 top-full mt-2 md:transform-none md:-translate-x-0">
+            <div className="hidden group-hover:block absolute z-50 bg-slate-950 text-white text-xs md:text-sm rounded px-4 pt-2 pb-4 md:px-6 md:pt-3 md:pb-6 md:min-h-24 w-52 md:w-96 break-words shadow-lg leading-relaxed md:left-0 md:bottom-full md:mb-3 left-1/2 transform -translate-x-1/2 top-full mt-2 md:transform-none md:-translate-x-0 flex items-start">
               {tooltip}
             </div>
           </div>
