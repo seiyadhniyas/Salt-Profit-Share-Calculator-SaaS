@@ -1262,29 +1262,29 @@ export default function App(){
                 <h3 className="text-base font-black text-sky-400 mb-5 uppercase tracking-widest">{t('summary')}</h3>
                 <div className="space-y-4 relative z-10">
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('netBags')}</span>
-                    <strong className="text-xl font-mono text-white">{results.netBags}</strong>
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('netBags')}</span>
+                    <strong className="text-base sm:text-xl font-mono text-white">{results.netBags}</strong>
                   </div>
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('saltNetWeight')}</span>
-                    <strong className="text-xl font-mono text-white">{formatKg(results.netBags * 50)}</strong>
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('saltNetWeight')}</span>
+                    <strong className="text-base sm:text-xl font-mono text-white">{formatKg(results.netBags * 50)}</strong>
                   </div>
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('initialPrice')}</span>
-                    <strong className="text-xl font-mono text-white">{formatLKR(results.initialPrice)}</strong>
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('initialPrice')}</span>
+                    <strong className="text-sm sm:text-xl font-mono text-white text-right">{formatLKR(results.initialPrice)}</strong>
                   </div>
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('contractorSpent')}</span>
-                    <strong className="text-xl font-mono text-white">{formatLKR(results.contractorTotalSpent)}</strong>
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('contractorSpent')}</span>
+                    <strong className="text-sm sm:text-xl font-mono text-white text-right">{formatLKR(results.contractorTotalSpent)}</strong>
                   </div>
                   <div className="my-6 border-t border-white/10 border-dashed"></div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('contractorShare')}</span>
-                    <strong className="text-xl font-mono text-emerald-400">{formatLKR(results.contractorShare)}</strong>
+                  <div className="flex justify-between items-center px-1">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('contractorShare')}</span>
+                    <strong className="text-sm sm:text-lg font-mono text-emerald-400 text-right">{formatLKR(results.contractorShare)}</strong>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}</span>
-                    <strong className="text-xl font-mono text-sky-400">{formatLKR(results.generalSharePerOwner)}</strong>
+                  <div className="flex justify-between items-center px-1">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}</span>
+                    <strong className="text-sm sm:text-lg font-mono text-sky-400 text-right">{formatLKR(results.generalSharePerOwner)}</strong>
                   </div>
                 </div>
               </div>
