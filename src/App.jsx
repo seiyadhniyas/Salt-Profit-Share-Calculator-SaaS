@@ -7,7 +7,7 @@ import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFilesFromSupabase, savePdfFileToSupabase } from './api/reports.js'
-import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment } from './api/billing.js'
+import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment, getAdminPendingPayments, activatePaymentRequestAsAdmin } from './api/billing.js'
 import { useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
 
@@ -265,6 +265,16 @@ export default function App(){
       paymentRequestSubmitted: 'Cash payment request submitted. Admin has been notified for verification.',
       checkoutStartFailed: 'Unable to start payment checkout',
       cashRequestFailed: 'Unable to submit cash payment request',
+      adminDashboard: 'Admin Dashboard',
+      refreshPending: 'Refresh Pending',
+      adminPendingHelp: 'Review pending/captured payments and activate user access with one click.',
+      noPendingPaymentRequests: 'No pending payment requests.',
+      paymentMethod: 'Method',
+      amount: 'Amount',
+      status: 'Status',
+      activateNow: 'Activate Now',
+      adminActivationSuccess: 'Payment verified. User access activated.',
+      adminActivationFailed: 'Activation failed',
     },
     ta: {
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
@@ -464,6 +474,16 @@ export default function App(){
       paymentRequestSubmitted: 'பண கட்டண கோரிக்கை சமர்ப்பிக்கப்பட்டது. சரிபார்ப்புக்காக நிர்வாகிக்கு அறிவிக்கப்பட்டது.',
       checkoutStartFailed: 'கட்டண செயல்முறையை தொடங்க முடியவில்லை',
       cashRequestFailed: 'பண கட்டண கோரிக்கையை சமர்ப்பிக்க முடியவில்லை',
+      adminDashboard: 'நிர்வாகி டாஷ்போர்டு',
+      refreshPending: 'நிலுவைகளை புதுப்பி',
+      adminPendingHelp: 'நிலுவை/பெறப்பட்ட கட்டணங்களை பரிசீலித்து ஒரு கிளிக்கில் பயனர் அணுகலை செயற்படுத்தவும்.',
+      noPendingPaymentRequests: 'நிலுவை கட்டண கோரிக்கைகள் இல்லை.',
+      paymentMethod: 'முறை',
+      amount: 'தொகை',
+      status: 'நிலை',
+      activateNow: 'இப்போது செயற்படுத்து',
+      adminActivationSuccess: 'கட்டணம் சரிபார்க்கப்பட்டது. பயனர் அணுகல் செயற்படுத்தப்பட்டது.',
+      adminActivationFailed: 'செயற்படுத்தல் தோல்வி',
     }
   }
 
@@ -483,6 +503,9 @@ export default function App(){
   const [savedFiles, setSavedFiles] = useState([])
   const [billingStatus, setBillingStatus] = useState(null)
   const [paymentBusy, setPaymentBusy] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [pendingPaymentRequests, setPendingPaymentRequests] = useState([])
+  const [adminActionBusy, setAdminActionBusy] = useState(false)
   const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
   const ONE_OFF_PRICE_LKR = 30000
   const STRIPE_FEE_PERCENT = Number(import.meta.env.VITE_STRIPE_LKR_FEE_PERCENT || 3.4)
@@ -560,6 +583,71 @@ export default function App(){
       console.error(error)
     }
   }, [session])
+
+  const refreshAdminStatus = useCallback(async (activeSession = session) => {
+    if (!supabase || !activeSession?.user?.id) {
+      setIsAdmin(false)
+      setPendingPaymentRequests([])
+      return
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', activeSession.user.id)
+        .maybeSingle()
+
+      if (error) throw error
+
+      const adminFlag = Boolean(data?.is_admin)
+      setIsAdmin(adminFlag)
+
+      if (!adminFlag) {
+        setPendingPaymentRequests([])
+      }
+    } catch (error) {
+      console.error(error)
+      setIsAdmin(false)
+      setPendingPaymentRequests([])
+    }
+  }, [session])
+
+  const refreshPendingPaymentRequests = useCallback(async (activeSession = session) => {
+    if (!activeSession?.user?.id || !isAdmin) {
+      setPendingPaymentRequests([])
+      return
+    }
+
+    try {
+      const resp = await getAdminPendingPayments(activeSession)
+      if (resp?.ok) {
+        setPendingPaymentRequests(resp.requests || [])
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }, [session, isAdmin])
+
+  const handleAdminActivatePaymentRequest = async (requestRow) => {
+    if (!requestRow?.id || !session?.user?.id) return
+
+    try {
+      setAdminActionBusy(true)
+      await activatePaymentRequestAsAdmin({
+        session,
+        paymentRequestId: requestRow.id,
+      })
+
+      alert(t('adminActivationSuccess'))
+      await refreshPendingPaymentRequests(session)
+      await refreshBillingStatus(session)
+    } catch (error) {
+      alert(`${t('adminActivationFailed')}: ${error?.message || error}`)
+    } finally {
+      setAdminActionBusy(false)
+    }
+  }
 
   const ensurePremiumAccess = async () => {
     if (!session?.user?.id) {
@@ -681,7 +769,14 @@ export default function App(){
     loadReports(session)
     loadSavedFiles(session)
     refreshBillingStatus(session)
-  }, [session, loadReports, loadSavedFiles, refreshBillingStatus])
+    refreshAdminStatus(session)
+  }, [session, loadReports, loadSavedFiles, refreshBillingStatus, refreshAdminStatus])
+
+  useEffect(() => {
+    if (menuOpen && isAdmin) {
+      refreshPendingPaymentRequests(session)
+    }
+  }, [menuOpen, isAdmin, session, refreshPendingPaymentRequests])
 
   useEffect(() => {
     const url = new URL(window.location.href)

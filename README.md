@@ -89,8 +89,12 @@ Industry-standard flow implemented:
    - Cash: manual request (`/.netlify/functions/requestCashPayment`)
 5. Stripe webhook (`/.netlify/functions/stripeWebhook`) marks payment as `paid_pending_verification` and notifies admin.
 6. Admin verifies payment externally and activates full access using:
-   - `/.netlify/functions/adminActivatePayment`
-   - must include header `x-admin-key: <ADMIN_VERIFICATION_KEY>`
+   - In-app Admin Dashboard (recommended), or
+   - `/.netlify/functions/adminActivatePayment` for manual API fallback
+7. In-app admin tools are powered by:
+   - `/.netlify/functions/adminListPendingPayments`
+   - `/.netlify/functions/adminActivatePaymentRequest`
+   - Server-side admin check via user JWT + `profiles.is_admin = true`
 7. User billing profile is set to full access and trial restrictions are removed.
 
 ### Admin Activation Example
@@ -100,6 +104,21 @@ curl -X POST https://<your-site>.netlify.app/.netlify/functions/adminActivatePay
   -H "Content-Type: application/json" \
   -H "x-admin-key: <ADMIN_VERIFICATION_KEY>" \
   -d '{"paymentRequestId":123,"userId":"<supabase-user-uuid>"}'
+```
+
+### In-App Admin Dashboard Setup
+
+1. Ensure the signed-in admin user has `is_admin = true` in `profiles`.
+2. Open Dashboard menu in app.
+3. Admin card shows pending/captured payment requests.
+4. Click `Activate Now` to mark request verified and enable full access.
+
+Example SQL to grant admin:
+
+```sql
+update profiles
+set is_admin = true
+where id = '<admin-user-uuid>';
 ```
 
 ### Stripe Fee Glance (Sri Lankan Cards)

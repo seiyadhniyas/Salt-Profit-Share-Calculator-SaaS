@@ -109,3 +109,45 @@ export async function requestCashPayment({ session, amountLkr = 30000 }) {
 
   return body
 }
+
+export async function getAdminPendingPayments(session) {
+  if (!session?.access_token) {
+    throw new Error('Please sign in as admin')
+  }
+
+  const res = await fetch('/.netlify/functions/adminListPendingPayments', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  })
+
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok || !body?.ok) {
+    throw new Error(body?.error || 'Unable to fetch pending payment requests')
+  }
+
+  return body
+}
+
+export async function activatePaymentRequestAsAdmin({ session, paymentRequestId }) {
+  if (!session?.access_token) {
+    throw new Error('Please sign in as admin')
+  }
+
+  const res = await fetch('/.netlify/functions/adminActivatePaymentRequest', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ paymentRequestId }),
+  })
+
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok || !body?.ok) {
+    throw new Error(body?.error || 'Unable to activate payment request')
+  }
+
+  return body
+}

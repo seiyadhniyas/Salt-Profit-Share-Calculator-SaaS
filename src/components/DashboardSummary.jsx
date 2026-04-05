@@ -49,6 +49,11 @@ export default function DashboardSummary({
   onRequestCashPayment,
   stripeFeePreview,
   paymentBusy,
+  isAdmin,
+  pendingPaymentRequests = [],
+  onRefreshPendingPaymentRequests,
+  onActivatePaymentRequest,
+  adminActionBusy,
 }) {
   const tr = (key, fallback) => (t ? t(key) : fallback)
   const signedIn = Boolean(session?.user)
@@ -105,6 +110,73 @@ export default function DashboardSummary({
       </div>
 
       <div className="grid gap-4 p-6 md:grid-cols-2">
+        {isAdmin && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl md:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="inline-flex rounded-full bg-gradient-to-r from-emerald-700 to-teal-600 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                {tr('adminDashboard', 'Admin Dashboard')}
+              </div>
+              <button
+                type="button"
+                onClick={onRefreshPendingPaymentRequests}
+                disabled={adminActionBusy}
+                className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {tr('refreshPending', 'Refresh Pending')}
+              </button>
+            </div>
+
+            <div className="mt-3 text-sm text-slate-600">
+              {tr('adminPendingHelp', 'Review pending/captured payments and activate user access with one click.')}
+            </div>
+
+            {pendingPaymentRequests.length === 0 ? (
+              <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                {tr('noPendingPaymentRequests', 'No pending payment requests.')}
+              </div>
+            ) : (
+              <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                    <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                      <tr>
+                        <th className="px-3 py-2 font-semibold">{tr('user', 'User')}</th>
+                        <th className="px-3 py-2 font-semibold">{tr('paymentMethod', 'Method')}</th>
+                        <th className="px-3 py-2 font-semibold">{tr('amount', 'Amount')}</th>
+                        <th className="px-3 py-2 font-semibold">{tr('status', 'Status')}</th>
+                        <th className="px-3 py-2 font-semibold">{tr('action', 'Action')}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 bg-white">
+                      {pendingPaymentRequests.map((req) => (
+                        <tr key={req.id} className="hover:bg-slate-50">
+                          <td className="px-3 py-2 text-slate-700">
+                            <div className="font-medium">{req.user_email || req.user_id}</div>
+                            <div className="text-xs text-slate-500">{req.created_at || '-'}</div>
+                          </td>
+                          <td className="px-3 py-2 text-slate-700">{String(req.payment_method || '-').toUpperCase()}</td>
+                          <td className="px-3 py-2 text-slate-700">{formatLKR(req.amount_lkr || 0)}</td>
+                          <td className="px-3 py-2 text-slate-700">{req.status || '-'}</td>
+                          <td className="px-3 py-2">
+                            <button
+                              type="button"
+                              onClick={() => onActivatePaymentRequest?.(req)}
+                              disabled={adminActionBusy}
+                              className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {adminActionBusy ? tr('pleaseWait', 'Please wait...') : tr('activateNow', 'Activate Now')}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl md:col-span-2">
           <div className="inline-flex rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
             {tr('billingAccess', 'Billing & Access')}

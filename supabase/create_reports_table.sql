@@ -8,9 +8,12 @@ create table if not exists profiles (
   display_name text,
   company_name text,
   phone text,
+  is_admin boolean not null default false,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+alter table profiles add column if not exists is_admin boolean not null default false;
 
 create table if not exists reports (
   id bigserial primary key,
@@ -60,11 +63,16 @@ create table if not exists payment_requests (
   stripe_session_id text,
   stripe_payment_intent text,
   status text not null default 'pending' check (status in ('pending', 'paid_pending_verification', 'verified_active', 'rejected', 'failed')),
+  verified_by_admin uuid references auth.users(id) on delete set null,
+  verified_at timestamptz,
   metadata jsonb,
   admin_notified boolean not null default false,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+alter table payment_requests add column if not exists verified_by_admin uuid references auth.users(id) on delete set null;
+alter table payment_requests add column if not exists verified_at timestamptz;
 
 insert into storage.buckets (id, name, public)
 values ('saved-files', 'saved-files', true)
