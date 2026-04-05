@@ -241,26 +241,26 @@ export default function DashboardSummary({
               )}
             </div>
 
-            <div className="rounded-[28px] bg-slate-50 border border-slate-200 p-5 shadow-sm sm:col-span-1 md:col-span-2">
+            <div className="rounded-[28px] bg-slate-50 border border-slate-200 p-5 shadow-sm sm:col-span-2 md:col-span-3 lg:col-span-2">
               <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">{tr('stripeFeeGlance', 'Stripe Fee Glance (Sri Lankan Cards)')}</div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-1">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">{tr('oneOffPrice', 'One-off Price')}</div>
                   <div className="text-sm font-bold text-slate-700">{stripeFeePreview?.baseFormatted || 'LKR 30,000.00'}</div>
                 </div>
                 <div className="space-y-1">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">{tr('estimatedCardFee', 'Estimated Card Fee')}</div>
-                  <div className="text-sm font-bold text-slate-700">{stripeFeePreview?.feeFormatted || 'LKR 0.00'}</div>
+                  <div className="text-sm font-bold text-slate-700">{stripeFeePreview?.feeFormatted || 'LKR 1,110.00'}</div>
                 </div>
-                <div className="space-y-1 border-l border-slate-200 pl-4">
+                <div className="space-y-1 border-l border-slate-200 pl-4 sm:border-l-0 sm:pl-0 lg:border-l lg:pl-4">
                   <div className="text-[10px] text-indigo-400 font-bold uppercase">{tr('estimatedTotal', 'Estimated Total')}</div>
-                  <div className="text-lg font-black text-slate-900">{stripeFeePreview?.totalFormatted || 'LKR 30,000.00'}</div>
+                  <div className="text-lg font-black text-slate-900">{stripeFeePreview?.totalFormatted || 'LKR 31,110.00'}</div>
                 </div>
               </div>
-              <div className="mt-3 text-[10px] italic text-slate-400 font-medium">{tr('feeDisclaimer', 'Actual Stripe fees may vary by issuer and card type.')}</div>
+              <div className="mt-4 text-[10px] italic text-slate-400 font-medium leading-tight">{tr('feeDisclaimer', 'Actual Stripe fees may vary by issuer and card type.')}</div>
             </div>
 
-            <div className="flex flex-col justify-center gap-3">
+            <div className="flex flex-col justify-center gap-3 sm:col-span-2 md:col-span-4 lg:col-span-1">
               {!fullAccessEnabled && (
                 <>
                   <button
@@ -283,6 +283,11 @@ export default function DashboardSummary({
               )}
             </div>
           </div>
+          {!fullAccessEnabled && paymentStatus === 'payment_pending_verification' && (
+            <div className="mt-4 rounded-2xl bg-amber-50 border border-amber-200 p-4 text-xs font-medium text-amber-800">
+              <span className="mr-1">⏳</span> {tr('activationPending', 'Payment received. Admin verification pending for activation.')}
+            </div>
+          )}
         </div>
 
         <StatCard
@@ -307,7 +312,7 @@ export default function DashboardSummary({
             <div className="mb-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
               {tr('workLocationsHelp', 'Add your work locations here to use them in reports')}
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-nowrap">
               <input
                 type="text"
                 value={newLocation}
@@ -319,7 +324,7 @@ export default function DashboardSummary({
                   }
                 }}
                 placeholder={tr('enterLocationName', 'Enter location name')}
-                className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-bold outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
+                className="flex-1 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none transition focus:bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
               />
               <button
                 type="button"
@@ -329,7 +334,7 @@ export default function DashboardSummary({
                     setNewLocation('')
                   }
                 }}
-                className="rounded-2xl bg-slate-900 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition active:scale-95 hover:bg-slate-800"
+                className="whitespace-nowrap rounded-2xl bg-slate-900 px-8 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition active:scale-95 hover:bg-slate-800"
               >
                 {tr('add', 'Add')}
               </button>

@@ -51,6 +51,11 @@ export default function App(){
       return Number(localStorage.getItem('contractorSharePercentage')) || 50
     } catch { return 50 }
   })
+  const [ownerCount, setOwnerCount] = useState(() => {
+    try {
+      return Number(localStorage.getItem('ownerCount')) || 2
+    } catch { return 2 }
+  })
 
     // Disaster Recovery state
     const [showDisasterRecovery, setShowDisasterRecovery] = useState(false)
@@ -78,6 +83,11 @@ export default function App(){
   useEffect(() => {
     try { localStorage.setItem('contractorSharePercentage', String(contractorSharePercentage)) } catch(e){}
   }, [contractorSharePercentage])
+
+  // Persist ownerCount to localStorage
+  useEffect(() => {
+    try { localStorage.setItem('ownerCount', String(ownerCount)) } catch(e){}
+  }, [ownerCount])
 
   const translations = {
     en: {
@@ -590,7 +600,6 @@ export default function App(){
     : normalizedOwnerNames.length === 1
       ? [normalizedOwnerNames[0], '']
       : ['', '']
-  const ownerCount = normalizedOwnerNames.length === 1 ? 1 : 2
   const estimatedStripeFee = ((ONE_OFF_PRICE_LKR * STRIPE_FEE_PERCENT) / 100) + STRIPE_FEE_FIXED
   const stripeFeePreview = {
     base: ONE_OFF_PRICE_LKR,
