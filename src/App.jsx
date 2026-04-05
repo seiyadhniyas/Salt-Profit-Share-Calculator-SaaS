@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react'
 import InputSection from './components/InputSection.jsx'
+import DisasterRecoveryCard from './components/DisasterRecoveryCard.jsx'
 import ResultSection from './components/ResultSection.jsx'
 import DashboardSummary from './components/DashboardSummary.jsx'
 import AuthModal from './components/AuthModal.jsx'
@@ -49,6 +50,18 @@ export default function App(){
     try {
       return Number(localStorage.getItem('contractorSharePercentage')) || 50
     } catch { return 50 }
+  })
+
+  // Disaster Recovery state
+  const [showDisasterRecovery, setShowDisasterRecovery] = useState(false)
+  const [disasterRecovery, setDisasterRecovery] = useState({
+    lossQuantity: '',
+    lossUnit: 'bags',
+    pondsReconstruction: '',
+    hutReconstruction: '',
+    electricityBills: '',
+    compensationReceived: '',
+    donationsReceived: '',
   })
 
   // Persist customLocations to localStorage
@@ -287,6 +300,23 @@ export default function App(){
       adminAuthSuccess: 'Authentication Successful',
       adminAccess: 'Admin Access',
       adminLoginPrompt: 'Sign in with admin credentials to access the admin dashboard.',
+      // Disaster Recovery
+      disasterRecovery: 'Disaster Recovery Expenses',
+      addDisasterRecovery: '+ Add Disaster Recovery Expenses',
+      lossQuantity: 'Loss Quantity of Salt',
+      lossQuantityPlaceholder: 'e.g. 100',
+      bags: 'Bags',
+      kg: 'kg',
+      pondsReconstruction: 'Ponds Reconstruction (LKR)',
+      pondsReconstructionPlaceholder: 'e.g. 50000',
+      hutReconstruction: 'Hut Reconstruction (LKR)',
+      hutReconstructionPlaceholder: 'e.g. 20000',
+      electricityBills: 'Electricity Bills (LKR)',
+      electricityBillsPlaceholder: 'e.g. 5000',
+      compensationReceived: 'Compensation Received (LKR)',
+      compensationReceivedPlaceholder: 'e.g. 10000',
+      donationsReceived: 'Donations Received (LKR)',
+      donationsReceivedPlaceholder: 'e.g. 5000',
     },
     ta: {
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
@@ -507,6 +537,23 @@ export default function App(){
       adminAuthSuccess: 'அங்கீகாரம் வெற்றிகரமாக',
       adminAccess: 'நிர்வாக அணுகல்',
       adminLoginPrompt: 'நிர்வாக டாஷ்போர்டைக் அணுக நிர்வாக நற்சான்றுகளில் உள்நுழையவும்.',
+      // Disaster Recovery
+      disasterRecovery: 'பேரிடர் மீட்பு செலவுகள்',
+      addDisasterRecovery: '+ பேரிடர் மீட்பு செலவுகளைச் சேர்க்கவும்',
+      lossQuantity: 'உப்பு இழப்পின் அளவு',
+      lossQuantityPlaceholder: 'எ.கா. 100',
+      bags: 'பைகள்',
+      kg: 'கிகி',
+      pondsReconstruction: 'குளங்கள் புनర्নितिर्माण (LKR)',
+      pondsReconstructionPlaceholder: 'எ.கா. 50000',
+      hutReconstruction: 'குடிலுக்கான புनर्നितिर्माण (LKR)',
+      hutReconstructionPlaceholder: 'எ.கா. 20000',
+      electricityBills: 'மின்சாரக் கட்டணங்கள் (LKR)',
+      electricityBillsPlaceholder: 'எ.கா. 5000',
+      compensationReceived: 'பெற்ற இழப்பீடு (LKR)',
+      compensationReceivedPlaceholder: 'எ.கா. 10000',
+      donationsReceived: 'பெற்ற தானங்கள் (LKR)',
+      donationsReceivedPlaceholder: 'எ.கா. 5000',
     }
   }
 
