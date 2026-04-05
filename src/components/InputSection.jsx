@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import AccordionCard from './AccordionCard'
 
 function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip }) {
   // Format display to show specified decimal places
@@ -79,15 +80,13 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
   return (
     <>
-      <div className="shadow-xl rounded-2xl p-5 mb-4" style={{ backgroundColor: '#ddfafe' }}>
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="text-xl font-bold text-gray-800">{t('documentDetails')}</h4>
-          <div>
-            <select value={lang} onChange={(e) => setLang && setLang(e.target.value)} className="border rounded px-2 py-1 text-sm font-medium" style={{ backgroundColor: '#fce4ec' }}>
-              <option value="en">ENG</option>
-              <option value="ta">தமிழ்</option>
-            </select>
-          </div>
+      <AccordionCard 
+        title={t('documentDetails')} 
+        bgColor="#ddfafe" 
+        defaultOpen={true}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-sm font-medium text-gray-500">{t('subtitle')}</div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="block">
@@ -142,11 +141,15 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
             />
           </label>
         </div>
-      </div>
+      </AccordionCard>
 
-      <div className="bg-yellow-50 shadow-xl rounded-2xl p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-gray-800">{t('inputData')}</h3>
+      <AccordionCard 
+        title={t('inputData')} 
+        bgColor="rgb(254, 252, 232)" 
+        defaultOpen={false}
+        icon="📝"
+      >
+        <div className="flex justify-end mb-4">
           <button
             onClick={reset}
             className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm transition"
@@ -250,7 +253,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
             <p className="text-sm text-gray-500">{t ? t('toggleLoansHint') : 'Toggle checkbox above to add loans'}</p>
           )}
         </div>
-      </div>
+      </AccordionCard>
     </>
   )
 }

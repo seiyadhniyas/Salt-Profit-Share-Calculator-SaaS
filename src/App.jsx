@@ -1171,10 +1171,21 @@ export default function App(){
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-xs lg:text-sm' : ''}`}>
       <div ref={rootRef} className="container-max">
         <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-4 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:px-6 sm:pb-6 sm:pt-5">
+          <div className="absolute left-3 top-3 sm:left-5 sm:top-4">
+            <select 
+              value={lang} 
+              onChange={(e) => setLang(e.target.value)} 
+              className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: '#fce4ec' }}
+            >
+              <option value="en">ENG</option>
+              <option value="ta">தமிழ்</option>
+            </select>
+          </div>
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1.25 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-5 sm:top-4 sm:px-3 sm:py-1.5"
+            className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-5 sm:top-4"
             aria-label={t('openDashboardMenu')}
           >
             <span className="text-lg leading-none">☰</span>
