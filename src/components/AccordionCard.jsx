@@ -7,25 +7,27 @@ export default function AccordionCard({ title, children, defaultOpen = false, bg
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className={`shadow-xl rounded-2xl overflow-hidden mb-4 border border-white/20`} style={{ backgroundColor: bgColor }}>
+    <div className={`android-card overflow-hidden mb-6 shadow-xl border border-slate-300`} style={{ backgroundColor: bgColor }}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-5 text-left focus:outline-none transition-colors hover:bg-black/5"
+        className="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none transition-colors hover:bg-black/5 active:bg-black/10"
       >
-        <h4 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-          {icon && <span>{icon}</span>}
-          {title}
-        </h4>
-        <span className={`transform transition-transform duration-200 text-gray-500 ${isOpen ? 'rotate-180' : ''}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <div className="flex items-center gap-3">
+          {icon && <span className="text-2xl opacity-80">{icon}</span>}
+          <h4 className="text-lg font-bold text-slate-900 tracking-tight">
+            {title}
+          </h4>
+        </div>
+        <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-black/5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
           </svg>
-        </span>
+        </div>
       </button>
       
       {isOpen && (
-        <div className="p-5 pt-0 border-t border-black/5 animate-fadeIn">
+        <div className="px-6 pb-6 pt-1 animate-fadeIn border-t border-black/5">
           {children}
         </div>
       )}

@@ -7,12 +7,12 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   
   return (
     <label className="block mb-3">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="text-base font-medium text-gray-700">{label}</div>
+      <div className="flex items-center gap-3 mb-1 ml-1">
+        <div className="text-sm font-semibold text-slate-700">{label}</div>
         {tooltip && (
           <div className="relative group">
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-500 border border-gray-300 rounded-full cursor-help hover:text-gray-700 hover:border-gray-500 transition">!</span>
-            <div className="hidden group-hover:block absolute z-50 bg-slate-950 text-white text-xs md:text-sm rounded px-4 pt-2 pb-4 md:px-6 md:pt-3 md:pb-6 md:min-h-24 w-52 md:w-96 break-words shadow-lg leading-relaxed md:left-0 md:bottom-full md:mb-3 left-1/2 transform -translate-x-1/2 top-full mt-2 md:transform-none md:-translate-x-0 flex items-start">
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-slate-400 border border-slate-200 rounded-full cursor-help hover:text-slate-600 hover:border-slate-300 transition">?</span>
+            <div className="hidden group-hover:block absolute z-50 bg-slate-900 text-white text-xs rounded-xl px-4 py-3 w-48 sm:w-56 shadow-2xl leading-relaxed left-1/2 -translate-x-1/2 bottom-full mb-3 animate-fadeIn before:content-[''] before:absolute before:top-full before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-t-slate-900">
               {tooltip}
             </div>
           </div>
@@ -25,7 +25,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
         min={min}
         value={displayValue}
         onChange={(e) => onChange(name, e.target.value)}
-        className="w-full border border-gray-300 rounded px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full bg-slate-50 border border-slate-200 rounded-[28px] px-6 py-4 text-slate-900 placeholder-slate-400 ring-1 ring-inset ring-slate-100 focus:ring-2 focus:ring-inset focus:ring-slate-900 transition-all outline-none"
       />
     </label>
   )
@@ -90,9 +90,14 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="block">
-            <div className="text-sm font-medium text-gray-700 mb-1">{t('locationDay')}</div>
+            <div className="text-sm font-semibold text-slate-700 mb-1 ml-1">{t('locationDay')}</div>
             {Array.isArray(customLocations) && customLocations.length > 0 ? (
-              <select name="location" value={inputs.location || ''} onChange={(e) => onChange('location', e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-base">
+              <select 
+                name="location" 
+                value={inputs.location || ''} 
+                onChange={(e) => onChange('location', e.target.value)} 
+                className="w-full bg-slate-50 border border-slate-200 rounded-[28px] px-6 py-4 text-slate-900 ring-1 ring-inset ring-slate-100 focus:ring-2 focus:ring-inset focus:ring-slate-900 transition-all outline-none appearance-none cursor-pointer"
+              >
                 <option value="">{t ? t('selectLocation') : 'Select a location'}</option>
                 {customLocations.map(loc => (
                   <option key={loc} value={loc}>{loc}</option>
@@ -104,39 +109,39 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 value=""
                 disabled
                 placeholder={t ? t('addLandNameInDashboard') : 'Add land name in Dashboard'}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-base bg-gray-50 text-gray-500 cursor-not-allowed"
+                className="w-full bg-slate-50 border border-slate-200 rounded-[28px] px-6 py-4 text-slate-400 cursor-not-allowed opacity-60"
               />
             )}
           </label>
 
           <label className="block">
-            <div className="text-sm font-medium text-gray-700 mb-1">{t('date')}</div>
+            <div className="text-sm font-semibold text-slate-700 mb-1 ml-1">{t('date')}</div>
             <input
               type="date"
               value={inputs.date || ''}
               onChange={(e) => onChange('date', e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-base"
+              className="w-full bg-slate-50 border border-slate-200 rounded-[28px] px-6 py-4 text-slate-900 ring-1 ring-inset ring-slate-100 focus:ring-2 focus:ring-inset focus:ring-slate-900 transition-all outline-none"
             />
           </label>
 
           <label className="block">
-            <div className="text-sm font-medium text-gray-700 mb-1">{t('buyerName')}</div>
+            <div className="text-sm font-semibold text-slate-700 mb-1 ml-1">{t('buyerName')}</div>
             <input
               type="text"
               value={inputs.buyerName || ''}
               onChange={(e) => onChange('buyerName', e.target.value)}
-              className="w-full border border-gray-300 rounded px-4 py-3 text-base"
+              className="w-full bg-slate-50 border border-slate-200 rounded-[28px] px-6 py-4 text-slate-900 placeholder-slate-400 ring-1 ring-inset ring-slate-100 focus:ring-2 focus:ring-inset focus:ring-slate-900 transition-all outline-none"
               placeholder=""
             />
           </label>
 
           <label className="block">
-            <div className="text-sm font-medium text-gray-700 mb-1">{t('billNumber')}</div>
+            <div className="text-sm font-semibold text-slate-700 mb-1 ml-1">{t('billNumber')}</div>
             <input
               type="text"
               value={inputs.billNumber || ''}
               onChange={(e) => onChange('billNumber', e.target.value)}
-              className="w-full border border-gray-300 rounded px-4 py-3 text-base"
+              className="w-full bg-slate-50 border border-slate-200 rounded-[28px] px-6 py-4 text-slate-900 placeholder-slate-400 ring-1 ring-inset ring-slate-100 focus:ring-2 focus:ring-inset focus:ring-slate-900 transition-all outline-none"
               placeholder=""
             />
           </label>

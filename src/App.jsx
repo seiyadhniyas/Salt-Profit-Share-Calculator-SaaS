@@ -1202,8 +1202,27 @@ export default function App(){
           </div>
         </header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-2">
+            <button
+              type="button"
+              onClick={() => setOwnerCount(ownerCount === 1 ? 2 : 1)}
+              className="w-full mb-6 py-4 px-6 rounded-[28px] bg-white border-none android-shadow flex items-center justify-between group transition-all active:scale-[0.98] hover:bg-slate-50"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-xl shadow-lg transform group-hover:rotate-12 transition-transform">
+                  {ownerCount === 1 ? '👤' : '👥'}
+                </div>
+                <div className="text-left">
+                  <div className="text-base font-bold text-slate-900 tracking-tight">{ownerCount === 1 ? (t ? t('singleOwner') : 'Single Owner') : (t ? t('twoOwners') : 'Two Owners')}</div>
+                  <div className="text-xs text-slate-500 font-medium opacity-80">{t ? t('toggleOwnerCount') : 'Tap to switch owner count'}</div>
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all shadow-inner">
+                <span className="text-lg">⇄</span>
+              </div>
+            </button>
+
             <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} />
             {/* Disaster Recovery toggle and card */}
             <div className="mt-4 flex flex-col items-center w-full">
@@ -1238,37 +1257,40 @@ export default function App(){
 
           <div>
             {results ? (
-                <div className="shadow-xl rounded-2xl p-5" style={{ backgroundColor: '#f2d3ff' }}>
-                <h3 className="text-lg font-bold text-gray-800 mb-3">{t('summary')}</h3>
-                <div className="text-sm space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{t('netBags')}:</span>
-                    <strong className="text-gray-900">{results.netBags}</strong>
+                <div className="android-shadow rounded-[32px] p-6 bg-slate-900 text-white relative overflow-hidden group border border-white/10">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-400 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700"></div>
+                <h3 className="text-base font-black text-sky-400 mb-5 uppercase tracking-widest">{t('summary')}</h3>
+                <div className="space-y-4 relative z-10">
+                  <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('netBags')}</span>
+                    <strong className="text-xl font-mono text-white">{results.netBags}</strong>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{t('saltNetWeight')}:</span>
-                    <strong className="text-gray-900">{formatKg(results.netBags * 50)}</strong>
+                  <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('saltNetWeight')}</span>
+                    <strong className="text-xl font-mono text-white">{formatKg(results.netBags * 50)}</strong>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{t('initialPrice')}:</span>
-                    <strong className="text-gray-900">{formatLKR(results.initialPrice)}</strong>
+                  <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('initialPrice')}</span>
+                    <strong className="text-xl font-mono text-white">{formatLKR(results.initialPrice)}</strong>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{t('contractorSpent')}:</span>
-                    <strong className="text-gray-900">{formatLKR(results.contractorTotalSpent)}</strong>
+                  <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl">
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('contractorSpent')}</span>
+                    <strong className="text-xl font-mono text-white">{formatLKR(results.contractorTotalSpent)}</strong>
                   </div>
-                  <div className="flex justify-between border-t pt-2 mt-2">
-                    <span className="text-gray-600">{t('contractorShare')}:</span>
-                    <strong className="text-gray-900">{formatLKR(results.contractorShare)}</strong>
+                  <div className="my-6 border-t border-white/10 border-dashed"></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{t('contractorShare')}</span>
+                    <strong className="text-xl font-mono text-emerald-400">{formatLKR(results.contractorShare)}</strong>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}:</span>
-                    <strong className="text-gray-900">{formatLKR(results.generalSharePerOwner)}</strong>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}</span>
+                    <strong className="text-xl font-mono text-sky-400">{formatLKR(results.generalSharePerOwner)}</strong>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-white shadow rounded-lg p-4 text-center text-gray-500">
+              <div className="android-card bg-slate-50 p-8 text-center border-none ring-1 ring-inset ring-slate-100 italic text-slate-400">
+                <div className="text-4xl mb-3 opacity-20">📊</div>
                 {t('enterValues')}
               </div>
             )}
@@ -1278,40 +1300,71 @@ export default function App(){
 
         {/* Disaster Recovery P&L summary */}
         {showDisasterRecovery && (
-          <div className="mt-8 mb-8">
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 shadow-xl">
-              <h3 className="text-lg font-bold text-rose-900 mb-3 flex items-center gap-2">
-                <span>🌊</span> {t('disasterRecovery')}
+          <div className="mt-12 mb-12">
+            <div className="android-card border border-rose-300 bg-rose-50 p-8 shadow-xl">
+              <h3 className="text-xl font-black text-rose-900 mb-6 flex items-center gap-3">
+                <span className="text-2xl">🌊</span> {t('disasterRecovery')}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <div className="text-rose-800 font-semibold mb-1">{t('pondsReconstruction')}</div>
-                  <div>{disasterRecovery.pondsReconstruction || '-'}</div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
+                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('pondsReconstruction')}</div>
+                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.pondsReconstruction || 0)}</div>
                 </div>
-                <div>
-                  <div className="text-rose-800 font-semibold mb-1">{t('hutReconstruction')}</div>
-                  <div>{disasterRecovery.hutReconstruction || '-'}</div>
+                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
+                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('hutReconstruction')}</div>
+                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.hutReconstruction || 0)}</div>
                 </div>
-                <div>
-                  <div className="text-rose-800 font-semibold mb-1">{t('electricityBills')}</div>
-                  <div>{disasterRecovery.electricityBills || '-'}</div>
+                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
+                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('electricityBills')}</div>
+                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.electricityBills || 0)}</div>
                 </div>
-                <div>
-                  <div className="text-rose-800 font-semibold mb-1">{t('compensationReceived')}</div>
-                  <div>{disasterRecovery.compensationReceived || '-'}</div>
+                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
+                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('compensationReceived')}</div>
+                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.compensationReceived || 0)}</div>
                 </div>
-                <div>
-                  <div className="text-rose-800 font-semibold mb-1">{t('donationsReceived')}</div>
-                  <div>{disasterRecovery.donationsReceived || '-'}</div>
+                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
+                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('donationsReceived')}</div>
+                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.donationsReceived || 0)}</div>
                 </div>
-                <div>
-                  <div className="text-rose-800 font-semibold mb-1">{t('lossQuantity')}</div>
-                  <div>{disasterRecovery.lossQuantity || '-'} {t(disasterRecovery.lossUnit || 'bags')}</div>
+                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
+                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('lossQuantity')}</div>
+                  <div className="text-base font-bold text-slate-900">{disasterRecovery.lossQuantity || 0} {t(disasterRecovery.lossUnit || 'bags')}</div>
+                  <div className="text-[10px] text-rose-600 font-medium">Value: {formatLKR((disasterRecovery.lossUnit === 'kg' ? (disasterRecovery.lossQuantity / 50) : disasterRecovery.lossQuantity) * (inputs.pricePerBag || 0))}</div>
                 </div>
               </div>
-              <div className="mt-4 flex flex-col md:flex-row gap-4">
-                <div className="text-rose-900 font-bold">{t('disasterRecovery')} {t('totalExpenses', 'Total Expenses')}: <span className="font-mono">{disasterRecovery.pondsReconstruction || 0 + disasterRecovery.hutReconstruction || 0 + disasterRecovery.electricityBills || 0}</span></div>
-                <div className="text-rose-900 font-bold">{t('disasterRecovery')} {t('totalIncome', 'Total Receipts')}: <span className="font-mono">{disasterRecovery.compensationReceived || 0 + disasterRecovery.donationsReceived || 0}</span></div>
+
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-rose-200">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-rose-800 uppercase">{t('totalExpenses', 'Total Expenses')}</span>
+                  <span className="text-2xl font-mono font-black text-rose-900">
+                    {formatLKR((Number(disasterRecovery.pondsReconstruction) || 0) + (Number(disasterRecovery.hutReconstruction) || 0) + (Number(disasterRecovery.electricityBills) || 0))}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-rose-800 uppercase">Total Income</span>
+                  <span className="text-2xl font-mono font-black text-emerald-700">
+                    {formatLKR((Number(disasterRecovery.compensationReceived) || 0) + (Number(disasterRecovery.donationsReceived) || 0))}
+                  </span>
+                </div>
+                <div className="flex flex-col p-4 rounded-3xl bg-white shadow-inner">
+                  <span className="text-xs font-bold text-slate-500 uppercase">Net Variance</span>
+                  {(() => {
+                    const totalExp = (Number(disasterRecovery.pondsReconstruction) || 0) + (Number(disasterRecovery.hutReconstruction) || 0) + (Number(disasterRecovery.electricityBills) || 0)
+                    const totalInc = (Number(disasterRecovery.compensationReceived) || 0) + (Number(disasterRecovery.donationsReceived) || 0)
+                    const lossValue = (disasterRecovery.lossUnit === 'kg' ? (disasterRecovery.lossQuantity / 50) : (disasterRecovery.lossQuantity || 0)) * (inputs.pricePerBag || 0)
+                    const net = totalInc - totalExp - lossValue
+                    return (
+                      <div className="flex flex-col">
+                        <span className={`text-2xl font-mono font-black ${net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          {formatLKR(net)}
+                        </span>
+                        <span className="text-[10px] font-bold tracking-tighter uppercase opacity-60">
+                          {net < 0 ? '⚠️ Total Loss' : '✅ Recovery Profit'}
+                        </span>
+                      </div>
+                    )
+                  })()}
+                </div>
               </div>
             </div>
           </div>
@@ -1399,19 +1452,38 @@ export default function App(){
           </div>
         )}
 
-        {/* Download button at page bottom */}
-        <div className="mt-6 mb-8 flex flex-wrap justify-center gap-3 pb-4">
-          <button onClick={downloadPDF} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded">
-            {t('downloadPDF')}
+        {/* Download buttons bottom section */}
+        <div className="mt-12 mb-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto px-4">
+          <button 
+            onClick={downloadPDF} 
+            className="flex flex-col items-center justify-center p-4 rounded-3xl bg-violet-600 android-shadow border border-violet-500 hover:bg-violet-700 active:scale-95 transition-all text-white gap-2"
+          >
+            <span className="text-2xl">📄</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{t('downloadPDF').replace('📥 ', '')}</span>
           </button>
-          <button onClick={savePdfToStorage} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded">
-            {t('savePdf')}
+          
+          <button 
+            onClick={savePdfToStorage} 
+            className="flex flex-col items-center justify-center p-4 rounded-3xl bg-emerald-600 android-shadow border border-emerald-500 hover:bg-emerald-700 active:scale-95 transition-all text-white gap-2"
+          >
+            <span className="text-2xl">☁️</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{t('savePdf').replace('☁️ ', '')}</span>
           </button>
-          <button onClick={saveCurrentReport} className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded">
-            {t('save')}
+
+          <button 
+            onClick={saveCurrentReport} 
+            className="flex flex-col items-center justify-center p-4 rounded-3xl bg-slate-900 android-shadow border border-slate-800 hover:bg-slate-800 active:scale-95 transition-all text-white gap-2"
+          >
+            <span className="text-2xl">💾</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{t('save').replace('💾 ', '')}</span>
           </button>
-          <button onClick={handleLoadReportsClick} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded">
-            {t('loadReports')}
+
+          <button 
+            onClick={handleLoadReportsClick} 
+            className="flex flex-col items-center justify-center p-4 rounded-3xl bg-indigo-600 android-shadow border border-indigo-500 hover:bg-indigo-700 active:scale-95 transition-all text-white gap-2"
+          >
+            <span className="text-2xl">📂</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{t('loadReports').replace('📂 ', '')}</span>
           </button>
         </div>
 
