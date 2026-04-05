@@ -130,7 +130,7 @@ export async function getAdminPendingPayments(session) {
   return body
 }
 
-export async function activatePaymentRequestAsAdmin({ session, paymentRequestId }) {
+export async function activatePaymentRequestAsAdmin({ session, paymentRequestId, adminNote }) {
   if (!session?.access_token) {
     throw new Error('Please sign in as admin')
   }
@@ -141,7 +141,7 @@ export async function activatePaymentRequestAsAdmin({ session, paymentRequestId 
       'Content-Type': 'application/json',
       Authorization: `Bearer ${session.access_token}`,
     },
-    body: JSON.stringify({ paymentRequestId }),
+    body: JSON.stringify({ paymentRequestId, adminNote }),
   })
 
   const body = await res.json().catch(() => ({}))

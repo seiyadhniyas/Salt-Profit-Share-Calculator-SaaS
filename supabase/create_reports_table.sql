@@ -1,6 +1,22 @@
 -- Create SaaS-ready schema for Salt Profit Share Calculator
 -- Run this in the Supabase SQL editor
 
+-- SAFETY: Drop and recreate for clean state (safe if you've migrated data elsewhere)
+drop trigger if exists on_auth_user_created on auth.users;
+drop function if exists public.handle_new_user();
+drop function if exists public.consume_trial_use(uuid);
+drop index if exists idx_payment_requests_status;
+drop index if exists idx_payment_requests_user_id;
+drop index if exists idx_saved_files_user_id;
+drop index if exists idx_saved_files_created_at;
+drop index if exists idx_reports_user_id;
+drop index if exists idx_reports_created_at;
+drop table if exists payment_requests cascade;
+drop table if exists billing_profiles cascade;
+drop table if exists saved_files cascade;
+drop table if exists reports cascade;
+drop table if exists profiles cascade;
+
 create extension if not exists "pgcrypto";
 
 create table if not exists profiles (
@@ -12,8 +28,6 @@ create table if not exists profiles (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
-
-alter table profiles add column if not exists is_admin boolean not null default false;
 
 create table if not exists reports (
   id bigserial primary key,
@@ -65,14 +79,12 @@ create table if not exists payment_requests (
   status text not null default 'pending' check (status in ('pending', 'paid_pending_verification', 'verified_active', 'rejected', 'failed')),
   verified_by_admin uuid references auth.users(id) on delete set null,
   verified_at timestamptz,
+  admin_note text,
   metadata jsonb,
   admin_notified boolean not null default false,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
-
-alter table payment_requests add column if not exists verified_by_admin uuid references auth.users(id) on delete set null;
-alter table payment_requests add column if not exists verified_at timestamptz;
 
 insert into storage.buckets (id, name, public)
 values ('saved-files', 'saved-files', true)

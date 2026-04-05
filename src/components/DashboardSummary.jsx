@@ -71,6 +71,10 @@ export default function DashboardSummary({
   const snapshotSaltWeight = snapshotNetBags * 50
   const [reportsOpen, setReportsOpen] = useState(false)
   const [newLocation, setNewLocation] = useState('')
+  const [approvalModalOpen, setApprovalModalOpen] = useState(false)
+  const [selectedPaymentRequest, setSelectedPaymentRequest] = useState(null)
+  const [adminApprovalNote, setAdminApprovalNote] = useState('')
+  const [approvalNoteError, setApprovalNoteError] = useState('')
   const fileRows = Array.isArray(savedFiles) ? savedFiles : []
   const trialLimit = Number(billingStatus?.trial_limit || 3)
   const trialUses = Number(billingStatus?.trial_uses || 0)
@@ -80,6 +84,31 @@ export default function DashboardSummary({
   const ownerNamesCount = Array.isArray(ownerNames)
     ? ownerNames.map(name => String(name || '').trim()).filter(Boolean).length
     : 0
+
+  const openApprovalModal = (requestRow) => {
+    setSelectedPaymentRequest(requestRow)
+    setAdminApprovalNote('')
+    setApprovalNoteError('')
+    setApprovalModalOpen(true)
+  }
+
+  const closeApprovalModal = () => {
+    setApprovalModalOpen(false)
+    setSelectedPaymentRequest(null)
+    setAdminApprovalNote('')
+    setApprovalNoteError('')
+  }
+
+  const confirmActivationWithNote = async () => {
+    const note = adminApprovalNote.trim()
+    if (!note) {
+      setApprovalNoteError(tr('adminNoteRequired', 'Admin note is required before activation.'))
+      return
+    }
+
+    await onActivatePaymentRequest?.(selectedPaymentRequest, note)
+    closeApprovalModal()
+  }
 
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
@@ -160,7 +189,7 @@ export default function DashboardSummary({
                           <td className="px-3 py-2">
                             <button
                               type="button"
-                              onClick={() => onActivatePaymentRequest?.(req)}
+                              onClick={() => openApprovalModal(req)}
                               disabled={adminActionBusy}
                               className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                             >
@@ -517,6 +546,61 @@ export default function DashboardSummary({
           </div>
         </div>
       </div>
+
+      {approvalModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-900">{tr('approvalModalTitle', 'Approve & Activate Payment')}</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              {tr('approvalModalSubtitle', 'Add verification note before activating full access.')}
+            </p>
+
+            <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
+              <div><span className="font-semibold">{tr('user', 'User')}:</span> {selectedPaymentRequest?.user_email || selectedPaymentRequest?.user_id || '-'}</div>
+              <div><span className="font-semibold">{tr('paymentMethod', 'Method')}:</span> {String(selectedPaymentRequest?.payment_method || '-').toUpperCase()}</div>
+              <div><span className="font-semibold">{tr('amount', 'Amount')}:</span> {formatLKR(selectedPaymentRequest?.amount_lkr || 0)}</div>
+            </div>
+
+            <label className="mt-4 block">
+              <span className="mb-1 block text-sm font-medium text-slate-700">{tr('adminVerificationNote', 'Admin Verification Note')}</span>
+              <textarea
+                value={adminApprovalNote}
+                onChange={(e) => {
+                  setAdminApprovalNote(e.target.value)
+                  if (approvalNoteError) setApprovalNoteError('')
+                }}
+                rows={4}
+                placeholder={tr('adminVerificationNotePlaceholder', 'Example: Bank transfer slip checked and matched with account records.')}
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+              />
+            </label>
+
+            {approvalNoteError && (
+              <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+                {approvalNoteError}
+              </div>
+            )}
+
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeApprovalModal}
+                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                {tr('cancel', 'Cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={confirmActivationWithNote}
+                disabled={adminActionBusy}
+                className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {adminActionBusy ? tr('pleaseWait', 'Please wait...') : tr('confirmActivate', 'Confirm & Activate')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -275,6 +275,13 @@ export default function App(){
       activateNow: 'Activate Now',
       adminActivationSuccess: 'Payment verified. User access activated.',
       adminActivationFailed: 'Activation failed',
+      approvalModalTitle: 'Approve & Activate Payment',
+      approvalModalSubtitle: 'Add verification note before activating full access.',
+      adminVerificationNote: 'Admin Verification Note',
+      adminVerificationNotePlaceholder: 'Example: Bank transfer slip checked and matched with account records.',
+      adminNoteRequired: 'Admin note is required before activation.',
+      cancel: 'Cancel',
+      confirmActivate: 'Confirm & Activate',
     },
     ta: {
       title: 'உப்பு இலாப பகிர்வு கணக்கீடு',
@@ -484,6 +491,13 @@ export default function App(){
       activateNow: 'இப்போது செயற்படுத்து',
       adminActivationSuccess: 'கட்டணம் சரிபார்க்கப்பட்டது. பயனர் அணுகல் செயற்படுத்தப்பட்டது.',
       adminActivationFailed: 'செயற்படுத்தல் தோல்வி',
+      approvalModalTitle: 'கட்டணத்தை அங்கீகரித்து செயற்படுத்து',
+      approvalModalSubtitle: 'முழு அணுகலை செயற்படுத்தும் முன் சரிபார்ப்பு குறிப்பை சேர்க்கவும்.',
+      adminVerificationNote: 'நிர்வாக சரிபார்ப்பு குறிப்பு',
+      adminVerificationNotePlaceholder: 'உதாரணம்: வங்கி பரிமாற்ற ரசீது சரிபார்க்கப்பட்டது; கணக்கு பதிவுகளுடன் பொருந்துகிறது.',
+      adminNoteRequired: 'செயற்படுத்துவதற்கு முன் நிர்வாக குறிப்பு கட்டாயம்.',
+      cancel: 'ரத்து செய்',
+      confirmActivate: 'உறுதி செய்து செயற்படுத்து',
     }
   }
 
@@ -629,7 +643,7 @@ export default function App(){
     }
   }, [session, isAdmin])
 
-  const handleAdminActivatePaymentRequest = async (requestRow) => {
+  const handleAdminActivatePaymentRequest = async (requestRow, adminNote) => {
     if (!requestRow?.id || !session?.user?.id) return
 
     try {
@@ -637,6 +651,7 @@ export default function App(){
       await activatePaymentRequestAsAdmin({
         session,
         paymentRequestId: requestRow.id,
+        adminNote,
       })
 
       alert(t('adminActivationSuccess'))

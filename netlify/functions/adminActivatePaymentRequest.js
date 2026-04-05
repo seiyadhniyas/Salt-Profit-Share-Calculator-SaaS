@@ -15,9 +15,14 @@ exports.handler = async function (event) {
 
     const body = JSON.parse(event.body || '{}')
     const paymentRequestId = body.paymentRequestId
+    const adminNote = String(body.adminNote || '').trim()
 
     if (!paymentRequestId) {
       return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'paymentRequestId is required' }) }
+    }
+
+    if (!adminNote) {
+      return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'adminNote is required' }) }
     }
 
     const getUrl = new URL('/rest/v1/payment_requests', auth.supabaseUrl)
@@ -58,6 +63,7 @@ exports.handler = async function (event) {
         status: 'verified_active',
         verified_by_admin: auth.user.id,
         verified_at: new Date().toISOString(),
+        admin_note: adminNote,
         updated_at: new Date().toISOString(),
       }),
     })
