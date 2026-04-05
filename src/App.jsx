@@ -53,7 +53,6 @@ export default function App(){
   })
 
   // Disaster Recovery state
-  const [showDisasterRecovery, setShowDisasterRecovery] = useState(false)
   const [disasterRecovery, setDisasterRecovery] = useState({
     lossQuantity: '',
     lossUnit: 'bags',
@@ -1179,29 +1178,13 @@ export default function App(){
           <div className="lg:col-span-2">
             <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} />
             
-            {/* Disaster Recovery Accordion */}
-            <div className="mt-6 rounded-xl border border-rose-300 shadow-md overflow-hidden">
-              <button
-                type="button"
-                className="w-full px-4 py-4 bg-gradient-to-r from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100 transition flex items-center justify-between border-b border-rose-300"
-                onClick={() => setShowDisasterRecovery(!showDisasterRecovery)}
-              >
-                <h3 className="text-lg font-bold text-rose-900 flex items-center gap-2">
-                  <span>🌊</span> {t('disasterRecovery')}
-                </h3>
-                <span className="text-2xl text-rose-700 transition-transform" style={{
-                  transform: showDisasterRecovery ? 'rotate(180deg)' : 'rotate(0deg)',
-                }}>▼</span>
-              </button>
-              {showDisasterRecovery && (
-                <div className="p-6 bg-white">
-                  <DisasterRecoveryCard
-                    value={disasterRecovery}
-                    onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
-                    t={t}
-                  />
-                </div>
-              )}
+            {/* Disaster Recovery Pricing Card */}
+            <div className="mt-6">
+              <DisasterRecoveryCard
+                value={disasterRecovery}
+                onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
+                t={t}
+              />
             </div>
           </div>
 
