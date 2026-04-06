@@ -209,6 +209,10 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                   <input type="radio" name="expensePayment" value="contractor" checked={(inputs.expensePayment || 'owners') === 'contractor'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
                   <span className="text-sm">{t('expenseContractor')}</span>
                 </label>
+                <label className="inline-flex items-center">
+                  <input type="radio" name="expensePayment" value="shared5050" checked={(inputs.expensePayment || 'owners') === 'shared5050'} onChange={(e) => onChange('expensePayment', e.target.value)} className="mr-2" />
+                  <span className="text-sm">{t('expenseShared5050')}</span>
+                </label>
               </div>
             </div>
             <div className="mt-3">

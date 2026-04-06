@@ -47,18 +47,18 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
             <div className="my-2 border-t"></div>
             <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (' + (t ? t('contractorSpentFormula') : 'Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses') + ')'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
             <StatRow
-              label={(t ? t('contractorShare') : 'Contractor Share') + (results.expensePayment === 'owners' ? ` (${t ? t('contractorShareOwnersFormula') : 'InitialPrice/2 + Spent'})` : ` (${t ? t('contractorShareContractorFormula') : '(InitialPrice - Spent)/2'})`)}
+              label={(t ? t('contractorShare') : 'Contractor Share') + (results.expensePayment === 'owners' ? ` (${t ? t('contractorShareOwnersFormula') : 'InitialPrice/2 + Spent'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('contractorShareShared5050Formula') : '(InitialPrice - Spent)/2 + (Spent / 2)'})` : ` (${t ? t('contractorShareContractorFormula') : '(InitialPrice - Spent)/2'})`)}
               value={formatLKR(results.contractorShare)}
               isNegative={false}
             />
             <div className="my-2 border-t"></div>
             <StatRow
-              label={(t ? t('grandTotalReceived') : 'Grand Total Received') + (results.expensePayment === 'owners' ? ` (${t ? t('grandTotalOwnersFormula') : 'InitialPrice - TotalLoan'})` : ` (${t ? t('grandTotalContractorFormula') : 'InitialPrice - Spent - TotalLoan'})`)}
+              label={(t ? t('grandTotalReceived') : 'Grand Total Received') + (results.expensePayment === 'owners' ? ` (${t ? t('grandTotalOwnersFormula') : 'InitialPrice - TotalLoan'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('grandTotalShared5050Formula') : 'InitialPrice - Spent/2 - TotalLoan'})` : ` (${t ? t('grandTotalContractorFormula') : 'InitialPrice - Spent - TotalLoan'})`)}
               value={formatLKR(results.grandTotalReceived)}
               isNegative={false}
             />
             <StatRow
-              label={(t ? t('ownerPool') : 'Owners Group Amount') + (results.expensePayment === 'owners' ? ` (${t ? t('ownerPoolOwnersFormula') : 'GrandTotal - ContractorShare'})` : ` (${t ? t('ownerPoolContractorFormula') : '(GrandTotal + TotalLoan)/2'})`)}
+              label={(t ? t('ownerPool') : 'Owners Group Amount') + (results.expensePayment === 'owners' ? ` (${t ? t('ownerPoolOwnersFormula') : 'GrandTotal - ContractorShare'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('ownerPoolShared5050Formula') : '(InitialPrice - Spent)/2'})` : ` (${t ? t('ownerPoolContractorFormula') : '(GrandTotal + TotalLoan)/2'})`)}
               value={formatLKR(results.ownerPool)}
               isNegative={results.highlights.ownerPoolNegative}
             />
