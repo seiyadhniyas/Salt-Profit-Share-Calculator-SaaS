@@ -166,8 +166,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">📦 {t('totalSaltPackedBags')}</h4>
-            <NumberInput label={t('totalSaltPackedBags')} name="packedBags" value={inputs.packedBags} onChange={onChange} step="1" decimals={null} />
-            <NumberInput label={t('deductedBags') || 'Deducted Bags'} name="deductedBags" value={inputs.deductedBags} onChange={onChange} step="1" decimals={null} />
+            <NumberInput label={t('totalSaltPackedBags')} name="packedBags" value={inputs.packedBags} onChange={onChange} decimals={null} />
+            <NumberInput label={t('deductedBags') || 'Deducted Bags'} name="deductedBags" value={inputs.deductedBags} onChange={onChange} decimals={null} />
             <NumberInput label={t('pricePerBag') || 'Price per Bag (LKR)'} name="pricePerBag" value={inputs.pricePerBag} onChange={onChange} decimals={2} />
           </div>
 
