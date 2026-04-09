@@ -45,7 +45,25 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
             <StatRow label={t ? t('netBags') + ' (' + t('packedMinusDeducted') + ')' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
             <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (' + (t ? t('netTimesPricePerBag') : 'Net × Price/Bag') + ')'} value={formatLKR(results.initialPrice)} isNegative={false} />
             <div className="my-2 border-t"></div>
-            <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (' + (t ? t('contractorSpentFormula') : 'Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses') + ')'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
+            <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (' + (t ? t('contractorSpentFormula') : 'Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses + Labour Costs') + ')'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
+            {results.extraExpensesTotal > 0 && (
+              <StatRow label="Extra Expenses" value={formatLKR(results.extraExpensesTotal)} isNegative={false} />
+            )}
+            {results.labourCostsTotal > 0 && (
+              <>
+                <StatRow label="Labour Costs (Total)" value={formatLKR(results.labourCostsTotal)} isNegative={false} />
+                {results.labourCosts && results.labourCosts.length > 0 && (
+                  <div className="ml-4 text-xs text-gray-600 space-y-1">
+                    {results.labourCosts.map((labour, idx) => (
+                      <div key={idx} className="flex justify-between">
+                        <span>{labour.name ? `${labour.name} (${labour.frequency})` : `Labour - ${labour.frequency}`}</span>
+                        <span className="font-mono">{formatLKR(labour.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
             <StatRow
               label={(t ? t('contractorShare') : 'Contractor Share') + (results.expensePayment === 'owners' ? ` (${t ? t('contractorShareOwnersFormula') : 'InitialPrice/2 + Spent'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('contractorShareShared5050Formula') : '(InitialPrice - Spent)/2 + (Spent / 2)'})` : ` (${t ? t('contractorShareContractorFormula') : '(InitialPrice - Spent)/2'})`)}
               value={formatLKR(results.contractorShare)}

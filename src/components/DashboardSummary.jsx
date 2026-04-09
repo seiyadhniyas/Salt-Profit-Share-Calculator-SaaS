@@ -6,6 +6,8 @@ function StatCard({ title, value, note, accent = 'slate', isTamil }) {
     slate: 'from-slate-900 to-slate-700',
     blue: 'from-blue-600 to-cyan-500',
     green: 'from-emerald-600 to-teal-500',
+    purple: 'from-purple-600 to-indigo-500',
+    amber: 'from-amber-500 to-orange-400',
   }
 
   return (
@@ -20,35 +22,26 @@ function StatCard({ title, value, note, accent = 'slate', isTamil }) {
 }
 
 export default function DashboardSummary({
+  open,
+  onClose,
   session,
-  reports,
-  savedFiles,
+  reports = [],
+  savedFiles = [],
   inputs,
   results,
-  filteredReports,
-  pnlSummary,
-  reportFromDate,
-  reportToDate,
-  onReportFromDateChange,
-  onReportToDateChange,
-  onClearReportFilters,
   onOpenAuth,
   onSignOut,
-  onLoadReport,
-  onLoadSavedFile,
   customLocations = [],
   onAddLocation,
   onDeleteLocation,
   ownerNames = ['', ''],
-  onOwnerNamesChange,
+  setOwnerNames,
   contractorSharePercentage = 50,
   onContractorSharePercentageChange,
   t,
   billingStatus,
   onStartCardPayment,
   onRequestCashPayment,
-  stripeFeePreview,
-  paymentBusy,
   isAdmin,
   pendingPaymentRequests = [],
   onRefreshPendingPaymentRequests,
@@ -56,626 +49,201 @@ export default function DashboardSummary({
   adminActionBusy,
   onOpenAdminAuth,
 }) {
+  if (!open) return null
+
   const tr = (key, fallback) => (t ? t(key) : fallback)
-  const isTamil = (t && t('lang') === 'ta') || (typeof t === 'function' && t('title') === 'உப்பு இலாப பகிர்வு கணக்கீடு')
+  const isTamil = (t && t('lang') === 'ta')
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || tr('guestMember', 'Guest member')
-  const reportsCount = Array.isArray(reports) ? reports.length : 0
-  const lastReportDate = reportsCount > 0 ? (reports[0]?.created_at || tr('recently', 'Recently')) : tr('noReportsYet', 'No reports yet')
-  const latestPayload = reports[0]?.payload || reports[0]?.inserted?.[0]?.payload || {}
-  const latestResults = latestPayload.results || {}
-  const liveNetBags = Number(results?.netBags) || 0
-  const liveInitialPrice = Number(results?.initialPrice) || 0
-  const latestNetBags = Number(latestResults.netBags) || 0
-  const latestInitialPrice = Number(latestResults.initialPrice) || 0
-  const snapshotNetBags = liveNetBags > 0 ? liveNetBags : latestNetBags
-  const snapshotInitialPrice = liveInitialPrice > 0 ? liveInitialPrice : latestInitialPrice
-  const snapshotSaltWeight = snapshotNetBags * 50
-  const [reportsOpen, setReportsOpen] = useState(false)
-  const [newLocation, setNewLocation] = useState('')
-  const [approvalModalOpen, setApprovalModalOpen] = useState(false)
-  const [selectedPaymentRequest, setSelectedPaymentRequest] = useState(null)
-  const [adminApprovalNote, setAdminApprovalNote] = useState('')
-  const [approvalNoteError, setApprovalNoteError] = useState('')
-  const fileRows = Array.isArray(savedFiles) ? savedFiles : []
-  const trialLimit = Number(billingStatus?.trial_limit || 3)
-  const trialUses = Number(billingStatus?.trial_uses || 0)
-  const trialRemaining = Math.max(0, trialLimit - trialUses)
-  const fullAccessEnabled = Boolean(billingStatus?.full_access_enabled)
-  const paymentStatus = billingStatus?.payment_status || 'trial'
-  const ownerNamesCount = Array.isArray(ownerNames)
-    ? ownerNames.map(name => String(name || '').trim()).filter(Boolean).length
-    : 0
-
-  const openApprovalModal = (requestRow) => {
-    setSelectedPaymentRequest(requestRow)
-    setAdminApprovalNote('')
-    setApprovalNoteError('')
-    setApprovalModalOpen(true)
-  }
-
-  const closeApprovalModal = () => {
-    setApprovalModalOpen(false)
-    setSelectedPaymentRequest(null)
-    setAdminApprovalNote('')
-    setApprovalNoteError('')
-  }
-
-  const confirmActivationWithNote = async () => {
-    const note = adminApprovalNote.trim()
-    if (!note) {
-      setApprovalNoteError(tr('adminNoteRequired', 'Admin note is required before activation.'))
-      return
-    }
-
-    await onActivatePaymentRequest?.(selectedPaymentRequest, note)
-    closeApprovalModal()
-  }
+  const [newLoc, setNewLoc] = useState('')
 
   return (
-    <section className={`mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl ${t ? 'text-xs md:text-sm' : ''}`}>
-      <div className="flex flex-col gap-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-700 px-6 py-5 text-white">
-        <div className="flex flex-wrap items-center justify-end gap-3">
-          {signedIn ? (
-            <button
-              type="button"
-              onClick={onSignOut}
-              className={`rounded-full border border-white/20 bg-white/10 px-5 py-2.5 ${isTamil ? 'text-xs' : 'text-sm'} font-semibold text-white transition hover:bg-white/20`}
-            >
-              {tr('signOut', 'Sign out')}
-            </button>
-          ) : (
-            <div className="flex flex-wrap gap-2 justify-end">
-              <button
-                type="button"
-                onClick={onOpenAuth}
-                className={`rounded-full bg-white px-3 py-1.5 ${isTamil ? 'text-[10px]' : 'text-sm'} font-semibold text-slate-900 transition hover:bg-slate-100`}
-              >
-                {tr('signInRegister', 'Sign in / Register')}
-              </button>
-              <button
-                type="button"
-                onClick={onOpenAdminAuth}
-                className={`rounded-full border border-amber-300 bg-amber-100 px-3 py-1.5 ${isTamil ? 'text-[10px]' : 'text-sm'} font-semibold text-amber-900 transition hover:bg-amber-200`}
-              >
-                👤 {tr('adminAccess', 'Admin Access')}
-              </button>
-            </div>
-          )}
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center p-0 sm:p-4">
+      <div className="w-full max-w-4xl max-h-[95vh] overflow-hidden rounded-t-[32px] sm:rounded-[32px] bg-[#fdf2ff] shadow-2xl flex flex-col transition-all">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-purple-100 bg-white">
+          <h2 className="text-lg font-black text-purple-900 uppercase tracking-tight">{tr('dashboard', 'Dashboard')}</h2>
+          <button onClick={onClose} className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 hover:bg-purple-100 transition active:scale-95 text-lg font-bold">✕</button>
         </div>
 
-        <p className="max-w-2xl text-sm leading-6 text-slate-300">
-          {tr('dashboardSubtitle', 'Quick producer summary for salt calculations, report sync, and saved performance snapshots.')}
-        </p>
-      </div>
-
-      <div className="grid gap-4 p-4 sm:p-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {isAdmin && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="inline-flex rounded-full bg-gradient-to-r from-emerald-700 to-teal-600 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-                {tr('adminDashboard', 'Admin Dashboard')}
-              </div>
-              <button
-                type="button"
-                onClick={onRefreshPendingPaymentRequests}
-                disabled={adminActionBusy}
-                className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {tr('refreshPending', 'Refresh Pending')}
-              </button>
-            </div>
-
-            <div className="mt-3 text-sm text-slate-600">
-              {tr('adminPendingHelp', 'Review pending/captured payments and activate user access with one click.')}
-            </div>
-
-            {pendingPaymentRequests.length === 0 ? (
-              <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
-                {tr('noPendingPaymentRequests', 'No pending payment requests.')}
-              </div>
-            ) : (
-              <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-                    <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                      <tr>
-                        <th className="px-3 py-2 font-semibold">{tr('user', 'User')}</th>
-                        <th className="px-3 py-2 font-semibold">{tr('paymentMethod', 'Method')}</th>
-                        <th className="px-3 py-2 font-semibold">{tr('amount', 'Amount')}</th>
-                        <th className="px-3 py-2 font-semibold">{tr('status', 'Status')}</th>
-                        <th className="px-3 py-2 font-semibold">{tr('action', 'Action')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white">
-                      {pendingPaymentRequests.map((req) => (
-                        <tr key={req.id} className="hover:bg-slate-50">
-                          <td className="px-3 py-2 text-slate-700">
-                            <div className="font-medium">{req.user_email || req.user_id}</div>
-                            <div className="text-xs text-slate-500">{req.created_at || '-'}</div>
-                          </td>
-                          <td className="px-3 py-2 text-slate-700">{String(req.payment_method || '-').toUpperCase()}</td>
-                          <td className="px-3 py-2 text-slate-700">{formatLKR(req.amount_lkr || 0)}</td>
-                          <td className="px-3 py-2 text-slate-700">{req.status || '-'}</td>
-                          <td className="px-3 py-2">
-                            <button
-                              type="button"
-                              onClick={() => openApprovalModal(req)}
-                              disabled={adminActionBusy}
-                              className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                              {adminActionBusy ? tr('pleaseWait', 'Please wait...') : tr('activateNow', 'Activate Now')}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-xl col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
-          <div className="inline-flex rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-white">
-            {tr('billingAccess', 'Billing & Access')}
-          </div>
-          <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
-            <div className="rounded-[28px] bg-slate-50 border border-slate-200 p-5 shadow-sm">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 mb-2">{tr('trialStatus', 'Trial Status')}</div>
-              <div className="text-sm font-bold text-slate-800">
-                {fullAccessEnabled
-                  ? tr('fullVersionActive', 'Full version is active')
-                  : `${tr('freeTrialUsed', 'Free trial used')}: ${trialUses}/${trialLimit}`}
-              </div>
-              {!fullAccessEnabled && (
-                <div className="mt-2 inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-black text-indigo-700">
-                  {tr('trialRemaining', 'Remaining')}: {trialRemaining}
-                </div>
-              )}
-              {!fullAccessEnabled && paymentStatus === 'payment_pending_verification' && (
-                <div className="mt-3 rounded-2xl bg-amber-50 border border-amber-200 p-3 text-xs font-medium text-amber-800">
-                  <span className="mr-1">⏳</span> {tr('activationPending', 'Payment received. Admin verification pending for activation.')}
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-[28px] bg-slate-50 border border-slate-200 p-5 shadow-sm sm:col-span-2 md:col-span-3 lg:col-span-2">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">{tr('stripeFeeGlance', 'Stripe Fee Glance (Sri Lankan Cards)')}</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="space-y-1">
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">{tr('oneOffPrice', 'One-off Price')}</div>
-                  <div className="text-sm font-bold text-slate-700">{stripeFeePreview?.baseFormatted || 'LKR 30,000.00'}</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">{tr('estimatedCardFee', 'Estimated Card Fee')}</div>
-                  <div className="text-sm font-bold text-slate-700">{stripeFeePreview?.feeFormatted || 'LKR 1,110.00'}</div>
-                </div>
-                <div className="space-y-1 border-l border-slate-200 pl-4 sm:border-l-0 sm:pl-0 lg:border-l lg:pl-4">
-                  <div className="text-[10px] text-indigo-400 font-bold uppercase">{tr('estimatedTotal', 'Estimated Total')}</div>
-                  <div className="text-lg font-black text-slate-900">{stripeFeePreview?.totalFormatted || 'LKR 31,110.00'}</div>
-                </div>
-              </div>
-              <div className="mt-4 text-[10px] italic text-slate-400 font-medium leading-tight">{tr('feeDisclaimer', 'Actual Stripe fees may vary by issuer and card type.')}</div>
-            </div>
-
-            <div className="flex flex-col justify-center gap-3 sm:col-span-2 md:col-span-4 lg:col-span-1">
-              {!fullAccessEnabled && (
-                <>
-                  <button
-                    type="button"
-                    onClick={onStartCardPayment}
-                    disabled={paymentBusy}
-                    className="w-full rounded-2xl bg-indigo-600 py-3 text-xs font-black text-white shadow-lg transition active:scale-95 hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {paymentBusy ? tr('pleaseWait', 'Please wait...') : tr('payByCard', 'Pay by Card (Stripe)')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onRequestCashPayment}
-                    disabled={paymentBusy}
-                    className="w-full rounded-2xl border border-slate-300 bg-white py-3 text-xs font-bold text-slate-700 transition active:scale-95 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {tr('submitCashRequest', 'Submit Cash Payment Request')}
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-          {!fullAccessEnabled && paymentStatus === 'payment_pending_verification' && (
-            <div className="mt-4 rounded-2xl bg-amber-50 border border-amber-200 p-4 text-xs font-medium text-amber-800">
-              <span className="mr-1">⏳</span> {tr('activationPending', 'Payment received. Admin verification pending for activation.')}
-            </div>
-          )}
-        </div>
-
-        <StatCard
-          title={tr('account', 'Account')}
-          value={signedIn ? displayName : tr('notSignedIn', 'Not signed in')}
-          note={signedIn ? tr('connectedSupabaseAuth', 'Connected through Supabase Auth') : tr('popupAuthReady', 'Popup auth is ready when you need it')}
-          accent="blue"
-          isTamil={isTamil}
-        />
-        <StatCard
-          title={tr('productionSnapshot', 'Production Snapshot')}
-          value={`${snapshotNetBags} ${tr('bagsUnit', 'bags')}`}
-          note={`${tr('weightLabel', 'Weight')}: ${snapshotSaltWeight} kg • ${tr('initialPriceLabel', 'Initial price')}: LKR ${snapshotInitialPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-          accent="slate"
-          isTamil={isTamil}
-        />
-        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-xl transition-all hover:shadow-2xl">
-          <div className="inline-flex rounded-full bg-gradient-to-r from-purple-600 to-pink-500 px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-white">
-            📍 {tr('workLocations', 'Work Locations')}
-          </div>
-          <div className="mt-5">
-            <div className="mb-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              {tr('workLocationsHelp', 'Add your work locations here to use them in reports')}
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-nowrap">
-              <input
-                type="text"
-                value={newLocation}
-                onChange={(e) => setNewLocation(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && newLocation.trim() && onAddLocation) {
-                    onAddLocation(newLocation.trim(), null)
-                    setNewLocation('')
-                  }
-                }}
-                placeholder={tr('enterLocationName', 'Enter location name')}
-                className="flex-1 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none transition focus:bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (newLocation.trim() && onAddLocation) {
-                    onAddLocation(newLocation.trim(), null)
-                    setNewLocation('')
-                  }
-                }}
-                className="whitespace-nowrap rounded-2xl bg-slate-900 px-8 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition active:scale-95 hover:bg-slate-800"
-              >
-                {tr('add', 'Add')}
-              </button>
-            </div>
-            {Array.isArray(customLocations) && customLocations.length > 0 && (
-              <div className="mt-5 grid grid-cols-1 gap-2">
-                {customLocations.map((loc) => (
-                  <div
-                    key={loc}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 transition-all hover:border-purple-200 hover:bg-white hover:shadow-md"
-                  >
-                    <span className="truncate text-sm font-bold text-slate-700">{loc}</span>
-                    <button
-                      type="button"
-                      onClick={() => onDeleteLocation && onDeleteLocation(loc)}
-                      className="rounded-full bg-red-50 p-2 text-red-500 opacity-0 transition group-hover:opacity-100 hover:bg-red-100"
-                      title={tr('deleteLocation', 'Delete location')}
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-6">
+          {/* User Profile and Auth */}
+          <section className="overflow-hidden rounded-3xl border border-purple-100 bg-white shadow-sm">
+            <div className="flex flex-col gap-4 bg-gradient-to-r from-purple-700 to-indigo-600 px-6 py-5 text-white">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl border border-white/30 backdrop-blur-md">👤</div>
+                  <div>
+                    <div className="text-xs font-bold text-purple-200 uppercase tracking-widest">{tr('account', 'Account')}</div>
+                    <div className="text-lg font-bold">{signedIn ? displayName : tr('guestMember', 'Guest Member')}</div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-xl transition-all hover:shadow-2xl">
-          <div className="inline-flex rounded-full bg-gradient-to-r from-orange-600 to-red-500 px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-white">
-            % {tr('profitShare', 'Profit Share')}
-          </div>
-          <div className="mt-5">
-            <div className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">
-              {tr('contractorSharePercentage', 'Contractor share percentage')}
-            </div>
-            <div className="flex flex-col gap-5">
-              <div className="relative flex items-center">
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="5"
-                  value={contractorSharePercentage}
-                  onChange={(e) => onContractorSharePercentageChange && onContractorSharePercentageChange(Number(e.target.value))}
-                  className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-orange-600"
-                />
-              </div>
-              <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4 border border-slate-100">
-                <div className="text-center">
-                  <div className="text-[10px] font-bold uppercase text-slate-400">{tr('contractor', 'Contractor')}</div>
-                  <div className="text-xl font-black text-slate-900">{contractorSharePercentage}%</div>
                 </div>
-                <div className="h-8 w-px bg-slate-200"></div>
-                <div className="text-center">
-                  <div className="text-[10px] font-bold uppercase text-slate-400">{tr('owners', 'Owners')}</div>
-                  <div className="text-xl font-black text-slate-900">{100 - contractorSharePercentage}%</div>
-                </div>
-              </div>
-            </div>
-            <div className="mt-3 text-center text-xs font-medium italic text-slate-500">
-              {contractorSharePercentage === 50 ? tr('splitStandard', '50/50 split (standard)') : 
-               contractorSharePercentage > 50 ? `${tr('contractorGetsMore', 'Contractor gets more')} (${contractorSharePercentage}%)` :
-               tr('ownersGetMore', 'Owners get more')}
-            </div>
-          </div>
-        </div>
-        <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-xl col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 transition-all hover:shadow-2xl">
-          <div className="inline-flex rounded-full bg-gradient-to-r from-cyan-600 to-blue-500 px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-white">
-            👥 {tr('ownerNames', 'Owner Names')}
-          </div>
-          <div className="mt-5">
-            <div className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">
-              {tr('ownerNamesHelp', "Customize your partners' names to display in reports")}
-            </div>
-            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              {[0, 1].map(idx => (
-                <div key={idx} className="group relative flex flex-col gap-2 rounded-2xl bg-slate-50 p-4 border border-slate-100 transition-all hover:border-blue-200 hover:bg-white hover:shadow-md">
-                  <div className="flex items-center justify-between">
-                    <div className="text-[10px] font-black uppercase tracking-widest text-blue-600">{tr('owner', 'Owner')} {idx + 1}</div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updated = [...(ownerNames || ['', ''])]
-                        updated[idx] = ''
-                        onOwnerNamesChange && onOwnerNamesChange(updated)
-                      }}
-                      className="text-slate-300 hover:text-red-500 transition-colors"
-                      title={tr('clear', 'Clear')}
-                    >
-                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                    </button>
+                {signedIn ? (
+                  <button onClick={onSignOut} className="rounded-full border border-white/40 bg-white/20 px-6 py-2 text-xs font-bold text-white transition hover:bg-white/30 uppercase">{tr('signOut', 'Sign Out')}</button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button onClick={onOpenAuth} className="rounded-full bg-white px-6 py-2 text-xs font-bold text-purple-700 transition hover:bg-purple-50 uppercase shadow-lg shadow-purple-900/20">{tr('signInRegister', 'Sign In')}</button>
+                    <button onClick={onOpenAdminAuth} className="rounded-full border border-amber-300 bg-amber-100 border-2 px-6 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200 uppercase">{tr('adminAccess', 'Admin')}</button>
                   </div>
-                  <input
-                    type="text"
-                    value={ownerNames?.[idx] ?? ''}
-                    onChange={(e) => {
-                      const updated = [...(ownerNames || ['', ''])]
-                      updated[idx] = e.target.value
-                      onOwnerNamesChange && onOwnerNamesChange(updated)
-                    }}
-                    placeholder={`${tr('owner', 'Owner')} ${idx + 1}`}
-                    className="w-full bg-transparent text-sm font-bold text-slate-900 border-none outline-none placeholder:text-slate-300"
-                  />
-                  <div className="h-0.5 w-full bg-slate-200 group-focus-within:bg-blue-500 transition-colors"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex flex-col gap-4 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-                  {tr('reports', 'Reports')} ({ownerNamesCount > 0 ? `${ownerNamesCount} ${tr('owners', 'Owners')}` : tr('noOwnersSet', 'No owners set')})
-                </div>
-                <div className="mt-3 text-2xl font-bold text-slate-900">{reportsCount}</div>
-                <div className="text-sm text-slate-500">{lastReportDate && lastReportDate !== tr('noReportsYet', 'No reports yet') ? `${tr('lastSync', 'Last sync')}: ${lastReportDate}` : tr('saveReportToPopulate', 'Save a report to populate the list')}</div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setReportsOpen(prev => !prev)}
-                  className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
-                >
-                  {reportsOpen ? tr('hideDetails', 'Hide details') : tr('showDetails', 'Show details')}
-                </button>
-                <button
-                  type="button"
-                  onClick={onClearReportFilters}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-                >
-                  {tr('clear', 'Clear')}
-                </button>
+                )}
               </div>
             </div>
 
-            {reportsOpen && (
-              <div className="border-t border-slate-200 px-5 py-5">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="block">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{tr('fromDate', 'From Date')}</div>
-                    <input
-                      type="date"
-                      value={reportFromDate}
-                      onChange={(e) => onReportFromDateChange(e.target.value)}
-                      className="mt-1 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
-                    />
-                  </label>
-                  <label className="block">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{tr('toDate', 'To Date')}</div>
-                    <input
-                      type="date"
-                      value={reportToDate}
-                      onChange={(e) => onReportToDateChange(e.target.value)}
-                      className="mt-1 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
-                    />
-                  </label>
-                </div>
-
-                <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="rounded-[28px] bg-blue-50 p-5 shadow-sm border border-blue-100">
-                    <div className="text-xs font-bold uppercase tracking-wider text-blue-600">{tr('grossSales', 'Gross Sales')}</div>
-                    <div className="mt-2 text-2xl font-black text-blue-900">{formatLKR(pnlSummary.grossSales)}</div>
+            <div className="p-4 sm:p-6 space-y-6">
+               {/* Billing & Premium */}
+               <div className="rounded-2xl border-2 border-purple-100 p-5 bg-gradient-to-br from-purple-50 to-white shadow-inner">
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div className="text-[10px] font-black uppercase text-purple-400 tracking-widest">PRICING & ACCESS</div>
+                    <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold uppercase">ONE-OFF: LKR 30,000</div>
                   </div>
-                  <div className="rounded-[28px] bg-amber-50 p-5 shadow-sm border border-amber-100">
-                    <div className="text-xs font-bold uppercase tracking-wider text-amber-600">{tr('totalExpenses', 'Operating Expenses')}</div>
-                    <div className="mt-2 text-2xl font-black text-amber-900">{formatLKR(pnlSummary.totalOperatingExpenses)}</div>
-                    <div className="mt-1 text-xs font-medium text-amber-700 opacity-80">{formatLKR(pnlSummary.totalLoans)} {tr('totalLoans', 'Loans')}</div>
-                  </div>
-                  <div className="rounded-[28px] bg-emerald-50 p-5 shadow-sm border border-emerald-100 sm:col-span-2">
-                    <div className="text-xs font-bold uppercase tracking-wider text-emerald-600">{tr('netProfit', 'Net Profit')}</div>
-                    <div className={`mt-2 text-2xl font-black ${pnlSummary.netProfit < 0 ? 'text-red-600' : 'text-emerald-800'}`}>
-                      {formatLKR(pnlSummary.netProfit)}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div>
+                      <div className="text-base font-black text-slate-800 uppercase italic underline decoration-purple-300 decoration-2">{billingStatus?.full_access_enabled ? tr('premiumActive', 'PREMIUM ACTIVE') : `${tr('trialUses', 'TRIAL USES')}: ${billingStatus?.trial_uses || 0}/3`}</div>
+                      {!billingStatus?.full_access_enabled && (
+                        <div className="text-xs text-slate-500 mt-2 font-medium leading-relaxed max-w-sm">
+                          PROMO: Full access for <span className="text-purple-600 font-bold">LKR 30,000</span> lifetime. 
+                          <br/><span className="text-[10px]">*Card payments include LKR 1,100 surcharge.</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="mt-1 text-xs font-medium text-emerald-700 opacity-80">
-                      {tr('grossMargin', 'Gross margin')}: {formatLKR(pnlSummary.grossMargin)} • {tr('reports', 'Reports')}: {pnlSummary.count}
-                    </div>
+                    {!billingStatus?.full_access_enabled && (
+                      <div className="flex gap-3">
+                        <button onClick={onStartCardPayment} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">PAY BY CARD</button>
+                        <button onClick={onRequestCashPayment} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">CASH / BANK</button>
+                      </div>
+                    )}
                   </div>
-                </div>
+               </div>
 
-                <div className="mt-6">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400">{tr('savedReports', 'Saved Reports')}</h4>
-                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">{filteredReports.length}</span>
-                  </div>
-                  
-                  {filteredReports.length === 0 ? (
-                    <div className="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 py-10 text-center text-sm text-slate-500">
-                      {reportsCount === 0 ? tr('noReportsLoaded', 'No reports loaded.') : tr('noReportsInPeriod', 'No reports in this period.')}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Locations Management */}
+                  <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 flex items-center gap-2">
+                       <span className="w-2 h-2 rounded-full bg-blue-500"></span> WORK LOCATIONS
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {filteredReports.map(r => {
-                        const reportId = r.id || (r.inserted && r.inserted[0] && r.inserted[0].id) || r.inserted?.[0]?.id;
-                        const createdAt = r.created_at || (r.inserted && r.inserted[0] && r.inserted[0].created_at) || '';
-                        const payload = r.payload || (r.inserted && r.inserted[0]?.payload) || {};
-                        const reportDate = payload.inputs?.date || '';
-                        const billNumber = payload.inputs?.billNumber || '';
-                        const ownerName = payload.inputs?.ownerName || tr('unnamed', 'Unnamed');
-                        const netProfit = payload.results?.netProfit || 0;
-
-                        return (
-                          <div key={reportId || Math.random()} className="group flex flex-col justify-between rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
-                            <div>
-                              <div className="mb-2 flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">#{String(reportId).slice(-6)}</span>
-                                <span className="text-[10px] font-medium text-slate-500">{new Date(createdAt).toLocaleDateString()}</span>
-                              </div>
-                              <h5 className="font-bold text-slate-900 line-clamp-1">{ownerName}</h5>
-                              <div className="mt-2 space-y-1">
-                                <div className="flex justify-between text-xs">
-                                  <span className="text-slate-500">{tr('date', 'Date')}</span>
-                                  <span className="font-medium text-slate-700">{reportDate}</span>
-                                </div>
-                                <div className="flex justify-between text-xs">
-                                  <span className="text-slate-500">{tr('billNumberShort', 'Bill #')}</span>
-                                  <span className="font-medium text-slate-700">{billNumber}</span>
-                                </div>
-                                <div className="mt-2 border-t border-slate-100 pt-2 flex justify-between text-xs">
-                                  <span className="font-bold text-slate-500">{tr('netProfit', 'Net Profit')}</span>
-                                  <span className={`font-black ${netProfit < 0 ? 'text-red-500' : 'text-emerald-600'}`}>{formatLKR(netProfit)}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <button 
-                              onClick={() => onLoadReport?.(r)} 
-                              className="mt-4 w-full rounded-2xl bg-slate-900 py-2.5 text-xs font-bold text-white shadow-lg transition active:scale-95 hover:bg-slate-800"
-                            >
-                              {tr('load', 'Load')}
-                            </button>
-                          </div>
-                        );
-                      })}
+                    <div className="flex gap-2 mb-4">
+                      <input 
+                        className="flex-1 bg-slate-50 rounded-xl px-4 py-3 text-sm border-2 border-slate-400 focus:border-purple-600 focus:ring-0 transition-all outline-none"
+                        value={newLoc}
+                        onChange={e => setNewLoc(e.target.value)}
+                        placeholder="NEW LOCATION NAME"
+                      />
+                      <button 
+                        onClick={() => { if(newLoc.trim()){ onAddLocation(newLoc); setNewLoc(''); }}}
+                        className="bg-purple-600 text-white px-4 py-3 rounded-xl text-xs font-black uppercase hover:bg-purple-700 transition"
+                      >Add</button>
                     </div>
-                  )}
-                </div>
-
-                <div className="mt-8">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400">{tr('savedFiles', 'Saved Files')}</h4>
-                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">{fileRows.length}</span>
-                  </div>
-                  
-                  {fileRows.length === 0 ? (
-                    <div className="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 py-10 text-center text-sm text-slate-500">
-                      {tr('noSavedFilesYet', 'No saved files yet.')}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {fileRows.map((file) => (
-                        <div key={file.name} className="flex flex-col justify-between rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-lg">
-                          <div className="flex items-start gap-3">
-                            <div className="rounded-xl bg-orange-100 p-2 text-orange-600">
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                            <div className="overflow-hidden">
-                              <div className="truncate text-sm font-bold text-slate-900" title={file.name}>{file.name}</div>
-                              <div className="mt-1 text-[10px] text-slate-500">
-                                {new Date(file.created_at).toLocaleDateString()} • {(file.size / 1024).toFixed(1)} KB
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => onLoadSavedFile?.(file.name)}
-                            className="mt-4 w-full rounded-2xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-bold text-slate-700 transition active:scale-95 hover:bg-slate-100"
-                          >
-                            {tr('view', 'View')}
-                          </button>
+                    <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
+                      {customLocations.map(loc => (
+                        <div key={loc} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl text-sm group border border-transparent hover:border-blue-100 transition-all">
+                          <span className="font-bold text-slate-700 uppercase">{loc}</span>
+                          <button onClick={() => onDeleteLocation(loc)} className="text-rose-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 transition opacity-0 group-hover:opacity-100 font-bold">✕</button>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+                  </div>
+
+                  {/* Owner Names Management */}
+                  <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 flex items-center gap-2">
+                       <span className="w-2 h-2 rounded-full bg-emerald-500"></span> OWNER NAMES
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex gap-2 items-center">
+                        <input 
+                          className="flex-1 bg-slate-50 rounded-xl px-4 py-3 text-sm border-2 border-slate-400 focus:border-purple-600 transition-all outline-none font-bold"
+                          value={ownerNames[0] || ''}
+                          onChange={e => { 
+                            const newValue = e.target.value;
+                            const n = [...ownerNames]; 
+                            n[0] = newValue; 
+                            setOwnerNames(n);
+                            localStorage.setItem('ownerNames', JSON.stringify(n));
+                          }}
+                          placeholder="Owner 1 Name"
+                        />
+                        <button onClick={() => { 
+                          const n = [...ownerNames]; 
+                          n[0] = ''; 
+                          setOwnerNames(n); 
+                          localStorage.setItem('ownerNames', JSON.stringify(n));
+                        }} className="text-rose-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 font-bold">✕</button>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <input 
+                          className="flex-1 bg-slate-50 rounded-xl px-4 py-3 text-sm border-2 border-slate-400 focus:border-purple-600 transition-all outline-none font-bold"
+                          value={ownerNames[1] || ''}
+                          onChange={e => { 
+                            const newValue = e.target.value;
+                            const n = [...ownerNames]; 
+                            n[1] = newValue; 
+                            setOwnerNames(n);
+                            localStorage.setItem('ownerNames', JSON.stringify(n));
+                          }}
+                          placeholder="Owner 2 Name"
+                        />
+                        <button onClick={() => { 
+                          const n = [...ownerNames]; 
+                          n[1] = ''; 
+                          setOwnerNames(n);
+                          localStorage.setItem('ownerNames', JSON.stringify(n));
+                        }} className="text-rose-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 font-bold">✕</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Profit Share Slider */}
+                  <div className="md:col-span-2 rounded-2xl border border-slate-300 p-6 bg-white shadow-xl">
+                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">PROFIT SHARE RATIO</div>
+                    <input
+                      type="range" min="0" max="100" step="5"
+                      value={contractorSharePercentage}
+                      onChange={e => onContractorSharePercentageChange(Number(e.target.value))}
+                      className="w-full h-3 rounded-lg bg-purple-100 accent-purple-600 mb-8 cursor-pointer shadow-inner"
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-slate-900 to-slate-700 p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600">
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">CONTRACTOR SHARE</div>
+                        <div className="text-4xl font-black text-white">{contractorSharePercentage}%</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-purple-700 to-indigo-600 p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400">
+                        <div className="text-[10px] font-black text-purple-200 uppercase tracking-widest mb-2">OWNERS SHARE</div>
+                        <div className="text-4xl font-black text-white">{100 - contractorSharePercentage}%</div>
+                      </div>
+                    </div>
+                  </div>
+               </div>
+            </div>
+          </section>
+
+          {/* Saved Reports Table */}
+          <section className="rounded-3xl border border-purple-200 bg-white p-6 shadow-xl overflow-hidden">
+             <div className="flex items-center justify-between mb-6">
+                <h3 className="text-sm font-black text-purple-900 uppercase tracking-widest">CLOUD DATA VAULT</h3>
+                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-black uppercase tracking-wider">{reports.length} ENTRIES</span>
+             </div>
+             <div className="overflow-x-auto">
+               <table className="w-full text-left text-xs">
+                 <thead className="bg-purple-50 text-purple-900 uppercase font-black">
+                   <tr>
+                     <th className="px-5 py-4 first:rounded-l-2xl">LOCATION</th>
+                     <th className="px-5 py-4">SECURE DATE</th>
+                     <th className="px-5 py-4 last:rounded-r-2xl">REVENUE (LKR)</th>
+                   </tr>
+                 </thead>
+                 <tbody className="divide-y divide-purple-50">
+                   {reports.length > 0 ? reports.map(r => (
+                     <tr key={r.id} className="hover:bg-purple-50/50 transition-colors cursor-pointer">
+                       <td className="px-5 py-4 font-black text-slate-800 uppercase">{r.payload?.inputs?.location || '-'}</td>
+                       <td className="px-5 py-4 font-bold text-slate-500">{new Date(r.created_at).toLocaleDateString()}</td>
+                       <td className="px-5 py-4 text-emerald-600 font-black">{formatLKR(r.payload?.results?.initialPrice || 0)}</td>
+                     </tr>
+                   )) : <tr><td colSpan="3" className="text-center py-10 font-bold text-slate-300 uppercase tracking-widest italic">NO SECURE RECORDS FOUND</td></tr>}
+                 </tbody>
+               </table>
+             </div>
+          </section>
         </div>
       </div>
-
-      {approvalModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-2xl">
-            <h3 className="text-lg font-bold text-slate-900">{tr('approvalModalTitle', 'Approve & Activate Payment')}</h3>
-            <p className="mt-1 text-sm text-slate-600">
-              {tr('approvalModalSubtitle', 'Add verification note before activating full access.')}
-            </p>
-
-            <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
-              <div><span className="font-semibold">{tr('user', 'User')}:</span> {selectedPaymentRequest?.user_email || selectedPaymentRequest?.user_id || '-'}</div>
-              <div><span className="font-semibold">{tr('paymentMethod', 'Method')}:</span> {String(selectedPaymentRequest?.payment_method || '-').toUpperCase()}</div>
-              <div><span className="font-semibold">{tr('amount', 'Amount')}:</span> {formatLKR(selectedPaymentRequest?.amount_lkr || 0)}</div>
-            </div>
-
-            <label className="mt-4 block">
-              <span className="mb-1 block text-sm font-medium text-slate-700">{tr('adminVerificationNote', 'Admin Verification Note')}</span>
-              <textarea
-                value={adminApprovalNote}
-                onChange={(e) => {
-                  setAdminApprovalNote(e.target.value)
-                  if (approvalNoteError) setApprovalNoteError('')
-                }}
-                rows={4}
-                placeholder={tr('adminVerificationNotePlaceholder', 'Example: Bank transfer slip checked and matched with account records.')}
-                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-              />
-            </label>
-
-            {approvalNoteError && (
-              <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
-                {approvalNoteError}
-              </div>
-            )}
-
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closeApprovalModal}
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                {tr('cancel', 'Cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={confirmActivationWithNote}
-                disabled={adminActionBusy}
-                className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {adminActionBusy ? tr('pleaseWait', 'Please wait...') : tr('confirmActivate', 'Confirm & Activate')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </section>
+    </div>
   )
 }

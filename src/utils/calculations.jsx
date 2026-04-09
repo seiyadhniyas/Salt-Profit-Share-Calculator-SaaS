@@ -29,6 +29,9 @@ export function computeAll(inputs, options = {}) {
   const extraExpenses = Array.isArray(inputs.extraExpenses) ? inputs.extraExpenses : []
   const extraExpensesTotal = extraExpenses.reduce((s, it) => s + safeNum(it.amount), 0)
   const totalOtherExpenses = otherExpenses + extraExpensesTotal
+  // labour costs array: [{id, name, date, frequency, amount}]
+  const labourCosts = Array.isArray(inputs.labourCosts) ? inputs.labourCosts : []
+  const labourCostsTotal = labourCosts.reduce((s, it) => s + safeNum(it.amount), 0)
   const expensePayment = inputs.expensePayment || 'owners'
   const is5050 = expensePayment === 'shared5050'
   const loanInaya = inputs.bothOwnersHaveLoans ? safeNum(inputs.loanInaya) : 0
@@ -45,7 +48,8 @@ export function computeAll(inputs, options = {}) {
   // Allow a manual override: if the user provides `contractorTotalSpentManual` then
   // use that value directly (treats contractor expenses as strictly user-controlled).
   // Otherwise compute from per-bag rates and other expenses as before.
-  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0) + (is5050 ? totalOtherExpenses : 0)
+  // IMPORTANT: Labour costs are ALWAYS added to contractor expenses (regardless of expense payment mode)
+  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0) + (is5050 ? totalOtherExpenses : 0) + labourCostsTotal
 
   // total loan (sum of both owners' loans)
   const totalLoan = loanInaya + loanShakira
@@ -163,6 +167,8 @@ export function computeAll(inputs, options = {}) {
     otherExpenses: round2(totalOtherExpenses),
     extraExpenses,
     extraExpensesTotal: round2(extraExpensesTotal),
+    labourCosts,
+    labourCostsTotal: round2(labourCostsTotal),
     loanInaya: round2(loanInaya),
     loanShakira: round2(loanShakira),
     contractorTotalSpent: round2(contractorTotalSpent),
