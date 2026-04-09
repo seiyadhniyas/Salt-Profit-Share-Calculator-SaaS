@@ -173,32 +173,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
           <div>
             <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">🏭 {t('contractorExpenses')}</h4>
-            <NumberInput label={t('packingFeePerBag') || 'Packing Wage per Bag (LKR)'} name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} decimals={2} />
-            <NumberInput label={t('bagCostPerUnit') || 'Plastic Bag Cost (LKR)'} name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} decimals={2} />
-            <NumberInput label={t('otherExpenses') || 'Other Expenses (LKR)'} name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} decimals={2} />
-            <label className="block mb-3">
-              <div className="text-sm font-medium text-gray-700 mb-1">{t('otherExpensesReason')}</div>
-              <input
-                type="text"
-                name="otherExpensesReason"
-                value={inputs.otherExpensesReason || ''}
-                onChange={(e) => onChange('otherExpensesReason', e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-base"
-                placeholder={t ? t('otherExpensesReasonPlaceholder') : 'Brief reason for other expenses'}
-              />
-            </label>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 {t('income')}</h4>
-            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} tooltip={t ? t('cashAutoHint') : 'Auto-filled from Net Bags × Price per Bag; edit to override'} />
-            <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} decimals={2} />
-          </div>
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <div className="block mb-3">
+            
+            <div className="block mb-4 pb-4 border-b">
               <div className="text-sm font-medium text-gray-700 mb-2">{t('expenseResponsibility')}</div>
               <div className="flex flex-col gap-3">
                 <label className="inline-flex items-center">
@@ -215,6 +191,22 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 </label>
               </div>
             </div>
+            
+            <NumberInput label={t('packingFeePerBag') || 'Packing Wage per Bag (LKR)'} name="packingFeePerBag" value={inputs.packingFeePerBag} onChange={onChange} decimals={2} />
+            <NumberInput label={t('bagCostPerUnit') || 'Plastic Bag Cost (LKR)'} name="bagCostPerUnit" value={inputs.bagCostPerUnit} onChange={onChange} decimals={2} />
+            <NumberInput label={t('otherExpenses') || 'Other Expenses (LKR)'} name="otherExpenses" value={inputs.otherExpenses} onChange={onChange} decimals={2} />
+            <label className="block mb-3">
+              <div className="text-sm font-medium text-gray-700 mb-1">{t('otherExpensesReason')}</div>
+              <input
+                type="text"
+                name="otherExpensesReason"
+                value={inputs.otherExpensesReason || ''}
+                onChange={(e) => onChange('otherExpensesReason', e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-base"
+                placeholder={t ? t('otherExpensesReasonPlaceholder') : 'Brief reason for other expenses'}
+              />
+            </label>
+            
             <div className="mt-3">
               <button type="button" onClick={addExpense} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded text-sm hover:bg-blue-100 w-fit">
                 {t('addExpenses')}
@@ -232,6 +224,12 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 ))}
               </div>
             )}
+          </div>
+
+          <div>
+            <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">💰 {t('income')}</h4>
+            <NumberInput label={t('cashReceived') || 'Cash Received (LKR)'} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} tooltip={t ? t('cashAutoHint') : 'Auto-filled from Net Bags × Price per Bag; edit to override'} />
+            <NumberInput label={t('chequeReceived') || 'Cheque Received (LKR)'} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} decimals={2} />
           </div>
         </div>
 

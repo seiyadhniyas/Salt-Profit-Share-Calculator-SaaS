@@ -55,23 +55,21 @@ export function computeAll(inputs, options = {}) {
   // If owners pay expenses: owners cover contractor expenses, so treat Grand Total
   // as InitialPrice minus TotalLoan (do not add/subtract contractor spent here).
   // If contractor pays expenses: subtract contractor spent and loans.
+  // If 50/50: split expenses equally, so subtract full contractor spent from available pool.
   let grandTotalReceived = 0
   if (expensePayment === 'owners') {
     grandTotalReceived = initialPrice - totalLoan
   } else if (expensePayment === 'contractor') {
     grandTotalReceived = initialPrice - contractorTotalSpent - totalLoan
   } else if (is5050) {
-    // 50/50 split of expenses: Contractor pays half, Owners pay half (taken from pool)
-    // grandTotalReceived should represent the total cash to be distributed among owners
-    // after paying their half of expenses and their loans.
-    grandTotalReceived = initialPrice - (contractorTotalSpent / 2) - totalLoan
+    grandTotalReceived = initialPrice - contractorTotalSpent - totalLoan
   }
 
   // contractor_share
   // If owners pay expenses: contractor receives full contractor expenses plus contractor%
   // of the initial price -> contractor_share = (InitialPrice * contractorShareFactor) + Spent
   // If contractor pays expenses: contractor_share = (InitialPrice - Spent) * contractorShareFactor
-  // If 50/50: contractor_share = (InitialPrice - Spent) * contractorShareFactor + (Spent / 2)
+  // If 50/50: contractor_share = (InitialPrice - Spent) * contractorShareFactor
   // Uses packedBags-based spent calculation defined above; blanks are treated as 0 via safeNum
   let contractorShare = 0
   if (expensePayment === 'owners') {
@@ -79,33 +77,32 @@ export function computeAll(inputs, options = {}) {
   } else if (expensePayment === 'contractor') {
     contractorShare = (initialPrice - contractorTotalSpent) * contractorShareFactor
   } else if (is5050) {
-    contractorShare = ((initialPrice - contractorTotalSpent) * contractorShareFactor) + (contractorTotalSpent / 2)
+    contractorShare = (initialPrice - contractorTotalSpent) * contractorShareFactor
   }
 
   // owner_pool (Owners Group Amount)
   // If owners pay expenses: ownerPool = grandTotalReceived - contractorShare
   // If contractor pays expenses: ownerPool = (grandTotalReceived + totalLoan) * ownerShareFactor
-  // If 50/50: ownerPool = (initialPrice - contractorTotalSpent) * ownerShareFactor
+  // If 50/50: ownerPool = (InitialPrice - contractorTotalSpent) / 2 (equals contractorShare)
   let ownerPool = 0
   if (expensePayment === 'owners') {
     ownerPool = grandTotalReceived - contractorShare
   } else if (expensePayment === 'contractor') {
     ownerPool = (grandTotalReceived + totalLoan) * ownerShareFactor
   } else if (is5050) {
-    ownerPool = (initialPrice - contractorTotalSpent) * ownerShareFactor
+    ownerPool = (initialPrice - contractorTotalSpent) / 2
   }
 
   // general_share_per_owner
   const generalSharePerOwner = ownerPool / ownerCount
 
   // raw final shares
-  // Logic Fix: If 'Contractor Pays Expenses' is selected,
-  // Owner 2's share should include Owner 1's loan (and vice versa).
-  // This compensates for the totalLoan being subtracted from initialPrice.
+  // Owner Final Share = (Owners Group Amount / 2) - Own Loan
   let finalInayaRaw = generalSharePerOwner - loanInaya
   let finalShakiraRaw = ownerCount === 2 ? (generalSharePerOwner - loanShakira) : 0
 
-  if (expensePayment === 'contractor') {
+  // Special handling for "Contractor Pays Expenses" only (not for 50/50 split)
+  if (expensePayment === 'contractor' && !is5050) {
     if (ownerCount === 2) {
       finalInayaRaw += loanShakira
       finalShakiraRaw += loanInaya
@@ -117,10 +114,10 @@ export function computeAll(inputs, options = {}) {
   let finalShakira = ownerCount === 2 ? Math.max(0, finalShakiraRaw) : 0
 
   // Validation: ensure sum of distributions equals available funds
-  // For "Contractor Pays Expenses": finalInaya + finalShakira + contractorShare should equal (grandTotalReceived + totalLoan)
-  // For other modes: finalInaya + finalShakira + contractorShare should equal grandTotalReceived
+  // For "Contractor Pays Expenses" (non-50/50): finalInaya + finalShakira + contractorShare should equal (grandTotalReceived + totalLoan)
+  // For 50/50 or other modes: finalInaya + finalShakira + contractorShare should equal grandTotalReceived
   const sumAll = finalInaya + (ownerCount === 2 ? finalShakira : 0) + contractorShare
-  const expectedTotal = expensePayment === 'contractor' ? (grandTotalReceived + totalLoan) : grandTotalReceived
+  const expectedTotal = (expensePayment === 'contractor' && !is5050) ? (grandTotalReceived + totalLoan) : grandTotalReceived
   const totalDiff = expectedTotal - sumAll
 
   if (Math.abs(totalDiff) > 0.0001) {
