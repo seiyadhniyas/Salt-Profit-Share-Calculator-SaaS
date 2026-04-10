@@ -51,13 +51,24 @@ export default function DashboardSummary({
 }) {
 
   const [showVaultExpanded, setShowVaultExpanded] = useState(false)
+  const [newLoc, setNewLoc] = useState('')
+  
   if (!open) return null
 
-  const tr = (key, fallback) => (t ? t(key) : fallback)
-  const isTamil = (t && t('lang') === 'ta')
+  // Safe translation function
+  const tr = (key, fallback) => {
+    try {
+      if (!t || typeof t !== 'function') return fallback
+      const result = t(key)
+      return result || fallback
+    } catch {
+      return fallback
+    }
+  }
+  
+  const isTamil = (t && typeof t === 'function' && t('lang') === 'ta')
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || tr('guestMember', 'Guest member')
-  const [newLoc, setNewLoc] = useState('')
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center p-0 sm:p-4">
@@ -80,11 +91,11 @@ export default function DashboardSummary({
                   </div>
                 </div>
                 {signedIn ? (
-                  <button onClick={onSignOut} className="rounded-full border border-white/40 bg-white/20 px-6 py-2 text-xs font-bold text-white transition hover:bg-white/30 uppercase">{tr('signOut', 'Sign Out')}</button>
+                  <button onClick={() => onSignOut?.()} className="rounded-full border border-white/40 bg-white/20 px-6 py-2 text-xs font-bold text-white transition hover:bg-white/30 uppercase">{tr('signOut', 'Sign Out')}</button>
                 ) : (
                   <div className="flex gap-2">
-                    <button onClick={onOpenAuth} className="rounded-full bg-white px-6 py-2 text-xs font-bold text-purple-700 transition hover:bg-purple-50 uppercase shadow-lg shadow-purple-900/20">SignIn/Register</button>
-                    <button onClick={onOpenAdminAuth} className="rounded-full border border-amber-300 bg-amber-100 border-2 px-6 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200 uppercase">Admin Access</button>
+                    <button onClick={() => onOpenAuth?.()} className="rounded-full bg-white px-6 py-2 text-xs font-bold text-purple-700 transition hover:bg-purple-50 uppercase shadow-lg shadow-purple-900/20">SignIn/Register</button>
+                    <button onClick={() => onOpenAdminAuth?.()} className="rounded-full border border-amber-300 bg-amber-100 border-2 px-6 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200 uppercase">Admin Access</button>
                   </div>
                 )}
               </div>
@@ -109,8 +120,8 @@ export default function DashboardSummary({
                     </div>
                     {!billingStatus?.full_access_enabled && (
                       <div className="flex gap-3">
-                        <button onClick={onStartCardPayment} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">PAY BY CARD</button>
-                        <button onClick={onRequestCashPayment} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">CASH / BANK</button>
+                        <button onClick={() => onStartCardPayment?.()} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">PAY BY CARD</button>
+                        <button onClick={() => onRequestCashPayment?.()} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">CASH / BANK</button>
                       </div>
                     )}
                   </div>
@@ -130,7 +141,7 @@ export default function DashboardSummary({
                         placeholder="NEW LOCATION NAME"
                       />
                       <button 
-                        onClick={() => { if(newLoc.trim()){ onAddLocation(newLoc); setNewLoc(''); }}}
+                        onClick={() => { if(newLoc.trim() && onAddLocation){ onAddLocation(newLoc); setNewLoc(''); }}}
                         className="bg-purple-600 text-white px-4 py-3 rounded-xl text-xs font-black uppercase hover:bg-purple-700 transition"
                       >Add</button>
                     </div>
@@ -138,7 +149,7 @@ export default function DashboardSummary({
                       {customLocations.map(loc => (
                         <div key={loc} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl text-sm group border border-transparent hover:border-blue-100 transition-all">
                           <span className="font-bold text-slate-700 uppercase">{loc}</span>
-                          <button onClick={() => onDeleteLocation(loc)} className="text-rose-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 transition opacity-0 group-hover:opacity-100 font-bold">✕</button>
+                          <button onClick={() => onDeleteLocation?.(loc)} className="text-rose-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 transition opacity-0 group-hover:opacity-100 font-bold">✕</button>
                         </div>
                       ))}
                     </div>
@@ -158,16 +169,16 @@ export default function DashboardSummary({
                             const newValue = e.target.value;
                             const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                             n[0] = newValue; 
-                            setOwnerNames(n);
-                            localStorage.setItem('ownerNames', JSON.stringify(n));
+                            setOwnerNames?.(n);
+                            try { localStorage.setItem('ownerNames', JSON.stringify(n)); } catch {}
                           }}
                           placeholder="Owner 1 Name"
                         />
                         <button onClick={() => { 
                           const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                           n[0] = ''; 
-                          setOwnerNames(n); 
-                          localStorage.setItem('ownerNames', JSON.stringify(n));
+                          setOwnerNames?.(n); 
+                          try { localStorage.setItem('ownerNames', JSON.stringify(n)); } catch {}
                         }} className="text-rose-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 font-bold">✕</button>
                       </div>
                       <div className="flex gap-2 items-center">
@@ -178,16 +189,16 @@ export default function DashboardSummary({
                             const newValue = e.target.value;
                             const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                             n[1] = newValue; 
-                            setOwnerNames(n);
-                            localStorage.setItem('ownerNames', JSON.stringify(n));
+                            setOwnerNames?.(n);
+                            try { localStorage.setItem('ownerNames', JSON.stringify(n)); } catch {}
                           }}
                           placeholder="Owner 2 Name"
                         />
                         <button onClick={() => { 
                           const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                           n[1] = ''; 
-                          setOwnerNames(n);
-                          localStorage.setItem('ownerNames', JSON.stringify(n));
+                          setOwnerNames?.(n);
+                          try { localStorage.setItem('ownerNames', JSON.stringify(n)); } catch {}
                         }} className="text-rose-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50 font-bold">✕</button>
                       </div>
                     </div>
@@ -199,7 +210,7 @@ export default function DashboardSummary({
                     <input
                       type="range" min="0" max="100" step="5"
                       value={contractorSharePercentage}
-                      onChange={e => onContractorSharePercentageChange(Number(e.target.value))}
+                      onChange={e => onContractorSharePercentageChange?.(Number(e.target.value))}
                       className="w-full h-3 rounded-lg bg-purple-100 accent-purple-600 mb-4 sm:mb-8 cursor-pointer shadow-inner"
                     />
                     <div className="grid grid-cols-2 gap-2 sm:gap-4">

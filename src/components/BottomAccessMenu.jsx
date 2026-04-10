@@ -5,7 +5,7 @@ import React from 'react';
 
 export default function BottomAccessMenu({ onDownloadPDF, onSave, onCloud, onPL, onDashboard }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-lg flex justify-around items-center h-16">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 shadow-lg flex justify-around items-center h-16" style={{background: 'linear-gradient(90deg, #fce4ec 0%, #f8bbd0 100%)'}}>
       <button onClick={onDownloadPDF} className="flex flex-col items-center text-slate-700 hover:text-blue-600 focus:outline-none">
         <span className="text-2xl">📥</span>
         <span className="text-xs">PDF</span>

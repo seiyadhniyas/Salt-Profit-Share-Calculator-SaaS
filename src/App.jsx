@@ -17,6 +17,7 @@ import { createTenant, listTenantsForUser } from './api/tenants.js'
 import { getUserRole, canEdit } from './api/roles.js'
 import RedesignedHeader from './components/RedesignedHeader.jsx'
 import BottomAccessMenu from './components/BottomAccessMenu.jsx'
+import AccordionCard from './components/AccordionCard.jsx'
 
 const STORAGE_KEY = 'salt_profit_share_last'
 
@@ -1054,32 +1055,20 @@ export default function App(){
             <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} />
             {/* Disaster Recovery toggle and card */}
             <div className="mt-4 flex flex-col items-center w-full">
-              {!showDisasterRecovery ? (
-                <button
-                  type="button"
-                  className="w-full max-w-md px-6 py-3 rounded-xl bg-rose-100 text-rose-700 font-semibold border border-rose-300 shadow hover:bg-rose-200 transition text-center flex items-center justify-center"
-                  style={{letterSpacing: 0.2, fontSize: '1.08rem'}} 
-                  onClick={() => setShowDisasterRecovery(true)}
+              <div className="w-full max-w-md">
+                <AccordionCard
+                  title={t('addDisasterRecovery')}
+                  icon={<span className="text-2xl">🌊</span>}
+                  defaultOpen={showDisasterRecovery}
+                  bgColor="#ffe4ef"
                 >
-                  <span className="mx-auto">{t('addDisasterRecovery')}</span>
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="w-full max-w-md mb-2 px-6 py-2 rounded-xl bg-gray-100 text-gray-700 border border-gray-300 shadow hover:bg-gray-200 transition text-center flex items-center justify-center"
-                    style={{letterSpacing: 0.2, fontSize: '1.08rem'}}
-                    onClick={() => setShowDisasterRecovery(false)}
-                  >
-                    <span className="mx-auto">✕ {t('disasterRecovery')}</span>
-                  </button>
                   <DisasterRecoveryCard
                     value={disasterRecovery}
                     onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
                     t={t}
                   />
-                </>
-              )}
+                </AccordionCard>
+              </div>
             </div>
           </div>
 

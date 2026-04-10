@@ -100,7 +100,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">{tr('memberAccess', 'Member Access')}</p>
-            <h2 className="mt-1 text-xl font-bold text-slate-900">{mode === 'signin' ? tr('signIn', 'Sign in') : tr('createAccount', 'Create account')}</h2>
+            <h2 className="mt-1 text-xl font-bold text-slate-900">{mode === 'signin' ? tr('signIn', 'Sign In') : tr('createAccount', 'Create Account')}</h2>
           </div>
           <button
             type="button"
@@ -118,7 +118,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               onClick={() => onModeChange?.('signin')}
               className={`rounded-xl px-3 py-2 transition ${mode === 'signin' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'}`}
             >
-              {tr('signIn', 'Sign in')}
+              {tr('signIn', 'Sign In')}
             </button>
             <button
               type="button"
@@ -139,7 +139,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder={tr('emailPlaceholder', 'you@example.com')}
+              placeholder="Enter your email address"
             />
           </label>
 
@@ -152,7 +152,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               value={form.password}
               onChange={(e) => updateField('password', e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder={tr('passwordPlaceholder', 'At least 6 characters')}
+              placeholder="Enter your password (min 6 characters)"
             />
           </label>
 
@@ -166,7 +166,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
                 value={form.confirmPassword}
                 onChange={(e) => updateField('confirmPassword', e.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                placeholder={tr('confirmPasswordPlaceholder', 'Repeat password')}
+                placeholder="Re-enter your password"
               />
             </label>
           )}
@@ -194,7 +194,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
             disabled={loading}
             className="w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? tr('pleaseWait', 'Please wait...') : mode === 'signin' ? tr('signInToDashboard', 'Sign in to dashboard') : tr('createAccount', 'Create account')}
+            {loading ? tr('pleaseWait', 'Please wait...') : mode === 'signin' ? tr('signInToDashboard', 'Sign In To Dashboard') : tr('createAccount', 'Create Account')}
           </button>
 
           <p className="text-xs leading-5 text-slate-500">
