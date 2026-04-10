@@ -76,7 +76,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
   const addLabourCost = () => {
     const id = Date.now()
-    const next = [...(inputs.labourCosts || []), { id, name: '', date: '', frequency: 'Weekly', amount: 0 }]
+    // Do not prefill amount, let user enter manually
+    const next = [...(inputs.labourCosts || []), { id, name: '', date: '', frequency: 'Weekly', amount: '' }]
     setInput(prev => ({ ...prev, labourCosts: next }))
   }
 
@@ -340,7 +341,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                     <input
                       type="number"
                       step="any"
-                      value={labour.amount === 0 ? '' : Number(labour.amount).toFixed(2)}
+                      value={labour.amount === '' ? '' : labour.amount}
                       onChange={(e) => updateLabourCost(labour.id, 'amount', e.target.value)}
                       placeholder="0.00"
                       className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 placeholder-slate-300 focus:border-slate-900 outline-none transition-all font-semibold text-sm"

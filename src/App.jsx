@@ -1058,19 +1058,21 @@ export default function App(){
             <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} />
             {/* Disaster Recovery toggle and card */}
             <div className="mt-4 flex flex-col items-center w-full">
-              <div className="w-full max-w-md">
-                <AccordionCard
-                  title={t('disasterExpenses')}
-                  icon={<span className="text-2xl">🌊</span>}
-                  defaultOpen={showDisasterRecovery}
-                  bgColor="#ffe4ef"
-                >
-                  <DisasterRecoveryCard
-                    value={disasterRecovery}
-                    onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
-                    t={t}
-                  />
-                </AccordionCard>
+              <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+                <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+                  <AccordionCard
+                    title={t('disasterExpenses')}
+                    icon={<span className="text-2xl">🌊</span>}
+                    defaultOpen={showDisasterRecovery}
+                    bgColor="#ffe4ef"
+                  >
+                    <DisasterRecoveryCard
+                      value={disasterRecovery}
+                      onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
+                      t={t}
+                    />
+                  </AccordionCard>
+                </div>
               </div>
             </div>
           </div>

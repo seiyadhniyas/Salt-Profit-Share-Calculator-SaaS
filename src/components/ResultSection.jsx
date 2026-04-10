@@ -53,14 +53,23 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               <>
                 <StatRow label="Labour Costs (Total)" value={formatLKR(results.labourCostsTotal)} isNegative={false} />
                 {results.labourCosts && results.labourCosts.length > 0 && (
-                  <div className="ml-4 text-xs text-gray-600 space-y-1">
-                    {results.labourCosts.map((labour, idx) => (
-                      <div key={idx} className="flex justify-between">
-                        <span>{labour.name ? `${labour.name} (${labour.frequency})` : `Labour - ${labour.frequency}`}</span>
-                        <span className="font-mono">{formatLKR(labour.amount)}</span>
+                  <>
+                    {/* Arrow moved upward, height unchanged */}
+                    <div className="relative flex justify-center" style={{ zIndex: 20, marginTop: '-14px', marginBottom: '6px' }}>
+                      <span className="text-2xl text-emerald-500 font-black drop-shadow-lg" style={{ WebkitTextStroke: '2px #059669', zIndex: 20, position: 'absolute', top: '-4px' }}>↓</span>
+                    </div>
+                    <div className="ml-4 mt-2 p-3 rounded-2xl bg-[#eed3ff] border" style={{ marginTop: '4px', border: '0.5px solid #a78bfa' }}>
+                      <div className="text-[13px] font-bold text-purple-800 tracking-wider mb-2 normal-case">Labour details</div>
+                      <div className="space-y-1">
+                        {results.labourCosts.map((labour, idx) => (
+                          <div key={idx} className="flex justify-between text-xs">
+                            <span className="font-semibold text-emerald-900">{labour.name ? `${labour.name} (${labour.frequency})` : `Labour - ${labour.frequency}`}</span>
+                            <span className="font-mono text-emerald-700">{formatLKR(labour.amount)}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  </>
                 )}
               </>
             )}
