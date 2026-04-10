@@ -16,6 +16,7 @@ import TenantSwitcher from './components/TenantSwitcher.jsx'
 import { createTenant, listTenantsForUser } from './api/tenants.js'
 import { getUserRole, canEdit } from './api/roles.js'
 import RedesignedHeader from './components/RedesignedHeader.jsx'
+import BottomAccessMenu from './components/BottomAccessMenu.jsx'
 
 const STORAGE_KEY = 'salt_profit_share_last'
 
@@ -994,7 +995,7 @@ export default function App(){
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 pb-14 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
         <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-4 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:px-6 sm:pb-6 sm:pt-5">
           <div className="absolute left-3 top-3 sm:left-5 sm:top-4">
@@ -1253,21 +1254,7 @@ export default function App(){
 
       </div>
 
-      <button
-        onClick={downloadPDF}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-all z-40 border-4 border-white"
-        title={t('downloadPDF')}
-      >
-        📥
-      </button>
 
-      <button
-        onClick={saveCurrentReport}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 active:scale-95 transition-all z-40 border-4 border-white"
-        title={t('save')}
-      >
-        💾
-      </button>
 
       <DashboardSummary
         open={menuOpen}
@@ -1322,6 +1309,26 @@ export default function App(){
       <AdminAuthModal 
         open={adminAuthModalOpen}
         onClose={() => setAdminAuthModalOpen(false)}
+      />
+
+      <BottomAccessMenu
+        onDownloadPDF={downloadPDF}
+        onSave={saveCurrentReport}
+        onCloud={() => {
+          setMenuOpen(true);
+          setTimeout(() => {
+            const filesTab = document.querySelector('[data-tab="files"]');
+            if (filesTab) filesTab.click();
+          }, 100);
+        }}
+        onPL={() => {
+          // Scroll to results section if available
+          const resultsSection = document.querySelector('.android-shadow.rounded-[32px]');
+          if (resultsSection) {
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }}
+        onDashboard={() => setMenuOpen(true)}
       />
     </div>
   )
