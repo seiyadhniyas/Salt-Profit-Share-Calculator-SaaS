@@ -353,8 +353,8 @@ export default function App(){
       yearly: 'Yearly',
     },
     ta: {
-      title: 'உப்பு லாபப் பங்கு கணக்கீட்டாளர்',
-      subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்ததாரர்களுக்கான நிதி கணக்கீட்டாளர்',
+      title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
+      subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்தக்காரர்களுக்கான நிதி கணக்கீடு',
       documentDetails: "ஆவண விவரங்கள்",
       locationDay: 'இடம்',
       date: 'தேதி',
@@ -1035,7 +1035,7 @@ export default function App(){
         </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-2">
+          <div className="lg:col-span-2 space-y-4">
             <button
               type="button"
               onClick={() => setOwnerCount(ownerCount === 1 ? 2 : 1)}
@@ -1107,7 +1107,7 @@ export default function App(){
                     Number(disasterRecovery.donationsReceived) ||
                     Number(disasterRecovery.lossQuantity)
                   ) ? (
-                    <div className="flex justify-between items-center bg-rose-100/90 p-3 rounded-2xl border border-rose-200 mt-2">
+                    <div className="flex justify-between items-center bg-rose-100/90 p-3 rounded-2xl border border-rose-200 my-4">
                       <span className="text-rose-700 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
                         <span className="text-lg">🌊</span> {t('disasterExpenses')}
                       </span>

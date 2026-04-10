@@ -93,7 +93,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
   const tr = (k, f) => (t ? t(k) : f)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <AccordionCard 
         title={tr('documentDetails', 'REPORT METADATA')} 
         bgColor="#e0f2fe" 
