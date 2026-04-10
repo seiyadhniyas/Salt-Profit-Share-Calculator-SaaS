@@ -12,6 +12,10 @@ import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFiles
 import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment, getAdminPendingPayments, activatePaymentRequestAsAdmin } from './api/billing.js'
 import { useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
+import TenantSwitcher from './components/TenantSwitcher.jsx'
+import { createTenant, listTenantsForUser } from './api/tenants.js'
+import { getUserRole, canEdit } from './api/roles.js'
+import RedesignedHeader from './components/RedesignedHeader.jsx'
 
 const STORAGE_KEY = 'salt_profit_share_last'
 
@@ -57,6 +61,8 @@ export default function App(){
       return Number(localStorage.getItem('ownerCount')) || 2
     } catch { return 2 }
   })
+  const [tenantId, setTenantId] = useState(null)
+  const [userRole, setUserRole] = useState(null)
 
   const [session, setSession] = useState(null)
 
@@ -102,6 +108,20 @@ export default function App(){
     }
     loadProfile()
   }, [session])
+
+  useEffect(() => {
+    if (!session?.user?.id) return
+    // Auto-select first tenant if available
+    listTenantsForUser(session.user.id).then(ts => {
+      if (ts?.length && !tenantId) setTenantId(ts[0].tenant_id)
+    })
+  }, [session, tenantId])
+
+  useEffect(() => {
+    if (session?.user?.id && tenantId) {
+      getUserRole(session.user.id, tenantId).then(setUserRole)
+    }
+  }, [session, tenantId])
 
   // Sync back to Supabase on changes
   useEffect(() => {
@@ -955,6 +975,18 @@ export default function App(){
     setAuthModalOpen(true)
   }
 
+  const handleAuthModeChange = (mode) => setAuthMode(mode)
+
+  const handleAuthSuccess = (user) => {
+    setAuthModalOpen(false)
+    // Refresh session or any relevant state
+    if (supabase) {
+      supabase.auth.getSession().then(({ data }) => {
+        setSession(data.session)
+      })
+    }
+  }
+
   const handleSignOut = async () => {
     if (!supabase) return
     await supabase.auth.signOut()
@@ -1258,12 +1290,13 @@ export default function App(){
           if (!error) loadSavedFiles(session)
         }}
         customLocations={customLocations}
-        onAddLocation={(name) => setCustomLocations(prev => [...new Set([...prev, name])])}
-        onDeleteLocation={(name) => setCustomLocations(prev => prev.filter(l => l !== name))}
+        onAddLocation={(name) => setCustomLocations([...customLocations, name])}
+        onDeleteLocation={(name) => setCustomLocations(customLocations.filter(l => l !== name))}
         ownerNames={ownerNames}
-        onOwnerNamesChange={setOwnerNames}
+        setOwnerNames={setOwnerNames}
         contractorSharePercentage={contractorSharePercentage}
         onContractorSharePercentageChange={setContractorSharePercentage}
+        t={t}
         billingStatus={billingStatus}
         onStartCardPayment={handleStartCardPayment}
         onRequestCashPayment={handleRequestCashPayment}
@@ -1271,20 +1304,19 @@ export default function App(){
         paymentBusy={paymentBusy}
         isAdmin={isAdmin}
         pendingPaymentRequests={pendingPaymentRequests}
-        onRefreshPendingPaymentRequests={() => refreshPendingPaymentRequests(session)}
+        onRefreshPendingPaymentRequests={refreshPendingPaymentRequests}
         onActivatePaymentRequest={handleAdminActivatePaymentRequest}
         adminActionBusy={adminActionBusy}
         onOpenAdminAuth={() => setAdminAuthModalOpen(true)}
-        t={t}
-        lang={lang}
-        inputs={inputs}
-        results={results}
       />
 
       <AuthModal
         open={authModalOpen}
+        mode={authMode}
         onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
+        onModeChange={handleAuthModeChange}
+        onSuccess={handleAuthSuccess}
+        t={t}
       />
 
       <AdminAuthModal 

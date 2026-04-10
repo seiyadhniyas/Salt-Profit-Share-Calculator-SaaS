@@ -49,6 +49,8 @@ export default function DashboardSummary({
   adminActionBusy,
   onOpenAdminAuth,
 }) {
+
+  const [showVaultExpanded, setShowVaultExpanded] = useState(false)
   if (!open) return null
 
   const tr = (key, fallback) => (t ? t(key) : fallback)
@@ -81,8 +83,8 @@ export default function DashboardSummary({
                   <button onClick={onSignOut} className="rounded-full border border-white/40 bg-white/20 px-6 py-2 text-xs font-bold text-white transition hover:bg-white/30 uppercase">{tr('signOut', 'Sign Out')}</button>
                 ) : (
                   <div className="flex gap-2">
-                    <button onClick={onOpenAuth} className="rounded-full bg-white px-6 py-2 text-xs font-bold text-purple-700 transition hover:bg-purple-50 uppercase shadow-lg shadow-purple-900/20">{tr('signInRegister', 'Sign In')}</button>
-                    <button onClick={onOpenAdminAuth} className="rounded-full border border-amber-300 bg-amber-100 border-2 px-6 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200 uppercase">{tr('adminAccess', 'Admin')}</button>
+                    <button onClick={onOpenAuth} className="rounded-full bg-white px-6 py-2 text-xs font-bold text-purple-700 transition hover:bg-purple-50 uppercase shadow-lg shadow-purple-900/20">SignIn/Register</button>
+                    <button onClick={onOpenAdminAuth} className="rounded-full border border-amber-300 bg-amber-100 border-2 px-6 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200 uppercase">Admin Access</button>
                   </div>
                 )}
               </div>
@@ -120,7 +122,7 @@ export default function DashboardSummary({
                     <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 flex items-center gap-2">
                        <span className="w-2 h-2 rounded-full bg-blue-500"></span> WORK LOCATIONS
                     </div>
-                    <div className="flex gap-2 mb-4">
+                    <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:gap-2">
                       <input 
                         className="flex-1 bg-slate-50 rounded-xl px-4 py-3 text-sm border-2 border-slate-400 focus:border-purple-600 focus:ring-0 transition-all outline-none"
                         value={newLoc}
@@ -154,7 +156,7 @@ export default function DashboardSummary({
                           value={ownerNames[0] || ''}
                           onChange={e => { 
                             const newValue = e.target.value;
-                            const n = [...ownerNames]; 
+                            const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                             n[0] = newValue; 
                             setOwnerNames(n);
                             localStorage.setItem('ownerNames', JSON.stringify(n));
@@ -162,7 +164,7 @@ export default function DashboardSummary({
                           placeholder="Owner 1 Name"
                         />
                         <button onClick={() => { 
-                          const n = [...ownerNames]; 
+                          const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                           n[0] = ''; 
                           setOwnerNames(n); 
                           localStorage.setItem('ownerNames', JSON.stringify(n));
@@ -174,7 +176,7 @@ export default function DashboardSummary({
                           value={ownerNames[1] || ''}
                           onChange={e => { 
                             const newValue = e.target.value;
-                            const n = [...ownerNames]; 
+                            const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                             n[1] = newValue; 
                             setOwnerNames(n);
                             localStorage.setItem('ownerNames', JSON.stringify(n));
@@ -182,7 +184,7 @@ export default function DashboardSummary({
                           placeholder="Owner 2 Name"
                         />
                         <button onClick={() => { 
-                          const n = [...ownerNames]; 
+                          const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
                           n[1] = ''; 
                           setOwnerNames(n);
                           localStorage.setItem('ownerNames', JSON.stringify(n));
@@ -192,22 +194,22 @@ export default function DashboardSummary({
                   </div>
 
                   {/* Profit Share Slider */}
-                  <div className="md:col-span-2 rounded-2xl border border-slate-300 p-6 bg-white shadow-xl">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">PROFIT SHARE RATIO</div>
+                  <div className="md:col-span-2 rounded-2xl border border-slate-300 p-4 sm:p-6 bg-white shadow-xl">
+                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 sm:mb-6">PROFIT SHARE RATIO</div>
                     <input
                       type="range" min="0" max="100" step="5"
                       value={contractorSharePercentage}
                       onChange={e => onContractorSharePercentageChange(Number(e.target.value))}
-                      className="w-full h-3 rounded-lg bg-purple-100 accent-purple-600 mb-8 cursor-pointer shadow-inner"
+                      className="w-full h-3 rounded-lg bg-purple-100 accent-purple-600 mb-4 sm:mb-8 cursor-pointer shadow-inner"
                     />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gradient-to-br from-slate-900 to-slate-700 p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">CONTRACTOR SHARE</div>
-                        <div className="text-4xl font-black text-white">{contractorSharePercentage}%</div>
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                      <div className="bg-gradient-to-br from-slate-900 to-slate-700 p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600">
+                        <div className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 sm:mb-2">CONTRACTOR SHARE</div>
+                        <div className="text-2xl sm:text-4xl font-black text-white">{contractorSharePercentage}%</div>
                       </div>
-                      <div className="bg-gradient-to-br from-purple-700 to-indigo-600 p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400">
-                        <div className="text-[10px] font-black text-purple-200 uppercase tracking-widest mb-2">OWNERS SHARE</div>
-                        <div className="text-4xl font-black text-white">{100 - contractorSharePercentage}%</div>
+                      <div className="bg-gradient-to-br from-purple-700 to-indigo-600 p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400">
+                        <div className="text-[9px] sm:text-[10px] font-black text-purple-200 uppercase tracking-widest mb-1 sm:mb-2">OWNERS SHARE</div>
+                        <div className="text-2xl sm:text-4xl font-black text-white">{100 - contractorSharePercentage}%</div>
                       </div>
                     </div>
                   </div>
@@ -220,8 +222,15 @@ export default function DashboardSummary({
              <div className="flex items-center justify-between mb-6">
                 <h3 className="text-sm font-black text-purple-900 uppercase tracking-widest">CLOUD DATA VAULT</h3>
                 <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-black uppercase tracking-wider">{reports.length} ENTRIES</span>
+                <button
+                  type="button"
+                  className="ml-4 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200 hover:bg-purple-100 transition"
+                  onClick={() => setShowVaultExpanded(v => !v)}
+                >
+                  {showVaultExpanded ? 'Collapse' : 'Expand'}
+                </button>
              </div>
-             <div className="overflow-x-auto">
+             <div className={`overflow-x-auto transition-all duration-300 ${showVaultExpanded ? '' : 'max-h-40 overflow-hidden'}`}>
                <table className="w-full text-left text-xs">
                  <thead className="bg-purple-50 text-purple-900 uppercase font-black">
                    <tr>
@@ -231,6 +240,7 @@ export default function DashboardSummary({
                    </tr>
                  </thead>
                  <tbody className="divide-y divide-purple-50">
+                   {/* TODO: Replace with full P&L aggregation logic for all time periods */}
                    {reports.length > 0 ? reports.map(r => (
                      <tr key={r.id} className="hover:bg-purple-50/50 transition-colors cursor-pointer">
                        <td className="px-5 py-4 font-black text-slate-800 uppercase">{r.payload?.inputs?.location || '-'}</td>

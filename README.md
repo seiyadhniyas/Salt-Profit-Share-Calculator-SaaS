@@ -130,6 +130,38 @@ The UI shows an estimated card-fee preview (percent + fixed LKR), configurable v
 
 This is for user transparency only; actual fees depend on Stripe/account/card conditions.
 
+## Features
+
+- User accounts & authentication (Supabase)
+- Multi-tenant data model (organizations/workspaces)
+- Role-based access control (admin, manager, user)
+- Modern UI/UX with responsive design
+- Accessibility best practices
+- Bulk import/export (JSON)
+- Reporting & analytics
+- Performance optimizations & caching
+- Security & compliance helpers
+- Payments/subscriptions (stub)
+- CI/CD pipeline (GitHub Actions)
+- Monitoring & logging utilities
+
+## Getting Started
+
+1. Clone the repo
+2. Install dependencies: `npm install`
+3. Set up `.env` with Supabase keys
+4. Run locally: `npm run dev`
+
+## Folder Structure
+
+- `src/` — Main source code
+- `supabase/` — Database schema & migrations
+- `.github/` — CI/CD workflows
+
+## Contributing
+
+PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
 ## How to use the app
 
 1. Fill `Document Details` (date, buyer, bill no.)
