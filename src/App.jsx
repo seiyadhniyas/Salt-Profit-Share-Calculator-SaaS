@@ -233,8 +233,9 @@ export default function App(){
       reset: '🔄 Reset',
       totalSaltPackedBags: 'Total Salt Packed Bags',
         // Disaster Recovery
-        disasterRecovery: 'Disaster Recovery Expenses',
-        addDisasterRecovery: '+ Add Disaster Recovery Expenses',
+          disasterRecovery: 'Disaster Recovery Expenses',
+          addDisasterRecovery: '+ Add Disaster Recovery Expenses',
+          disasterExpenses: '+ Disaster Expenses',
         lossQuantity: 'Loss Quantity of Salt',
         lossQuantityPlaceholder: 'e.g. 100',
         bags: 'Bags',
@@ -363,8 +364,9 @@ export default function App(){
       reset: '🔄 மீட்டமை',
       totalSaltPackedBags: 'மொத்த உப்பு மூட்டைகள்',
         // Disaster Recovery
-        disasterRecovery: 'பேரழிவு மீட்பு செலவுகள்',
-        addDisasterRecovery: '+ பேரழிவு மீட்பு செலவுகளைச் சேர்க்கவும்',
+          disasterRecovery: 'பேரழிவு மீட்பு செலவுகள்',
+          addDisasterRecovery: '+ பேரழிவு மீட்பு செலவுகளைச் சேர்க்கவும்',
+          disasterExpenses: '+ பேரழிவு செலவுகள்',
         lossQuantity: 'உப்பு இழப்பு அளவு',
         lossQuantityPlaceholder: 'எ.கா. 100',
         bags: 'மூட்டைகள்',
@@ -495,8 +497,9 @@ export default function App(){
       reset: '🔄 නැවත සකසන්න',
       totalSaltPackedBags: 'මුළු ලුණු මලු ප්‍රමාණය',
         // Disaster Recovery
-        disasterRecovery: 'ආපදා ප්‍රතිසාධන වියදම්',
-        addDisasterRecovery: '+ ආපදා ප්‍රතිසාධන වියදම් එක් කරන්න',
+          disasterRecovery: 'ආපදා ප්‍රතිසාධන වියදම්',
+          addDisasterRecovery: '+ ආපදා ප්‍රතිසාධන වියදම් එක් කරන්න',
+          disasterExpenses: '+ ආපදා වියදම්',
         lossQuantity: 'ලුණු අලාභ ප්‍රමාණය',
         lossQuantityPlaceholder: 'උදා: 100',
         bags: 'මලු',
@@ -1057,7 +1060,7 @@ export default function App(){
             <div className="mt-4 flex flex-col items-center w-full">
               <div className="w-full max-w-md">
                 <AccordionCard
-                  title={t('addDisasterRecovery')}
+                  title={t('disasterExpenses')}
                   icon={<span className="text-2xl">🌊</span>}
                   defaultOpen={showDisasterRecovery}
                   bgColor="#ffe4ef"
@@ -1095,6 +1098,36 @@ export default function App(){
                     <strong className="text-sm sm:text-xl font-mono text-white text-right">{formatLKR(results.contractorTotalSpent)}</strong>
                   </div>
                   <div className="my-6 border-t border-white/10 border-dashed"></div>
+                  {/* Disaster Expenses Summary - always show if any data present */}
+                  {(
+                    Number(disasterRecovery.pondsReconstruction) ||
+                    Number(disasterRecovery.hutReconstruction) ||
+                    Number(disasterRecovery.electricityBills) ||
+                    Number(disasterRecovery.compensationReceived) ||
+                    Number(disasterRecovery.donationsReceived) ||
+                    Number(disasterRecovery.lossQuantity)
+                  ) ? (
+                    <div className="flex justify-between items-center bg-rose-100/90 p-3 rounded-2xl border border-rose-200 mt-2">
+                      <span className="text-rose-700 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-lg">🌊</span> {t('disasterExpenses')}
+                      </span>
+                      <strong className={`text-sm sm:text-lg font-mono text-right ${(() => {
+                        const totalExp = (Number(disasterRecovery.pondsReconstruction) || 0) + (Number(disasterRecovery.hutReconstruction) || 0) + (Number(disasterRecovery.electricityBills) || 0)
+                        const totalInc = (Number(disasterRecovery.compensationReceived) || 0) + (Number(disasterRecovery.donationsReceived) || 0)
+                        const lossValue = (disasterRecovery.lossUnit === 'kg' ? (disasterRecovery.lossQuantity / 50) : (disasterRecovery.lossQuantity || 0)) * (inputs.pricePerBag || 0)
+                        const net = totalInc - totalExp - lossValue
+                        return net < 0 ? 'text-rose-600' : 'text-emerald-700'
+                      })()}`}>
+                        {(() => {
+                          const totalExp = (Number(disasterRecovery.pondsReconstruction) || 0) + (Number(disasterRecovery.hutReconstruction) || 0) + (Number(disasterRecovery.electricityBills) || 0)
+                          const totalInc = (Number(disasterRecovery.compensationReceived) || 0) + (Number(disasterRecovery.donationsReceived) || 0)
+                          const lossValue = (disasterRecovery.lossUnit === 'kg' ? (disasterRecovery.lossQuantity / 50) : (disasterRecovery.lossQuantity || 0)) * (inputs.pricePerBag || 0)
+                          const net = totalInc - totalExp - lossValue
+                          return formatLKR(net)
+                        })()}
+                      </strong>
+                    </div>
+                  ) : null}
                   <div className="flex justify-between items-center px-1">
                     <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('contractorShare')}</span>
                     <strong className="text-sm sm:text-lg font-mono text-emerald-400 text-right">{formatLKR(results.contractorShare)}</strong>
