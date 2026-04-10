@@ -23,14 +23,19 @@ export default function DisasterRecoveryCard({ value, onChange, t }) {
               className={inputStyle.replace('w-full', 'w-32')}
               placeholder={tr('lossQuantityPlaceholder', 'e.g. 100')}
             />
-            <select
-              value={value.lossUnit || 'bags'}
-              onChange={e => onChange('lossUnit', e.target.value)}
-              className={selectStyle + " flex-1"}
-            >
-              <option value="bags">{tr('bags', 'Bags')}</option>
-              <option value="kg">{tr('kg', 'kg')}</option>
-            </select>
+            <div className="relative flex-1">
+              <select
+                value={value.lossUnit || 'bags'}
+                onChange={e => onChange('lossUnit', e.target.value)}
+                className={selectStyle + " w-full pr-10"}
+              >
+                <option value="bags">{tr('bags', 'Bags')}</option>
+                <option value="kg">{tr('kg', 'kg')}</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-rose-400 text-xs">
+                ▼
+              </div>
+            </div>
           </div>
         </div>
         <div>

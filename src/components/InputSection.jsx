@@ -284,44 +284,44 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         {(inputs.labourCosts || []).length > 0 && (
           <div className="space-y-4">
             {(inputs.labourCosts || []).map(labour => (
-              <div key={labour.id} className="relative bg-white/50 border-2 border-purple-100 rounded-[28px] p-8 shadow-xl backdrop-blur-md">
-                <button 
-                  type="button" 
-                  onClick={() => removeLabourCost(labour.id)} 
-                  className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 transition-transform hover:rotate-90 shadow-sm font-bold"
+              <div key={labour.id} className="relative bg-white/50 border-2 border-purple-100 rounded-[28px] p-4 md:p-5 shadow-xl rounded-[28px] backdrop-blur-md">
+                <button
+                  type="button"
+                  onClick={() => removeLabourCost(labour.id)}
+                  className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 transition-transform hover:rotate-90 shadow-sm font-bold z-10"
                   title="REMOVE"
                 >
                   ✕
                 </button>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <label className="block">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <label className="block w-full">
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('labourNameRole', 'Labour Name / Role')}</div>
                     <input
-                      type="text" 
-                      value={labour.name || ''} 
-                      onChange={(e) => updateLabourCost(labour.id, 'name', e.target.value)} 
+                      type="text"
+                      value={labour.name || ''}
+                      onChange={(e) => updateLabourCost(labour.id, 'name', e.target.value)}
                       placeholder="e.g., Master Worker"
-                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-6 py-4 text-slate-900 placeholder-slate-300 focus:border-slate-900 outline-none transition-all font-semibold text-sm" 
+                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 placeholder-slate-300 focus:border-slate-900 outline-none transition-all font-semibold text-sm"
                     />
                   </label>
 
-                  <label className="block">
+                  <label className="block w-full">
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('dateOfService', 'Date of Service')}</div>
-                    <input 
-                      type="date" 
-                      value={labour.date || ''} 
-                      onChange={(e) => updateLabourCost(labour.id, 'date', e.target.value)} 
-                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-6 py-4 text-slate-900 focus:border-slate-900 outline-none transition-all font-semibold text-sm" 
+                    <input
+                      type="date"
+                      value={labour.date || ''}
+                      onChange={(e) => updateLabourCost(labour.id, 'date', e.target.value)}
+                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 focus:border-slate-900 outline-none transition-all font-semibold text-sm"
                     />
                   </label>
 
-                  <label className="block">
+                  <label className="block w-full">
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('paymentFrequency', 'Payment Frequency')}</div>
-                    <div className="relative">
-                      <select 
-                        value={labour.frequency || 'Weekly'} 
-                        onChange={(e) => updateLabourCost(labour.id, 'frequency', e.target.value)} 
-                        className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-6 py-4 text-slate-900 focus:border-slate-900 outline-none transition-all appearance-none cursor-pointer font-semibold text-sm"
+                    <div className="relative w-full">
+                      <select
+                        value={labour.frequency || 'Weekly'}
+                        onChange={(e) => updateLabourCost(labour.id, 'frequency', e.target.value)}
+                        className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 focus:border-slate-900 outline-none transition-all appearance-none cursor-pointer font-semibold text-sm"
                       >
                         <option value="Weekly">{tr('weekly', 'Weekly')}</option>
                         <option value="Fortnightly">{tr('fortnightly', 'Fortnightly')}</option>
@@ -329,21 +329,21 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                         <option value="Quarterly">{tr('quarterly', 'Quarterly')}</option>
                         <option value="Yearly">{tr('yearly', 'Yearly')}</option>
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-slate-500 text-xs">
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 text-xs">
                         ▼
                       </div>
                     </div>
                   </label>
 
-                  <label className="block">
+                  <label className="block w-full">
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('amount', 'Total Amount (LKR)')}</div>
-                    <input 
-                      type="number" 
-                      step="any" 
-                      value={labour.amount === 0 ? '' : Number(labour.amount).toFixed(2)} 
-                      onChange={(e) => updateLabourCost(labour.id, 'amount', e.target.value)} 
+                    <input
+                      type="number"
+                      step="any"
+                      value={labour.amount === 0 ? '' : Number(labour.amount).toFixed(2)}
+                      onChange={(e) => updateLabourCost(labour.id, 'amount', e.target.value)}
                       placeholder="0.00"
-                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-6 py-4 text-slate-900 placeholder-slate-300 focus:border-slate-900 outline-none transition-all font-semibold text-sm" 
+                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 placeholder-slate-300 focus:border-slate-900 outline-none transition-all font-semibold text-sm"
                     />
                   </label>
                 </div>
