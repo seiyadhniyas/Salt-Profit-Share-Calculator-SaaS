@@ -44,7 +44,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
           <div className="space-y-1">
             <StatRow label={t ? t('netBags') + ' (' + t('packedMinusDeducted') + ')' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
             <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (' + (t ? t('netTimesPricePerBag') : 'Net × Price/Bag') + ')'} value={formatLKR(results.initialPrice)} isNegative={false} />
-            <div className="my-2 border-t"></div>
+            <div className="my-2 border-t border-slate-300"></div>
             <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (' + (t ? t('contractorSpentFormula') : 'Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses + Labour Costs') + ')'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
             {results.extraExpensesTotal > 0 && (
               <StatRow label="Extra Expenses" value={formatLKR(results.extraExpensesTotal)} isNegative={false} />
@@ -69,7 +69,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               value={formatLKR(results.contractorShare)}
               isNegative={false}
             />
-            <div className="my-2 border-t"></div>
+            <div className="my-2 border-t border-slate-300"></div>
             <StatRow
               label={(t ? t('grandTotalReceived') : 'Grand Total Received') + (results.expensePayment === 'owners' ? ` (${t ? t('grandTotalOwnersFormula') : 'InitialPrice - TotalLoan'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('grandTotalShared5050Formula') : 'InitialPrice - Spent/2 - TotalLoan'})` : ` (${t ? t('grandTotalContractorFormula') : 'InitialPrice - Spent - TotalLoan'})`)}
               value={formatLKR(results.grandTotalReceived)}

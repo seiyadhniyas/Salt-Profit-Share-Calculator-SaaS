@@ -1097,7 +1097,7 @@ export default function App(){
                     <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('contractorSpent')}</span>
                     <strong className="text-sm sm:text-xl font-mono text-white text-right">{formatLKR(results.contractorTotalSpent)}</strong>
                   </div>
-                  <div className="my-6 border-t border-white/10 border-dashed"></div>
+                  <div className="my-6 border-t border-white/30 border-dashed"></div>
                   {/* Disaster Expenses Summary - always show if any data present */}
                   {(
                     Number(disasterRecovery.pondsReconstruction) ||
@@ -1183,7 +1183,7 @@ export default function App(){
                 </div>
               </div>
 
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-rose-200">
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-rose-400/80">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-rose-800 uppercase">{t('totalExpenses', 'Total Expenses')}</span>
                   <span className="text-2xl font-mono font-black text-rose-900">
