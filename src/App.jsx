@@ -569,7 +569,7 @@ export default function App(){
       yearly: 'ஆண்டு',
       amount: 'மொத்த தொகை (LKR)',
       noRecordsLabourLog: 'தொழிலாளர் பதிவுகள் எதுவும் இல்லை',
-      stockReserved: 'பதிவுசெய்யப்பட்ட உப்பு',
+      stockReserved: 'சேமிக்கப்பட்ட இருப்பு',
       quantityUnit: 'அளவு அலகு',
       stockLevel: 'உப்பு அளவு',
       stockLevelPlaceholder: '0',
@@ -592,13 +592,13 @@ export default function App(){
       locations: 'இடங்கள்',
       totalEstimatedPrice: 'மொத்த மதிப்பிடப்பட்ட விலை',
       period: 'காலம்',
-      saveStockReserved: 'பதிவுசெய்யப்பட்ட உப்பைச் சேமிக்கவும்',
+      saveStockReserved: 'சேமிக்கப்பட்ட இருப்பை பதிவு செய்க',
       approxBagFormat: 'சுமார் {qty} மூட்டைகள் (50கிலோ/மூட்டை)',
       bagsFromKg: 'மூட்டைகள் (கிலோ÷50)',
       stockSource: 'உப்பு மூலம்',
-      soldReservedStock: 'விற்கப்பட்ட பதிவுசெய்யப்பட்ட உப்பு',
+      soldReservedStock: 'சேமிக்கப்பட்ட இருப்பு',
       freshlyHarvested: 'புதிதாக அறுவடை செய்யப்பட்ட',
-      mixedStockReservedAndFresh: 'கலவை (பதிவுசெய்யப்பட்ட + உப்பு)',
+      mixedStockReservedAndFresh: 'கலவை (சேமிக்கப்பட்ட + புதிய)',
     },
     si: {
       title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
@@ -1245,8 +1245,36 @@ export default function App(){
               </div>
             </button>
 
-            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} stockReserved={stockReserved} stockSource={stockSource} setStockSource={setStockSource} />
-            
+            <InputSection 
+              inputs={inputs} 
+              setInput={setInputs} 
+              reset={() => {
+                reset();
+                setStockReserved({
+                  stockLevel: '',
+                  stockUnit: 'bags',
+                  estimatedPrice: '',
+                  selectedLocations: [],
+                  fromDate: '',
+                  toDate: '',
+                });
+              }} 
+              toggleLoans={toggleLoans} 
+              t={t} 
+              lang={lang} 
+              setLang={setLang} 
+              customLocations={customLocations} 
+              ownerNames={activeOwnerNames} 
+              ownerCount={ownerCount} 
+              stockReserved={stockReserved} 
+              setStockReserved={setStockReserved}
+              stockSource={stockSource} 
+              setStockSource={setStockSource} 
+              saveStockReserved={saveStockReserved}
+              results={results}
+              bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
+            />
+
             {/* Disaster Recovery toggle and card */}
             <div className="mt-4 flex flex-col items-center w-full">
               <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
@@ -1262,22 +1290,6 @@ export default function App(){
                     t={t}
                   />
                 </AccordionCard>
-              </div>
-            </div>
-
-            {/* Stock Reserved Card */}
-            <div className="mt-4 flex flex-col items-center w-full">
-              <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
-                <StockReservedCard
-                  stockReserved={stockReserved}
-                  onStockReservedChange={(field, val) => setStockReserved(prev => ({ ...prev, [field]: val }))}
-                  customLocations={customLocations}
-                  onAddLocation={(location) => setCustomLocations([...customLocations, location])}
-                  onSave={saveStockReserved}
-                  t={t}
-                  labourCostsTotal={results?.labourCostsTotal || 0}
-                  bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
-                />
               </div>
             </div>
           </div>

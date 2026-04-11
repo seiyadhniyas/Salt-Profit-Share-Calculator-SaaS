@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import AccordionCard from './AccordionCard'
+import StockReservedCard from './StockReservedCard'
 
 function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip }) {
   const displayValue = value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
@@ -7,7 +8,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   return (
     <label className="block mb-3">
       <div className="flex items-center gap-3 mb-2 ml-1">
-        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</div>
+        <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight">{label}</div>
         {tooltip && (
           <div className="relative group">
             <span className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-slate-300 border border-slate-200 rounded-full cursor-help hover:text-slate-500 transition">?</span>
@@ -30,7 +31,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   )
 }
 
-export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2, stockReserved = {}, stockSource = 'freshly-harvested', setStockSource }) {
+export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2, stockReserved = {}, setStockReserved, stockSource = 'freshly-harvested', setStockSource, saveStockReserved, results, bagCostPerUnit }) {
   const isSingleOwner = ownerCount === 1
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
 
@@ -102,7 +103,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
           <label className="block">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('locationDay', 'LOCATION')} <span className="text-rose-600">*</span></div>
+            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('locationDay', 'LOCATION')} <span className="text-rose-600">*</span></div>
             {Array.isArray(customLocations) && customLocations.length > 0 ? (
               <div className="relative">
                 <select 
@@ -132,7 +133,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           </label>
 
           <label className="block">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('date', 'DATE')} <span className="text-rose-600">*</span></div>
+            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('date', 'DATE')} <span className="text-rose-600">*</span></div>
             <input
               type="date"
               value={inputs.date || ''}
@@ -143,7 +144,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           </label>
 
           <label className="block">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('buyerName', 'BUYER NAME')}</div>
+            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('buyerName', 'BUYER NAME')}</div>
             <input
               type="text"
               value={inputs.buyerName || ''}
@@ -153,7 +154,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           </label>
 
           <label className="block">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('billNumber', 'BILL NO.')}</div>
+            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('billNumber', 'BILL NO.')}</div>
             <input
               type="text"
               value={inputs.billNumber || ''}
@@ -182,8 +183,8 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2 p-3 bg-blue-50 rounded-2xl border-2 border-blue-100">
-               <span className="text-xl">📦</span>
-               <div className="text-xs font-black text-blue-900 uppercase tracking-widest">{tr('totalSaltPackedBags', 'SALT QUANTITY')}</div>
+              <span className="text-xl">📦</span>
+               <div className="text-xs font-semibold text-blue-900 tracking-tight">Total Current Salt Sale</div>
             </div>
             <NumberInput label={tr('totalSaltPackedBags', 'PACKED BAGS')} name="packedBags" value={inputs.packedBags} onChange={onChange} decimals={null} />
             <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs.deductedBags} onChange={onChange} decimals={null} />
@@ -191,12 +192,12 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
             {/* Stock Source Selector */}
             <div className="bg-slate-50 p-6 rounded-[28px] border-2 border-blue-100">
-              <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4">{tr('stockSource', 'STOCK SOURCE')}</div>
+              <div className="text-[10px] text-blue-500 uppercase tracking-tight mb-4">{tr('stockSource', 'STOCK SOURCE')}</div>
               <div className="flex flex-col gap-3">
                 {[
-                  { id: 'freshly-harvested', label: tr('freshlyHarvested', 'Freshly Harvested'), desc: 'New salt from harvest' },
-                  { id: 'sold-reserved', label: tr('soldReservedStock', 'Sold Reserved Stock'), desc: 'From stored inventory' },
-                  { id: 'mixed', label: tr('mixedStockReservedAndFresh', 'Mixed (Reserved + Fresh)'), desc: 'Combination of both' }
+                  { id: 'freshly-harvested', label: tr('freshlyHarvested', 'Freshly harvested'), desc: 'New salt from harvest' },
+                  { id: 'sold-reserved', label: tr('soldReservedStock', 'Sold reserved stock'), desc: 'From stored inventory' },
+                  { id: 'mixed', label: tr('mixedStockReservedAndFresh', 'Mixed (reserved + fresh)'), desc: 'Combination of both' }
                 ].map(opt => (
                   <label key={opt.id} className="flex items-start gap-3 cursor-pointer group">
                     <input 
@@ -208,15 +209,15 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                       className="w-5 h-5 text-blue-600 focus:ring-0 border-2 border-slate-300 mt-0.5" 
                     />
                     <div className="flex-1">
-                      <span className="text-[10px] font-black text-slate-700 group-hover:text-slate-900 uppercase tracking-tighter transition-colors block">{opt.label}</span>
-                      <span className="text-[9px] text-slate-500 group-hover:text-slate-600">{opt.desc}</span>
+                      <span className="text-[10px] text-slate-700 group-hover:text-slate-900 tracking-tight transition-colors block normal-case font-normal">{opt.label}</span>
+                      <span className="text-[9px] text-slate-500 group-hover:text-slate-600 normal-case font-normal">{opt.desc}</span>
                     </div>
                   </label>
                 ))}
               </div>
 
               {/* Show available reserved stock if applicable */}
-              {stockSource === 'sold-reserved' && (Array.isArray(stockReserved.selectedLocations) && stockReserved.selectedLocations.length > 0) && (
+              {(stockSource === 'sold-reserved' || stockSource === 'mixed') && (Array.isArray(stockReserved.selectedLocations) && stockReserved.selectedLocations.length > 0) && (
                 <div className="mt-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
                   <div className="text-[10px] font-bold text-blue-800">
                     Available Reserved: {stockReserved.stockLevel || 0} {stockReserved.stockUnit || 'bags'}
@@ -226,12 +227,14 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                   </div>
                 </div>
               )}
-              {stockSource === 'sold-reserved' && !(Array.isArray(stockReserved.selectedLocations) && stockReserved.selectedLocations.length > 0) && (
-                <div className="mt-4 p-3 bg-yellow-100 rounded-lg border-l-4 border-yellow-500">
-                  <div className="text-[10px] font-bold text-yellow-800">
-                    ⚠️ No reserved stock available. Add stock in 'Stock Reserved' card first.
+              {(stockSource === 'sold-reserved' || stockSource === 'mixed') && (
+                (!Array.isArray(stockReserved.selectedLocations) || stockReserved.selectedLocations.length === 0 || !stockReserved.stockLevel || !stockReserved.estimatedPrice || !stockReserved.fromDate || !stockReserved.toDate) && (
+                  <div className="mt-4 p-3 bg-yellow-100 rounded-lg border-l-4 border-yellow-500">
+                    <div className="text-[10px] font-bold text-yellow-800">
+                      ⚠️ No reserved stock available. Add details in 'Stock Reserved' card first.
+                    </div>
                   </div>
-                </div>
+                )
               )}
             </div>
           </div>
@@ -239,20 +242,20 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2 p-3 bg-purple-50 rounded-2xl border-2 border-purple-100">
                <span className="text-xl">🏭</span>
-               <div className="text-xs font-black text-purple-900 uppercase tracking-widest">{tr('contractorExpenses', 'OPERATIONAL COSTS')}</div>
+               <div className="text-xs font-semibold text-purple-900 uppercase tracking-tight">{tr('contractorExpenses', 'OPERATIONAL COSTS')}</div>
             </div>
             
             <div className="bg-slate-50 p-6 rounded-[28px] border-2 border-slate-100">
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">COST RESPONSIBILITY</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-tight mb-4">COST RESPONSIBILITY</div>
               <div className="flex flex-col gap-4">
                 {[
-                  { id: 'owners', label: tr('expenseOwners', 'OWNERS RESPONSIBILITY') },
-                  { id: 'contractor', label: tr('expenseContractor', 'CONTRACTOR RESPONSIBILITY') },
-                  { id: 'shared5050', label: tr('expenseShared5050', '50/50 SHARED') }
+                  { id: 'owners', label: tr('expenseOwners', 'Owners responsibility') },
+                  { id: 'contractor', label: tr('expenseContractor', 'Contractor responsibility') },
+                  { id: 'shared5050', label: tr('expenseShared5050', '50/50 shared') }
                 ].map(opt => (
                   <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
                     <input type="radio" name="expensePayment" value={opt.id} checked={(inputs.expensePayment || 'owners') === opt.id} onChange={(e) => onChange('expensePayment', e.target.value)} className="w-5 h-5 text-purple-600 focus:ring-0 border-2 border-slate-300" />
-                    <span className="text-[10px] font-black text-slate-500 group-hover:text-slate-900 uppercase tracking-tighter transition-colors">{opt.label}</span>
+                    <span className="text-[10px] text-slate-500 group-hover:text-slate-900 tracking-tight transition-colors normal-case font-normal">{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -282,13 +285,13 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2 p-3 bg-emerald-50 rounded-2xl border-2 border-emerald-100">
                <span className="text-xl">💰</span>
-               <div className="text-xs font-black text-emerald-900 uppercase tracking-widest">{tr('income', 'NET SETTLEMENT')}</div>
+               <div className="text-xs font-semibold text-emerald-900 uppercase tracking-tight">{tr('income', 'NET SETTLEMENT')}</div>
             </div>
             <NumberInput label={tr('cashReceived', 'PHYSICAL CASH (LKR)')} name="cashReceived" value={inputs.cashReceived} onChange={onChange} decimals={2} tooltip={tr('cashAutoHint', 'AUTO-CALCULATED FROM NET SALES; OVERRIDE IF NEEDED')} />
             <NumberInput label={tr('chequeReceived', 'BANK CHEQUES (LKR)')} name="chequeReceived" value={inputs.chequeReceived} onChange={onChange} decimals={2} />
             
-            <div className="mt-12 bg-indigo-50/50 p-6 rounded-[28px] border-2 border-indigo-100">
-               <div className="flex items-center gap-3 mb-4">
+            <div className={`mt-12 bg-indigo-50/50 rounded-[28px] border-2 border-indigo-100 transition-all duration-300 ${inputs.bothOwnersHaveLoans ? 'p-6' : 'p-0 flex items-center min-h-[64px]'}`}>
+              <div className="flex items-center gap-3 w-full mb-0 px-6 py-4">
                 <input
                   id="toggleLoans"
                   type="checkbox"
@@ -296,13 +299,12 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                   onChange={(e) => toggleLoans(e.target.checked)}
                   className="h-5 w-5 text-indigo-600 rounded-lg border-2 border-indigo-200 focus:ring-0"
                 />
-                <label htmlFor="toggleLoans" className="text-[10px] font-black text-indigo-900 uppercase tracking-widest cursor-pointer">
+                <label htmlFor="toggleLoans" className="text-[10px] font-semibold text-indigo-900 uppercase tracking-tight cursor-pointer">
                   {tr(isSingleOwner ? 'oneOwnerHasLoan' : 'bothOwnersHaveLoans', isSingleOwner ? 'OWNER HAS LOAN' : 'BOTH OWNERS HAVE LOANS')}
                 </label>
               </div>
-
               {inputs.bothOwnersHaveLoans && (
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-96 overflow-hidden transition-all duration-300 px-6 pb-6">
                   <NumberInput label={`${tr('loan', 'LOAN')} (${ownerNames?.[0] || tr('owner', 'OWNER') + ' 1'})`} name="loanInaya" value={inputs.loanInaya} onChange={onChange} decimals={2} />
                   {!isSingleOwner && (
                     <NumberInput label={`${tr('loan', 'LOAN')} (${ownerNames?.[1] || tr('owner', 'OWNER') + ' 2'})`} name="loanShakira" value={inputs.loanShakira} onChange={onChange} decimals={2} />
@@ -313,6 +315,22 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           </div>
         </div>
       </AccordionCard>
+
+      {/* Stock Reserved Card - between Input Data and Labour Costs */}
+      <div className="mt-4 flex flex-col items-center w-full">
+        <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+          <StockReservedCard
+            stockReserved={stockReserved}
+            onStockReservedChange={(field, val) => setStockReserved(prev => ({ ...prev, [field]: val }))}
+            customLocations={customLocations}
+            onAddLocation={(location) => setCustomLocations([...customLocations, location])}
+            onSave={saveStockReserved}
+            t={t}
+            labourCostsTotal={results?.labourCostsTotal || 0}
+            bagCostPerUnit={bagCostPerUnit}
+          />
+        </div>
+      </div>
 
       <AccordionCard 
         title={tr('labourCosts', 'Labour Costs')} 
@@ -344,7 +362,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                 </button>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <label className="block w-full">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('labourNameRole', 'Labour Name / Role')}</div>
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('labourNameRole', 'Labour Name / Role')}</div>
                     <input
                       type="text"
                       value={labour.name || ''}
@@ -355,7 +373,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                   </label>
 
                   <label className="block w-full">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('dateOfService', 'Date of Service')}</div>
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('dateOfService', 'Date of Service')}</div>
                     <input
                       type="date"
                       value={labour.date || ''}
@@ -365,7 +383,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                   </label>
 
                   <label className="block w-full">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('paymentFrequency', 'Payment Frequency')}</div>
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('paymentFrequency', 'Payment Frequency')}</div>
                     <div className="relative w-full">
                       <select
                         value={labour.frequency || 'Weekly'}
@@ -385,7 +403,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
                   </label>
 
                   <label className="block w-full">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('amount', 'Total Amount (LKR)')}</div>
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('amount', 'Total Amount (LKR)')}</div>
                     <input
                       type="number"
                       step="any"

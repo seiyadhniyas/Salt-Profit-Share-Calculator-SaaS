@@ -130,7 +130,7 @@ export default function DashboardSummary({
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Locations Management */}
                   <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 flex items-center gap-2">
+                    <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 flex items-center gap-2">
                        <span className="w-2 h-2 rounded-full bg-blue-500"></span> WORK LOCATIONS
                     </div>
                     <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:gap-2">
@@ -157,7 +157,7 @@ export default function DashboardSummary({
 
                   {/* Owner Names Management */}
                   <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 flex items-center gap-2">
+                    <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 flex items-center gap-2">
                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span> OWNER NAMES
                     </div>
                     <div className="space-y-4">
@@ -206,7 +206,7 @@ export default function DashboardSummary({
 
                   {/* Profit Share Slider */}
                   <div className="md:col-span-2 rounded-2xl border border-slate-300 p-4 sm:p-6 bg-white shadow-xl">
-                    <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 sm:mb-6">PROFIT SHARE RATIO</div>
+                    <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 sm:mb-6">PROFIT SHARE RATIO</div>
                     <input
                       type="range" min="0" max="100" step="5"
                       value={contractorSharePercentage}
@@ -215,7 +215,7 @@ export default function DashboardSummary({
                     />
                     <div className="grid grid-cols-2 gap-2 sm:gap-4">
                       <div className="bg-gradient-to-br from-slate-900 to-slate-700 p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600">
-                        <div className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 sm:mb-2">CONTRACTOR SHARE</div>
+                        <div className="text-[9px] sm:text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1 sm:mb-2">CONTRACTOR SHARE</div>
                         <div className="text-2xl sm:text-4xl font-black text-white">{contractorSharePercentage}%</div>
                       </div>
                       <div className="bg-gradient-to-br from-purple-700 to-indigo-600 p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400">
