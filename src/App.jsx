@@ -1149,12 +1149,14 @@ export default function App(){
         totalEstimatedPrice,
       }
 
+      console.log('Attempting to save stock reserved to Supabase...', payload)
       const resp = await saveStockReservedToSupabase(payload, session)
       if (resp && resp.ok) {
         alert('Stock Reserved record saved successfully!')
-        // Clear or reset the form if desired
+        // Refresh local records if needed
         return true
       } else {
+        console.error('Save failed:', resp.error)
         alert(`Failed to save: ${resp.error}`)
         return false
       }

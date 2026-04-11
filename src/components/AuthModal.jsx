@@ -13,12 +13,14 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+  const [isResetMode, setIsResetMode] = useState(false)
 
   useEffect(() => {
     if (open) {
       setError('')
       setMessage('')
       setForm(initialForm)
+      setIsResetMode(false)
     }
   }, [open, mode])
 
@@ -28,13 +30,40 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault()
+    if (!form.email) {
+      setError(tr('emailRequired', 'Email is required to reset password.'))
+      return
+    }
+    setLoading(true)
+    setError('')
+    setMessage('')
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(form.email, {
+        redirectTo: `${window.location.origin}${window.location.pathname}?type=recovery`,
+      })
+      if (resetError) throw resetError
+      setMessage(tr('resetEmailSent', 'Password reset instructions sent to your email.'))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const submit = async (event) => {
     event.preventDefault()
     setError('')
     setMessage('')
 
     if (!isSupabaseConfigured || !supabase) {
-      setError(tr('authSupabaseMissing', 'Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY to your env file.'))
+      setError(tr('authSupabaseMissing', 'Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your env file.'))
+      return
+    }
+
+    if (isResetMode) {
+      handleForgotPassword(event)
       return
     }
 
@@ -143,6 +172,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
             />
           </label>
 
+          {!isResetMode && (
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-slate-700">{tr('password', 'Password')}</span>
             <input
@@ -155,8 +185,9 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               placeholder="Enter your password (min 6 characters)"
             />
           </label>
+          )}
 
-          {mode === 'signup' && (
+          {mode === 'signup' && !isResetMode && (
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-slate-700">{tr('confirmPassword', 'Confirm Password')}</span>
               <input
@@ -169,6 +200,30 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
                 placeholder="Re-enter your password"
               />
             </label>
+          )}
+
+          {mode === 'signin' && !isResetMode && (
+            <div className="flex justify-end pr-1">
+              <button
+                type="button"
+                onClick={() => setIsResetMode(true)}
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition"
+              >
+                {tr('forgotPassword', 'Forgot Password?')}
+              </button>
+            </div>
+          )}
+
+          {isResetMode && (
+            <div className="flex justify-end pr-1">
+              <button
+                type="button"
+                onClick={() => setIsResetMode(false)}
+                className="text-xs font-semibold text-slate-500 hover:text-slate-700 transition"
+              >
+                {tr('backToSignIn', 'Back to Sign In')}
+              </button>
+            </div>
           )}
 
           {error && (
@@ -194,7 +249,10 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
             disabled={loading}
             className="w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? tr('pleaseWait', 'Please wait...') : mode === 'signin' ? tr('signInToDashboard', 'Sign In To Dashboard') : tr('createAccount', 'Create Account')}
+             {loading ? tr('pleaseWait', 'Please wait...') : 
+                isResetMode ? tr('sendResetInstructions', 'Send Reset Instructions') :
+                mode === 'signin' ? tr('signInToDashboard', 'Sign In To Dashboard') : 
+                tr('createAccount', 'Create Account')}
           </button>
 
           <p className="text-xs leading-5 text-slate-500">
