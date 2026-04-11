@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 /**
  * Accordion component to wrap pricing/input cards.
  */
-export default function AccordionCard({ title, children, defaultOpen = false, bgColor = 'white', icon }) {
+export default function AccordionCard({ title, children, defaultOpen = false, bgColor = 'white', icon, onReset }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
@@ -19,10 +19,24 @@ export default function AccordionCard({ title, children, defaultOpen = false, bg
             {title}
           </h4>
         </div>
-        <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-black/5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-          </svg>
+        <div className="flex items-center gap-3">
+          {onReset && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onReset()
+              }}
+              className="px-3 py-1.5 bg-purple-50 text-purple-600 border border-purple-200 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-purple-100 transition-all active:scale-95"
+            >
+              🔄 RESET
+            </button>
+          )}
+          <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-black/5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
       </button>
       

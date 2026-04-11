@@ -113,6 +113,72 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
     }
   }
 
+  const resetRevenueAndExpenses = () => {
+    if (typeof setInput === 'function') {
+      setInput(prev => ({
+        ...prev,
+        packedBags: 0,
+        deductedBags: 0,
+        pricePerBag: 0,
+        packingFeePerBag: 0,
+        bagCostPerUnit: 0,
+        otherExpenses: 0,
+        cashReceived: 0,
+        chequeReceived: 0,
+        expensePayment: 'owners',
+        extraExpenses: [],
+        bothOwnersHaveLoans: false,
+        loanInaya: 0,
+        loanShakira: 0
+      }))
+    }
+    setCashReceivedManuallySet(false)
+  }
+
+  const resetLabourCosts = () => {
+    if (typeof setInput === 'function') {
+      setInput(prev => ({
+        ...prev,
+        labourCosts: []
+      }))
+    }
+  }
+
+  const resetDocumentDetails = () => {
+    if (typeof setInput === 'function') {
+      setInput(prev => ({
+        ...prev,
+        location: '',
+        date: '',
+        buyerName: '',
+        billNumber: ''
+      }))
+    }
+  }
+
+  const resetStockReserved = () => {
+    setStockReserved({
+      selectedLocations: [],
+      stockLevel: 0,
+      stockUnit: 'bags',
+      estimatedPrice: 0,
+      fromDate: '',
+      toDate: ''
+    })
+  }
+
+  const resetDisasterRecovery = () => {
+    setDisasterRecovery({
+      lossQuantity: '',
+      lossUnit: 'bags',
+      pondsReconstruction: '',
+      hutReconstruction: '',
+      electricityBills: '',
+      compensationReceived: '',
+      donationsReceived: ''
+    })
+  }
+
   const tr = (k, f) => (t ? t(k) : f)
 
   return (
@@ -122,6 +188,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
         title={tr('documentDetails', 'REPORT METADATA')} 
         bgColor="#e0f2fe" 
         defaultOpen={true}
+        onReset={resetDocumentDetails}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-2">
           <label className="block">
@@ -194,16 +261,8 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
         bgColor="#fefce8" 
         defaultOpen={!activeModule ? false : true}
         icon="📝"
+        onReset={resetRevenueAndExpenses}
       >
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={reset}
-            className="px-6 py-2 bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition-all"
-          >
-            {tr('reset', 'RESET FORM')}
-          </button>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
           {(activeModule === 'revenue' || !activeModule) && (
           <div className={`space-y-6 ${contractorSectionDisabled ? 'opacity-50 pointer-events-none select-none' : ''}`}> 
@@ -357,6 +416,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
             t={t}
             labourCostsTotal={results?.labourCostsTotal || 0}
             bagCostPerUnit={bagCostPerUnit}
+            onReset={resetStockReserved}
           />
         </div>
       </div>
@@ -368,6 +428,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
         bgColor="#eed3ff" 
         defaultOpen={!activeModule ? false : true}
         icon="👷"
+        onReset={resetLabourCosts}
       >
         <div className="mb-6">
           <button 
@@ -459,13 +520,19 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
       )}
 
       {(activeModule === 'disaster' || !activeModule) && (
-      <div style={{ backgroundColor: "#fce4ec" }} className="android-card p-6 mb-6 shadow-xl border border-slate-300">
+      <AccordionCard 
+        title={tr('disasterRecovery', 'Disaster Recovery')} 
+        bgColor="#fce4ec" 
+        defaultOpen={false}
+        icon="🏘️"
+        onReset={resetDisasterRecovery}
+      >
         <DisasterRecoveryCard
           value={disasterRecovery}
           onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
           t={t}
         />
-      </div>
+      </AccordionCard>
       )}
     </div>
   )

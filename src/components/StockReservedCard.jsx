@@ -10,6 +10,7 @@ export default function StockReservedCard({
   t,
   labourCostsTotal = 0,
   bagCostPerUnit = 0,
+  onReset,
 }) {
   const [isManualEntry, setIsManualEntry] = useState(false)
   const [manualLocation, setManualLocation] = useState('')
@@ -59,6 +60,7 @@ export default function StockReservedCard({
       icon={<span className="text-4xl">🏠</span>}
       bgColor="#eafdb6"
       defaultOpen={false}
+      onReset={onReset}
     >
       <div className="space-y-4 mt-4">
         {/* Stock Level Section */}
