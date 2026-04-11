@@ -475,6 +475,52 @@ export default function App(){
       adminAuthSuccess: 'Authentication Successful',
       adminDashboard: 'Admin Dashboard',
       redirectingToDashboard: 'Redirecting to dashboard...',
+      secureVault: 'Secure Vault',
+      cloudDataVault: 'Cloud Data Vault',
+      memberManagement: 'Member Management',
+      profileSettings: 'Profile Settings',
+      paymentStatus: 'Payment Status',
+      subscriptionStatus: 'Subscription Status',
+      account: 'Account',
+      signOut: 'Sign Out',
+      pricingAndAccess: 'PRICING & ACCESS',
+      oneOffPrice: 'ONE-OFF: LKR 30,000',
+      lifetimeAccessPromo: 'PROMO: Full access for LKR 30,000 lifetime.',
+      cardSurchargeNote: '*Card payments include LKR 1,100 surcharge.',
+      payByCard: 'PAY BY CARD',
+      cashOrBank: 'CASH / BANK',
+      workLocations: 'WORK LOCATIONS',
+      newLocationName: 'NEW LOCATION NAME',
+      ownerNamesTitle: 'OWNER NAMES',
+      owner1Name: 'Owner 1 Name',
+      owner2Name: 'Owner 2 Name',
+      pond: 'Pond',
+      leeway: 'Leeway',
+      saltern: 'Saltern',
+      extraExpenses: 'Extra Expenses',
+      labourCostsTotal: 'Labour Costs (Total)',
+      amount: 'Amount',
+      adminAccess: 'Admin Access',
+      signInRegister: 'Sign In / Register',
+      setup: 'Setup',
+      locationDateBuyer: 'Location, Date & Buyer',
+      revenue: 'Revenue',
+      bagsPriceSource: 'Bags, Price & Source',
+      costs: 'Costs',
+      expensesFees: 'Expenses & Fees',
+      labour: 'Labour',
+      serviceLog: 'Service Log',
+      inventory: 'Inventory',
+      stockReservedSub: 'Stock Reserved',
+      disaster: 'Disaster',
+      recoveryCosts: 'Recovery Costs',
+      setupData: 'Setup Data',
+      revenueData: 'Revenue Data',
+      costsData: 'Costs Data',
+      labourData: 'Labour Data',
+      inventoryData: 'Inventory Data',
+      disasterData: 'Disaster Data',
+      done: 'Done',
     },
     ta: {
       title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
@@ -678,6 +724,52 @@ export default function App(){
       adminAuthSuccess: 'அங்கீகாரம் வெற்றிகரமாக முடிந்தது',
       adminDashboard: 'நிர்வாகி டாஷ்போர்ட்',
       redirectingToDashboard: 'டாஷ்போர்டுக்கு திருப்பி அனுப்பப்படுகிறது...',
+      secureVault: 'பாதுகாப்பான பெட்டகம்',
+      cloudDataVault: 'மேகக்கணி தரவு பெட்டகம்',
+      memberManagement: 'உறுப்பினர் மேலாண்மை',
+      profileSettings: 'சுயவிவர அமைப்புகள்',
+      paymentStatus: 'கட்டண நிலை',
+      subscriptionStatus: 'சந்தா நிலை',
+      account: 'கணக்கு',
+      signOut: 'வெளியேறு',
+      pricingAndAccess: 'விலை மற்றும் அணுகல்',
+      oneOffPrice: 'ஒரு முறை: LKR 30,000',
+      lifetimeAccessPromo: 'சலுகை: வாழ்நாள் முழுவதும் முழு அணுகல் LKR 30,000.',
+      cardSurchargeNote: '*அட்டை கொடுப்பனவுகளில் LKR 1,100 கூடுதல் கட்டணம் அடங்கும்.',
+      payByCard: 'அட்டை மூலம் பணம் செலுத்துங்கள்',
+      cashOrBank: 'ரொக்க / வங்கி',
+      workLocations: 'பணி இடங்கள்',
+      newLocationName: 'புதிய இடத்தின் பெயர்',
+      ownerNamesTitle: 'உரிமையாளர் பெயர்கள்',
+      owner1Name: 'உரிமையாளர் 1 பெயர்',
+      owner2Name: 'உரிமையாளர் 2 பெயர்',
+      pond: 'குளம்',
+      leeway: 'லீவே (Leeway)',
+      saltern: 'சால்டர்ன் (Saltern)',
+      extraExpenses: 'கூடுதல் செலவுகள்',
+      labourCostsTotal: 'தொழிலாளர் செலவுகள் (மொத்தம்)',
+      amount: 'தொகை',
+      adminAccess: 'நிர்வாக அணுகல்',
+      signInRegister: 'உள்நுழைய / பதிவு செய்ய',
+      setup: 'அமைப்பு',
+      locationDateBuyer: 'இடம், தேதி மற்றும் வாங்குபவர்',
+      revenue: 'வருவாய்',
+      bagsPriceSource: 'மூட்டைகள், விலை மற்றும் மூலம்',
+      costs: 'செலவுகள்',
+      expensesFees: 'செலவுகள் மற்றும் கட்டணங்கள்',
+      labour: 'தொழிலாளர்',
+      serviceLog: 'பணிப் பதிவு',
+      inventory: 'இருப்பு',
+      stockReservedSub: 'சேமிக்கப்பட்ட இருப்பு',
+      disaster: 'பேரழிவு',
+      recoveryCosts: 'மீட்பு செலவுகள்',
+      setupData: 'அமைப்பு தரவு',
+      revenueData: 'வருவாய் தரவு',
+      costsData: 'செலவு தரவு',
+      labourData: 'தொழிலாளர் தரவு',
+      inventoryData: 'இருப்பு தரவு',
+      disasterData: 'பேரழிவு தரவு',
+      done: 'முடிந்தது',
     },
     si: {
       title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
@@ -873,7 +965,53 @@ export default function App(){
       adminAuthSuccess: 'සත්‍යාපනය සාර්ථකයි',
       adminDashboard: 'පරිපාලක ඩෑෂ්බෝර්ඩ්',
       redirectingToDashboard: 'ඩෑෂ්බෝර්ඩ් එකට යොමු කරමින්...',
-    }
+      secureVault: 'ආරක්ෂිත සේප්පුව',
+      cloudDataVault: 'වලාකුළු දත්ත සේප්පුව',
+      memberManagement: 'සාමාජික කළමනාකරණය',
+      profileSettings: 'පැතිකඩ සැකසුම්',
+      paymentStatus: 'ගෙවීම් තත්ත්වය',
+      subscriptionStatus: 'දායකත්ව තත්ත්වය',
+      account: 'ගිණුම',
+      signOut: 'ලොග් අවුට් වන්න',
+      pricingAndAccess: 'මිල ගණන් සහ ප්‍රවේශය',
+      oneOffPrice: 'එක් වරක්: LKR 30,000',
+      lifetimeAccessPromo: 'ප්‍රොමෝ: ජීවිත කාලයටම සම්පූර්ණ ප්‍රවේශය LKR 30,000.',
+      cardSurchargeNote: '*කාඩ්පත් ගෙවීම් සඳහා LKR 1,100 අමතක අමතර ගාස්තුවක් ඇතුළත් වේ.',
+      payByCard: 'කාඩ්පතෙන් ගෙවන්න',
+      cashOrBank: 'මුදල් / බැංකු',
+      workLocations: 'වැඩ කරන ස්ථාන',
+      newLocationName: 'නව ස්ථාන නම',
+      ownerNamesTitle: 'අයිතිකරුවන්ගේ නම්',
+      owner1Name: 'අයිතිකරු 1 නම',
+      owner2Name: 'අයිතිකරු 2 නම',
+      pond: 'පොකුණ (Pond)',
+      leeway: 'ලීවේ (Leeway)',
+      saltern: 'ලුණු ලේවාය (Saltern)',
+      extraExpenses: 'අමතර වියදම්',
+      labourCostsTotal: 'සේවක වියදම් (මුළු)',
+      amount: 'මුදල',
+      adminAccess: 'පරිපාලක ප්‍රවේශය',
+      signInRegister: 'ලොග් වන්න / ලියාපදිංචි වන්න',
+      setup: 'සැකසුම්',
+      locationDateBuyer: 'ස්ථානය, දිනය සහ ගැණුම්කරු',
+      revenue: 'ආදායම',
+      bagsPriceSource: 'මලු, මිල සහ ප්‍රභවය',
+      costs: 'වියදම්',
+      expensesFees: 'වියදම් සහ ගාස්තු',
+      labour: 'සේවක',
+      serviceLog: 'සේවා ලේඛනය',
+      inventory: 'තොග',
+      stockReservedSub: 'සුරක්ෂිත තොග',
+      disaster: 'ආපදා',
+      recoveryCosts: 'ප්‍රතිසාධන වියදම්',
+      setupData: 'සැකසුම් දත්ත',
+      revenueData: 'ආදායම් දත්ත',
+      costsData: 'වියදම් දත්ත',
+      labourData: 'සේවක දත්ත',
+      inventoryData: 'තොග දත්ත',
+      disasterData: 'ආපදා දත්ත',
+      done: 'අවසන්',
+    },
   }
 
   const t = (key) => {
@@ -1367,12 +1505,12 @@ export default function App(){
             {/* Phase 1 Dashboard Grid Prototype */}
             <div className="grid grid-cols-2 gap-2 mb-8">
               {[
-                { id: 'setup', title: 'Setup', sub: 'Location, Date & Buyer', icon: '📋', color: 'bg-[#cdebf9]' },
-                { id: 'revenue', title: 'Revenue', sub: 'Bags, Price & Source', icon: '📦', color: 'bg-[#ffe4c4]' },
-                { id: 'costs', title: 'Costs', sub: 'Expenses & Fees', icon: '🏭', color: 'bg-[#ffffd8]' },
-                { id: 'labour', title: 'Labour', sub: 'Service Log', icon: '👷', color: 'bg-[#fad8fa]' },
-                { id: 'inventory', title: 'Inventory', sub: 'Stock Reserved', icon: '💾', color: 'bg-[#ecffb1]' },
-                { id: 'disaster', title: 'Disaster', sub: 'Recovery Costs', icon: '🌊', color: 'bg-[#ffe4ee]' }
+                { id: 'setup', title: t('setup'), sub: t('locationDateBuyer'), icon: '📋', color: 'bg-[#cdebf9]' },
+                { id: 'revenue', title: t('revenue'), sub: t('bagsPriceSource'), icon: '📦', color: 'bg-[#ffe4c4]' },
+                { id: 'costs', title: t('costs'), sub: t('expensesFees'), icon: '🏭', color: 'bg-[#ffffd8]' },
+                { id: 'labour', title: t('labour'), sub: t('serviceLog'), icon: '👷', color: 'bg-[#fad8fa]' },
+                { id: 'inventory', title: t('inventory'), sub: t('stockReservedSub'), icon: '💾', color: 'bg-[#ecffb1]' },
+                { id: 'disaster', title: t('disaster'), sub: t('recoveryCosts'), icon: '🌊', color: 'bg-[#ffe4ee]' }
               ].map(module => (
                 <button
                   key={module.id}
@@ -1384,8 +1522,8 @@ export default function App(){
                     {module.icon}
                   </div>
                   <div className="z-10">
-                    <div className="text-base font-bold text-slate-900">{module.title}</div>
-                    <div className="text-[10px] text-slate-500 font-medium tracking-tight mt-0.5 line-clamp-1">{module.sub}</div>
+                    <div className="text-base font-bold text-slate-900 uppercase">{module.title}</div>
+                    <div className="text-[10px] text-slate-500 font-medium tracking-tight mt-0.5 line-clamp-1 uppercase">{module.sub}</div>
                   </div>
                 </button>
               ))}
@@ -1402,7 +1540,7 @@ export default function App(){
                       <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-xl">
                         {activeModule === 'setup' ? '📋' : activeModule === 'revenue' ? '📦' : activeModule === 'costs' ? '🏭' : activeModule === 'labour' ? '👷' : activeModule === 'inventory' ? '💾' : '🌊'}
                       </div>
-                      <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight">{activeModule} Data</h2>
+                      <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight">{t(activeModule + 'Data')}</h2>
                     </div>
                     <button 
                       onClick={() => setActiveModule(null)}
@@ -1442,9 +1580,9 @@ export default function App(){
                   <div className="p-6 bg-white border-t border-slate-200" style={{ marginBottom: '64px' }}>
                     <button 
                       onClick={() => setActiveModule(null)}
-                      className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-lg active:scale-[0.98] transition-all"
+                      className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-lg active:scale-[0.98] transition-all uppercase"
                     >
-                      Done
+                      {t('done')}
                     </button>
                   </div>
                 </div>
@@ -1670,6 +1808,7 @@ export default function App(){
       <AdminAuthModal 
         open={adminAuthModalOpen}
         onClose={() => setAdminAuthModalOpen(false)}
+        t={t}
       />
 
       <BottomAccessMenu

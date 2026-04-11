@@ -168,7 +168,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder="Enter your email address"
+              placeholder={tr('email', 'Email')}
             />
           </label>
 
@@ -182,7 +182,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
               value={form.password}
               onChange={(e) => updateField('password', e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder="Enter your password (min 6 characters)"
+              placeholder={tr('password', 'Password')}
             />
           </label>
           )}
@@ -197,7 +197,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
                 value={form.confirmPassword}
                 onChange={(e) => updateField('confirmPassword', e.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none ring-0 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                placeholder="Re-enter your password"
+                placeholder={tr('confirmPassword', 'Confirm Password')}
               />
             </label>
           )}

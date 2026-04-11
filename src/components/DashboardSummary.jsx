@@ -94,8 +94,8 @@ export default function DashboardSummary({
                   <button onClick={() => onSignOut?.()} className="rounded-full border border-white/40 bg-white/20 px-6 py-2 text-xs font-bold text-white transition hover:bg-white/30 uppercase">{tr('signOut', 'Sign Out')}</button>
                 ) : (
                   <div className="flex gap-2">
-                    <button onClick={() => onOpenAuth?.()} className="rounded-full bg-white px-6 py-2 text-xs font-bold text-purple-700 transition hover:bg-purple-50 uppercase shadow-lg shadow-purple-900/20">SignIn/Register</button>
-                    <button onClick={() => onOpenAdminAuth?.()} className="rounded-full border border-amber-300 bg-amber-100 border-2 px-6 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200 uppercase">Admin Access</button>
+                    <button onClick={() => onOpenAuth?.()} className="rounded-full bg-white px-6 py-2 text-xs font-bold text-purple-700 transition hover:bg-purple-50 uppercase shadow-lg shadow-purple-900/20">{tr('signInRegister', 'SignIn/Register')}</button>
+                    <button onClick={() => onOpenAdminAuth?.()} className="rounded-full border border-amber-300 bg-amber-100 border-2 px-6 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200 uppercase">{tr('adminAccess', 'Admin Access')}</button>
                   </div>
                 )}
               </div>
@@ -105,23 +105,23 @@ export default function DashboardSummary({
                {/* Billing & Premium */}
                <div className="rounded-2xl border-2 border-purple-100 p-5 bg-gradient-to-br from-purple-50 to-white shadow-inner">
                   <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                    <div className="text-[10px] font-black uppercase text-purple-400 tracking-widest">PRICING & ACCESS</div>
-                    <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold uppercase">ONE-OFF: LKR 30,000</div>
+                    <div className="text-[10px] font-black uppercase text-purple-400 tracking-widest">{tr('pricingAndAccess', 'PRICING & ACCESS')}</div>
+                    <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold uppercase">{tr('oneOffPrice', 'ONE-OFF: LKR 30,000')}</div>
                   </div>
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div>
                       <div className="text-base font-black text-slate-800 uppercase italic underline decoration-purple-300 decoration-2">{billingStatus?.full_access_enabled ? tr('premiumActive', 'PREMIUM ACTIVE') : `${tr('trialUses', 'TRIAL USES')}: ${billingStatus?.trial_uses || 0}/3`}</div>
                       {!billingStatus?.full_access_enabled && (
                         <div className="text-xs text-slate-500 mt-2 font-medium leading-relaxed max-w-sm">
-                          PROMO: Full access for <span className="text-purple-600 font-bold">LKR 30,000</span> lifetime. 
-                          <br/><span className="text-[10px]">*Card payments include LKR 1,100 surcharge.</span>
+                          {tr('lifetimeAccessPromo', 'PROMO: Full access for LKR 30,000 lifetime.')}
+                          <br/><span className="text-[10px]">{tr('cardSurchargeNote', '*Card payments include LKR 1,100 surcharge.')}</span>
                         </div>
                       )}
                     </div>
                     {!billingStatus?.full_access_enabled && (
                       <div className="flex gap-3">
-                        <button onClick={() => onStartCardPayment?.()} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">PAY BY CARD</button>
-                        <button onClick={() => onRequestCashPayment?.()} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">CASH / BANK</button>
+                        <button onClick={() => onStartCardPayment?.()} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">{tr('payByCard', 'PAY BY CARD')}</button>
+                        <button onClick={() => onRequestCashPayment?.()} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
                       </div>
                     )}
                   </div>
@@ -131,19 +131,19 @@ export default function DashboardSummary({
                   {/* Locations Management */}
                   <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 flex items-center gap-2">
-                       <span className="w-2 h-2 rounded-full bg-blue-500"></span> WORK LOCATIONS
+                       <span className="w-2 h-2 rounded-full bg-blue-500"></span> {tr('workLocations', 'WORK LOCATIONS')}
                     </div>
                     <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:gap-2">
                       <input 
                         className="flex-1 bg-slate-50 rounded-xl px-4 py-3 text-sm border-2 border-slate-400 focus:border-purple-600 focus:ring-0 transition-all outline-none"
                         value={newLoc}
                         onChange={e => setNewLoc(e.target.value)}
-                        placeholder="NEW LOCATION NAME"
+                        placeholder={tr('newLocationName', 'NEW LOCATION NAME')}
                       />
                       <button 
                         onClick={() => { if(newLoc.trim() && onAddLocation){ onAddLocation(newLoc); setNewLoc(''); }}}
                         className="bg-purple-600 text-white px-4 py-3 rounded-xl text-xs font-black uppercase hover:bg-purple-700 transition"
-                      >Add</button>
+                      >{tr('add', 'ADD')}</button>
                     </div>
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
                       {customLocations.map(loc => (
@@ -158,7 +158,7 @@ export default function DashboardSummary({
                   {/* Owner Names Management */}
                   <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 flex items-center gap-2">
-                       <span className="w-2 h-2 rounded-full bg-emerald-500"></span> OWNER NAMES
+                       <span className="w-2 h-2 rounded-full bg-emerald-500"></span> {tr('ownerNamesTitle', 'OWNER NAMES')}
                     </div>
                     <div className="space-y-4">
                       <div className="flex gap-2 items-center">
@@ -172,7 +172,7 @@ export default function DashboardSummary({
                             setOwnerNames?.(n);
                             try { localStorage.setItem('ownerNames', JSON.stringify(n)); } catch {}
                           }}
-                          placeholder="Owner 1 Name"
+                          placeholder={tr('owner1Name', 'Owner 1 Name')}
                         />
                         <button onClick={() => { 
                           const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];
@@ -192,7 +192,7 @@ export default function DashboardSummary({
                             setOwnerNames?.(n);
                             try { localStorage.setItem('ownerNames', JSON.stringify(n)); } catch {}
                           }}
-                          placeholder="Owner 2 Name"
+                          placeholder={tr('owner2Name', 'Owner 2 Name')}
                         />
                         <button onClick={() => { 
                           const n = Array.isArray(ownerNames) ? [...ownerNames] : ['', ''];

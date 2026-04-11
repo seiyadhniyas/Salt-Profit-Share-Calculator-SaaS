@@ -108,13 +108,13 @@ export default function AdminAuthModal({ open, onClose, onSuccess, t }) {
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email
+                {tr('email', 'Email')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                placeholder={tr('email', 'Email')}
                 required
                 disabled={loading}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -123,7 +123,7 @@ export default function AdminAuthModal({ open, onClose, onSuccess, t }) {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Password
+                {tr('password', 'Password')}
               </label>
               <input
                 type="password"
@@ -148,14 +148,14 @@ export default function AdminAuthModal({ open, onClose, onSuccess, t }) {
                 disabled={loading}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition disabled:bg-slate-400"
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? tr('pleaseWait', 'Please wait...') : tr('signIn', 'Sign In')}
               </button>
               <button
                 type="button"
                 onClick={handleClose}
                 className="flex-1 bg-slate-300 hover:bg-slate-400 text-slate-900 font-semibold py-2 rounded-lg transition"
               >
-                Cancel
+                {tr('close', 'Close')}
               </button>
             </div>
           </form>
