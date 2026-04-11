@@ -206,7 +206,18 @@ export default function DashboardSummary({
 
                   {/* Profit Share Slider */}
                   <div className="md:col-span-2 rounded-2xl border border-slate-300 p-4 sm:p-6 bg-white shadow-xl">
-                    <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 sm:mb-6">PROFIT SHARE RATIO</div>
+                    <div className="flex justify-between items-center mb-4 sm:mb-6">
+                      <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight">PROFIT SHARE RATIO</div>
+                      {session?.user ? (
+                        <div className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-tighter border border-emerald-100 animate-pulse">
+                          Cloud Synced
+                        </div>
+                      ) : (
+                        <div className="text-[9px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full uppercase tracking-tighter border border-amber-100">
+                          Local Cache Only
+                        </div>
+                      )}
+                    </div>
                     <input
                       type="range" min="0" max="100" step="5"
                       value={contractorSharePercentage}
@@ -265,7 +276,7 @@ export default function DashboardSummary({
           </section>
 
           {/* Copyright Footer */}
-          <div className="text-center py-6 border-t border-purple-100 mt-2">
+          <div className="text-center pt-2 pb-10 border-t border-purple-100 mb-20 lg:mb-24">
             <p className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase">
               Copyright © {new Date().getFullYear()} | Fixmation (Pvt) Ltd
             </p>

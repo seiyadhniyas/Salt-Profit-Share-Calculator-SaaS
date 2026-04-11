@@ -1559,7 +1559,7 @@ export default function App(){
         </div>
 
 
-        {results && <div className="mb-5"><ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} /></div>}
+        {results && <div className="mb-20 sm:mb-24 lg:mb-32"><ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} /></div>}
 
         {/* Hidden/off-screen printable area */}
         {results && (
