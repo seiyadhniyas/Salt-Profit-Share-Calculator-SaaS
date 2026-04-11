@@ -8,7 +8,7 @@ export default defineConfig({
     postcss: null
   },
   server: {
-    port: 5173,
+    port: 3000,
     open: true,
     middleware: true
   }

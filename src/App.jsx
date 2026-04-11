@@ -24,23 +24,23 @@ import AccordionCard from './components/AccordionCard.jsx'
 const STORAGE_KEY = 'salt_profit_share_last'
 
 export default function App(){
-  if (!isSupabaseConfigured || !supabase) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', color: '#1e293b' }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>Supabase Not Configured</h1>
-        <p style={{ fontSize: 18, maxWidth: 480, textAlign: 'center' }}>
-          Please set your Supabase credentials in a <code>.env</code> file at the project root.<br />
-          Example:<br />
-          <code>VITE_SUPABASE_URL=...</code><br />
-          <code>VITE_SUPABASE_ANON_KEY=...</code>
-        </p>
-        <p style={{ marginTop: 32, color: '#ef4444', fontWeight: 600 }}>
-          The app cannot function without these values.<br />
-          See <a href="https://supabase.com/docs/guides/getting-started" target="_blank" rel="noopener noreferrer">Supabase Docs</a> for help.
-        </p>
-      </div>
-    )
-  }
+  // if (!isSupabaseConfigured || !supabase) {
+  //   return (
+  //     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', color: '#1e293b' }}>
+  //       <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>Supabase Not Configured</h1>
+  //       <p style={{ fontSize: 18, maxWidth: 480, textAlign: 'center' }}>
+  //         Please set your Supabase credentials in a <code>.env</code> file at the project root.<br />
+  //         Example:<br />
+  //         <code>VITE_SUPABASE_URL=...</code><br />
+  //         <code>VITE_SUPABASE_ANON_KEY=...</code>
+  //       </p>
+  //       <p style={{ marginTop: 32, color: '#ef4444', fontWeight: 600 }}>
+  //         The app cannot function without these values.<br />
+  //         See <a href="https://supabase.com/docs/guides/getting-started" target="_blank" rel="noopener noreferrer">Supabase Docs</a> for help.
+  //       </p>
+  //     </div>
+  //   )
+  // }
   const defaultInputs = {
     packedBags: 0,
     deductedBags: 0,
@@ -165,7 +165,6 @@ export default function App(){
   }, [ownerNames, customLocations, contractorSharePercentage, ownerCount, session])
 
   // Disaster Recovery state
-  const [showDisasterRecovery, setShowDisasterRecovery] = useState(false)
   const [disasterRecovery, setDisasterRecovery] = useState(() => {
     try {
       const saved = localStorage.getItem('disasterRecovery')
@@ -287,6 +286,7 @@ export default function App(){
       inputData: 'Input Data',
       reset: '🔄 Reset',
       totalSaltPackedBags: 'Total Salt Packed Bags',
+      totalCurrentSaltSale: 'Total Current Salt Sale',
         // Disaster Recovery
           disasterRecovery: 'Disaster Recovery Expenses',
           addDisasterRecovery: '+ Add Disaster Recovery Expenses',
@@ -319,6 +319,8 @@ export default function App(){
       expenseContractor: 'Contractor Pays Expenses',
       expenseShared5050: 'Owner & Contractor Shared 50%',
       addExpenses: '+ add expenses',
+      costResponsibility: 'COST RESPONSIBILITY',
+      addOperationalCost: '+ ADD OPERATIONAL COST',
       remove: 'Remove',
       bothOwnersHaveLoans: 'Owners have loans',
       oneOwnerHasLoan: 'Owner has loan',
@@ -359,6 +361,8 @@ export default function App(){
       societyServiceCharge: 'Society Service Charge',
       societyServiceReserved30: 'Society Service Reserved 30%',
       finalShare: 'Final Share',
+      totalDistributed: 'Total Distributed',
+      labourDetails: 'Labour Details',
       loan: 'Loan',
       lossDetected: 'Loss detected',
       zakatLabel: 'Zakat (5%)',
@@ -436,6 +440,9 @@ export default function App(){
       soldReservedStock: 'Sold Reserved Stock',
       freshlyHarvested: 'Freshly Harvested',
       mixedStockReservedAndFresh: 'Mixed (Reserved + Fresh)',
+      freshlyHarvestedDesc: 'New salt from harvest',
+      soldReservedStockDesc: 'From stored inventory',
+      mixedStockDesc: 'Combination of both',
     },
     ta: {
       title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
@@ -448,6 +455,7 @@ export default function App(){
       inputData: 'உள்ளீட்டு தரவு',
       reset: '🔄 மீட்டமை',
       totalSaltPackedBags: 'மொத்த உப்பு மூட்டைகள்',
+      totalCurrentSaltSale: 'மொத்த தற்போதைய உப்பு விற்பனை',
         // Disaster Recovery
           disasterRecovery: 'பேரழிவு மீட்பு செலவுகள்',
           addDisasterRecovery: '+ பேரழிவு மீட்பு செலவுகளைச் சேர்க்கவும்',
@@ -480,6 +488,8 @@ export default function App(){
       expenseContractor: 'ஒப்பந்ததாரர் செலுத்துதல்',
       expenseShared5050: 'உரிமையாளர் & ஒப்பந்ததாரர் 50/50',
       addExpenses: '+ செலவுகளை சேர்க்க',
+      costResponsibility: 'செலவு பொறுப்பு',
+      addOperationalCost: '+ செயல்பாட்டு செலவைச் சேர்க்கவும்',
       remove: 'அகற்று',
       bothOwnersHaveLoans: 'உரிமையாளர்களுக்கு கடன் உள்ளது',
       oneOwnerHasLoan: 'உரிமையாளருக்கு கடன் உள்ளது',
@@ -520,6 +530,8 @@ export default function App(){
       societyServiceCharge: 'சங்க சேவை கட்டணம்',
       societyServiceReserved30: 'சங்க சேவை ஒதுக்கீடு 30%',
       finalShare: 'இறுதி பங்கு',
+      totalDistributed: 'மொத்தமாக விநியோகிக்கப்பட்டது',
+      labourDetails: 'தொழிலாளர் விவரங்கள்',
       loan: 'கடன்',
       lossDetected: 'நஷ்டம் ஏற்பட்டுள்ளது',
       zakatLabel: 'ஜகாத் (5%)',
@@ -599,6 +611,9 @@ export default function App(){
       soldReservedStock: 'சேமிக்கப்பட்ட இருப்பு',
       freshlyHarvested: 'புதிதாக அறுவடை செய்யப்பட்ட',
       mixedStockReservedAndFresh: 'கலவை (சேமிக்கப்பட்ட + புதிய)',
+      freshlyHarvestedDesc: 'அறுவடையில் இருந்து புதிய உப்பு',
+      soldReservedStockDesc: 'சேமிக்கப்பட்ட இருப்பில் இருந்து',
+      mixedStockDesc: 'இரண்டின் கலவையும்',
     },
     si: {
       title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
@@ -611,6 +626,7 @@ export default function App(){
       inputData: 'දත්ත ඇතුළත් කිරීම',
       reset: '🔄 නැවත සකසන්න',
       totalSaltPackedBags: 'මුළු ලුණු මලු ප්‍රමාණය',
+      totalCurrentSaltSale: 'මුළු වත්මන් ලුණු විකිණීම',
         // Disaster Recovery
           disasterRecovery: 'ආපදා ප්‍රතිසාධන වියදම්',
           addDisasterRecovery: '+ ආපදා ප්‍රතිසාධන වියදම් එක් කරන්න',
@@ -643,6 +659,8 @@ export default function App(){
       expenseContractor: 'කොන්ත්‍රාත්කරු ගෙවීම',
       expenseShared5050: 'අයිතිකරු සහ කොන්ත්‍රාත්කරු 50% බැගින්',
       addExpenses: '+ වියදම් එක් කරන්න',
+      costResponsibility: 'වියදම් පිළිබඳ වගකීම',
+      addOperationalCost: '+ ක්‍රියාකාරක වියදමක් එක් කරන්න',
       remove: 'ඉවත් කරන්න',
       bothOwnersHaveLoans: 'ණය තිබේ',
       oneOwnerHasLoan: 'ණය තිබේ',
@@ -686,6 +704,8 @@ export default function App(){
       societyServiceCharge: 'සංගම් සේවා ගාස්තුව',
       societyServiceReserved30: 'සංගම් සේවා වෙන්කිරීම 30%',
       finalShare: 'අවසාන කොටස',
+      totalDistributed: 'මුළු බෙදාහැරීම',
+      labourDetails: 'සේවක විස්තර',
       lossDetected: 'අලාභයක් සිදුවී ඇත',
       zakatLabel: 'සකාත් (5%)',
       afterZakatLabel: 'සකාත් ගෙවීමෙන් පසු',
@@ -781,6 +801,7 @@ export default function App(){
   const [isAdmin, setIsAdmin] = useState(false)
   const [pendingPaymentRequests, setPendingPaymentRequests] = useState([])
   const [adminActionBusy, setAdminActionBusy] = useState(false)
+  const [activeModule, setActiveModule] = useState(null)
   const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
   const ONE_OFF_PRICE_LKR = 30000
   const STRIPE_FEE_PERCENT = Number(import.meta.env.VITE_STRIPE_LKR_FEE_PERCENT || 3.4)
@@ -1247,6 +1268,93 @@ export default function App(){
               </div>
             </button>
 
+            {/* Phase 1 Dashboard Grid Prototype */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              {[
+                { id: 'setup', title: 'Setup', sub: 'Location, Date & Buyer', icon: '📋', color: 'bg-blue-50' },
+                { id: 'revenue', title: 'Revenue', sub: 'Bags, Price & Source', icon: '📦', color: 'bg-green-50' },
+                { id: 'costs', title: 'Costs', sub: 'Expenses & Fees', icon: '🏭', color: 'bg-purple-50' },
+                { id: 'labour', title: 'Labour', sub: 'Service Log', icon: '👷', color: 'bg-orange-50' },
+                { id: 'inventory', title: 'Inventory', sub: 'Stock Reserved', icon: '💾', color: 'bg-cyan-50' },
+                { id: 'disaster', title: 'Disaster', sub: 'Recovery Costs', icon: '🌊', color: 'bg-red-50' }
+              ].map(module => (
+                <button
+                  key={module.id}
+                  onClick={() => setActiveModule(module.id)}
+                  className={`relative p-5 rounded-[32px] ${module.color} border-none android-shadow flex flex-col items-start text-left active:scale-95 transition-all group overflow-hidden h-[140px]`}
+                >
+                  <div className="absolute -top-2 -right-2 w-20 h-20 bg-slate-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+                  <div className="w-12 h-12 rounded-2xl bg-slate-900/5 flex items-center justify-center text-2xl mb-3 z-10">
+                    {module.icon}
+                  </div>
+                  <div className="z-10">
+                    <div className="text-base font-bold text-slate-900">{module.title}</div>
+                    <div className="text-[10px] text-slate-500 font-medium tracking-tight mt-0.5 line-clamp-1">{module.sub}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Module Overlay */}
+            {activeModule && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4">
+                <div 
+                  className="w-full h-[92vh] sm:h-auto sm:max-w-4xl bg-[#f8fafc] rounded-t-[40px] sm:rounded-[40px] shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom duration-300"
+                >
+                  <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200 bg-white">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-xl">
+                        {activeModule === 'setup' ? '📋' : activeModule === 'revenue' ? '📦' : activeModule === 'costs' ? '🏭' : activeModule === 'labour' ? '👷' : activeModule === 'inventory' ? '💾' : '🌊'}
+                      </div>
+                      <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight">{activeModule} Data</h2>
+                    </div>
+                    <button 
+                      onClick={() => setActiveModule(null)}
+                      className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  
+                  <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
+                    <InputSection 
+                      inputs={inputs} 
+                      setInput={setInputs} 
+                      reset={() => {
+                        reset();
+                        setStockReserved({ stockLevel: '', stockUnit: 'bags', estimatedPrice: '', selectedLocations: [], fromDate: '', toDate: '' });
+                      }} 
+                      toggleLoans={toggleLoans} 
+                      t={t} 
+                      lang={lang} 
+                      setLang={setLang} 
+                      customLocations={customLocations} 
+                      ownerNames={activeOwnerNames} 
+                      ownerCount={ownerCount} 
+                      stockReserved={stockReserved} 
+                      setStockReserved={setStockReserved}
+                      stockSource={stockSource} 
+                      setStockSource={setStockSource} 
+                      saveStockReserved={saveStockReserved}
+                      results={results}
+                      activeModule={activeModule}
+                      bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
+                    />
+                  </div>
+
+                  <div className="p-6 bg-white border-t border-slate-200" style={{ marginBottom: '64px' }}>
+                    <button 
+                      onClick={() => setActiveModule(null)}
+                      className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-lg active:scale-[0.98] transition-all"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="hidden">
             <InputSection 
               inputs={inputs} 
               setInput={setInputs} 
@@ -1276,24 +1384,8 @@ export default function App(){
               results={results}
               bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
             />
-
-            {/* Disaster Recovery toggle and card */}
-            <div className="mt-4 flex flex-col items-center w-full">
-              <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
-                <AccordionCard
-                  title={t('disasterExpenses')}
-                  icon={<span className="text-2xl">🌊</span>}
-                  defaultOpen={showDisasterRecovery}
-                  bgColor="#ffe4ef"
-                >
-                  <DisasterRecoveryCard
-                    value={disasterRecovery}
-                    onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
-                    t={t}
-                  />
-                </AccordionCard>
-              </div>
             </div>
+
           </div>
 
           <div>
@@ -1368,78 +1460,6 @@ export default function App(){
           </div>
         </div>
 
-
-        {/* Disaster Recovery P&L summary */}
-        {showDisasterRecovery && (
-          <div className="mt-12 mb-12">
-            <div className="android-card border border-rose-300 bg-rose-50 p-8 shadow-xl">
-              <h3 className="text-xl font-black text-rose-900 mb-6 flex items-center gap-3">
-                <span className="text-2xl">🌊</span> {t('disasterRecovery')}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
-                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('pondsReconstruction')}</div>
-                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.pondsReconstruction || 0)}</div>
-                </div>
-                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
-                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('hutReconstruction')}</div>
-                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.hutReconstruction || 0)}</div>
-                </div>
-                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
-                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('electricityBills')}</div>
-                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.electricityBills || 0)}</div>
-                </div>
-                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
-                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('compensationReceived')}</div>
-                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.compensationReceived || 0)}</div>
-                </div>
-                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
-                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('donationsReceived')}</div>
-                  <div className="text-lg font-mono font-bold text-slate-900">{formatLKR(disasterRecovery.donationsReceived || 0)}</div>
-                </div>
-                <div className="bg-white/40 p-4 rounded-2xl border border-rose-100">
-                  <div className="text-[11px] font-bold text-rose-800 uppercase tracking-wider mb-1">{t('lossQuantity')}</div>
-                  <div className="text-base font-bold text-slate-900">{disasterRecovery.lossQuantity || 0} {t(disasterRecovery.lossUnit || 'bags')}</div>
-                  <div className="text-[10px] text-rose-600 font-medium">Value: {formatLKR((disasterRecovery.lossUnit === 'kg' ? (disasterRecovery.lossQuantity / 50) : disasterRecovery.lossQuantity) * (inputs.pricePerBag || 0))}</div>
-                </div>
-              </div>
-
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-rose-400/80">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-rose-800 uppercase">{t('totalExpenses', 'Total Expenses')}</span>
-                  <span className="text-2xl font-mono font-black text-rose-900">
-                    {formatLKR((Number(disasterRecovery.pondsReconstruction) || 0) + (Number(disasterRecovery.hutReconstruction) || 0) + (Number(disasterRecovery.electricityBills) || 0))}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-rose-800 uppercase">Total Income</span>
-                  <span className="text-2xl font-mono font-black text-emerald-700">
-                    {formatLKR((Number(disasterRecovery.compensationReceived) || 0) + (Number(disasterRecovery.donationsReceived) || 0))}
-                  </span>
-                </div>
-                <div className="flex flex-col p-4 rounded-3xl bg-white shadow-inner">
-                  <span className="text-xs font-bold text-slate-500 uppercase">Net Variance</span>
-                  {(() => {
-                    const totalExp = (Number(disasterRecovery.pondsReconstruction) || 0) + (Number(disasterRecovery.hutReconstruction) || 0) + (Number(disasterRecovery.electricityBills) || 0)
-                    const totalInc = (Number(disasterRecovery.compensationReceived) || 0) + (Number(disasterRecovery.donationsReceived) || 0)
-                    const lossValue = (disasterRecovery.lossUnit === 'kg' ? (disasterRecovery.lossQuantity / 50) : (disasterRecovery.lossQuantity || 0)) * (inputs.pricePerBag || 0)
-                    const net = totalInc - totalExp - lossValue
-                    return (
-                      <div className="flex flex-col">
-                        <span className={`text-2xl font-mono font-black ${net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                          {formatLKR(net)}
-                        </span>
-                        <span className="text-[10px] font-bold tracking-tighter uppercase opacity-60">
-                          {net < 0 ? '⚠️ Total Loss' : '✅ Recovery Profit'}
-                        </span>
-                      </div>
-                    )
-                  })()}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {results && <ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} />}
 

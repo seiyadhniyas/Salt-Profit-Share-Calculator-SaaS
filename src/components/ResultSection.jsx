@@ -1,6 +1,5 @@
 import React from 'react'
 import { formatLKR } from '../utils/calculations.jsx'
-import AccordionCard from './AccordionCard'
 
 function StatRow({label, value, isNegative}){
   // split bracketed part to allow responsive stacking
@@ -35,12 +34,11 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
     <div className="mt-2">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Detailed Breakdown */}
-        <AccordionCard 
-          title={t ? t('calculationBreakdown') : 'Calculation Breakdown'}
-          bgColor="#fff0f0"
-          defaultOpen={false}
-          icon="📊"
-        >
+        <div className="android-card p-6" style={{ backgroundColor: "#fff0f0" }}>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-lg">📊</span>
+            <h3 className="text-lg font-bold text-slate-800">{t ? t('calculationBreakdown') : 'Calculation Breakdown'}</h3>
+          </div>
           <div className="space-y-1">
             <StatRow label={t ? t('netBags') + ' (' + t('packedMinusDeducted') + ')' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
             <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (' + (t ? t('netTimesPricePerBag') : 'Net × Price/Bag') + ')'} value={formatLKR(results.initialPrice)} isNegative={false} />
@@ -59,7 +57,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
                       <span className="text-2xl text-emerald-500 font-black drop-shadow-lg" style={{ WebkitTextStroke: '2px #059669', zIndex: 20, position: 'absolute', top: '-4px' }}>↓</span>
                     </div>
                     <div className="ml-4 mt-2 p-3 rounded-2xl bg-[#eed3ff] border" style={{ marginTop: '4px', border: '0.5px solid #a78bfa' }}>
-                      <div className="text-[13px] font-bold text-purple-800 tracking-wider mb-2 normal-case">Labour details</div>
+                      <div className="text-[13px] font-bold text-purple-800 tracking-wider mb-2 normal-case">{t ? t('labourDetails') : 'Labour details'}</div>
                       <div className="space-y-1">
                         {results.labourCosts.map((labour, idx) => (
                           <div key={idx} className="flex justify-between text-xs">
@@ -94,15 +92,14 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
             <StatRow label={t ? `${t('societyServiceCharge')} (${t('netBags')} × 100)` : 'Society Service Charge (Net Bags × 100)'} value={formatLKR(results.netBags * 100)} isNegative={false} />
             <StatRow label={t ? t('societyServiceReserved30') : 'Society Service Reserved 30%'} value={formatLKR((results.netBags * 100) * 0.30)} isNegative={false} />
           </div>
-        </AccordionCard>
+        </div>
 
         {/* Final Results */}
-        <AccordionCard 
-          title={t ? t('finalResults') : 'Final Results'}
-          bgColor="#f0fdf4"
-          defaultOpen={false}
-          icon="🥇"
-        >
+        <div className="android-card p-6" style={{ backgroundColor: "#f0fdf4" }}>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-lg">🥇</span>
+            <h3 className="text-lg font-bold text-slate-800">{t ? t('finalResults') : 'Final Results'}</h3>
+          </div>
           <div className="space-y-4">
             <div className="android-card p-6 bg-sky-50 border border-sky-100">
               <div className="flex justify-between items-center mb-4">
@@ -170,7 +167,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               </div>
             </div>
           </div>
-        </AccordionCard>
+        </div>
       </div>
     </div>
   )
