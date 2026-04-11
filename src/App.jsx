@@ -386,6 +386,8 @@ export default function App(){
       premiumActive: 'Premium Access Active',
       logout: 'Sign Out',
       login: 'Sign In / Register',
+      guestMember: 'Guest Member',
+      trialUses: 'Trial Uses',
       customLocations: 'Work Locations',
       ownerNames: 'Owner Names',
       contractorSharePercentage: 'Contractor Share Percentage',
@@ -443,6 +445,36 @@ export default function App(){
       freshlyHarvestedDesc: 'New salt from harvest',
       soldReservedStockDesc: 'From stored inventory',
       mixedStockDesc: 'Combination of both',
+      // Auth translations
+      memberAccess: 'Member Access',
+      signIn: 'Sign In',
+      createAccount: 'Create Account',
+      register: 'Register',
+      close: 'Close',
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      forgotPassword: 'Forgot Password?',
+      backToSignIn: 'Back to Sign In',
+      pleaseWait: 'Please wait...',
+      sendResetInstructions: 'Send Reset Instructions',
+      signInToDashboard: 'Sign In To Dashboard',
+      authFooterNote: 'This dashboard is designed for lifetime members of the Saltern Welfare Society. Calculator logic stays unchanged after sign in.',
+      supabaseNotConfigured: 'Supabase is not configured locally yet. Create a',
+      supabaseNotConfiguredSuffix: 'from the example file.',
+      authSupabaseMissing: 'Supabase credentials are missing. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your env file.',
+      authPasswordsMismatch: 'Passwords do not match.',
+      authAccountCreated: 'Account created successfully!',
+      authConfirmationEmailSent: 'A confirmation email has been sent to',
+      authVerifyThenSignIn: 'Please click the link in the email to verify your account, then sign in with your credentials.',
+      authFailedTryAgain: 'Authentication failed. Please try again.',
+      emailRequired: 'Email is required to reset password.',
+      resetEmailSent: 'Password reset instructions sent to your email.',
+      // Admin auth
+      adminAuthRequired: 'Admin Authentication',
+      adminAuthSuccess: 'Authentication Successful',
+      adminDashboard: 'Admin Dashboard',
+      redirectingToDashboard: 'Redirecting to dashboard...',
     },
     ta: {
       title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
@@ -555,6 +587,8 @@ export default function App(){
       premiumActive: 'பிரீமியம் அணுகல் செயல்பாட்டில் உள்ளது',
       logout: 'வெளியேறு',
       login: 'உள்நுழைய / பதிவு செய்ய',
+      guestMember: 'விருந்தினர் உறுப்பினர்',
+      trialUses: 'சோதனை பயன்பாடுகள்',
       customLocations: 'பணி இடங்கள்',
       ownerNames: 'உரிமையாளர் பெயர்கள்',
       contractorSharePercentage: 'ஒப்பந்ததாரர் பங்கு சதவீதம்',
@@ -614,6 +648,36 @@ export default function App(){
       freshlyHarvestedDesc: 'அறுவடையில் இருந்து புதிய உப்பு',
       soldReservedStockDesc: 'சேமிக்கப்பட்ட இருப்பில் இருந்து',
       mixedStockDesc: 'இரண்டின் கலவையும்',
+      // Auth translations
+      memberAccess: 'உறுப்பினர் அணுகல்',
+      signIn: 'உள்நுழைய',
+      createAccount: 'கணக்கை உருவாக்கு',
+      register: 'பதிவு செய்ய',
+      close: 'மூடு',
+      email: 'மின்னஞ்சல்',
+      password: 'கடவுச்சொல்',
+      confirmPassword: 'கடவுச்சொல்லை உறுதிப்படுத்து',
+      forgotPassword: 'கடவுச்சொல்லை மறந்துவிட்டீர்களா?',
+      backToSignIn: 'உள்நுழைவுக்கு திரும்பு',
+      pleaseWait: 'தயவுசெய்து காத்திருங்கள்...',
+      sendResetInstructions: 'மீட்டமை வழிமுறைகளை அனுப்பு',
+      signInToDashboard: 'டாஷ்போர்டுக்கு உள்நுழைய',
+      authFooterNote: 'இந்த டாஷ்போர்ட் சால்டர்ன் வெல்ஃபேர் சொசைட்டியின் வாழ்நாள் உறுப்பினர்களுக்கு வடிவமைக்கப்பட்டது. உள்நுழைவுக்குப் பிறகு கணக்கீட்டு தர்க்கம் மாறாமல் இருக்கும்.',
+      supabaseNotConfigured: 'சூபாபேஸ் இன்னும் உள்ளூரில் கட்டமைக்கப்படவில்லை. உதாரண கோப்பில் இருந்து ஒன்றை உருவாக்கவும்',
+      supabaseNotConfiguredSuffix: 'உதாரண கோப்பில் இருந்து.',
+      authSupabaseMissing: 'சூபாபேஸ் சான்றுகள் இல்லை. உங்கள் env கோப்பில் VITE_SUPABASE_URL மற்றும் VITE_SUPABASE_ANON_KEY ஐச் சேர்க்கவும்.',
+      authPasswordsMismatch: 'கடவுச்சொற்கள் பொருந்தவில்லை.',
+      authAccountCreated: 'கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது!',
+      authConfirmationEmailSent: 'உறுதிப்படுத்தும் மின்னஞ்சல் அனுப்பப்பட்டது:',
+      authVerifyThenSignIn: 'மின்னஞ்சலில் உள்ள இணைப்பை அழுத்தி கணக்கை உறுதி செய்து பின்னர் உள்நுழைக.',
+      authFailedTryAgain: 'அங்கீகாரம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.',
+      emailRequired: 'கடவுச்சொல்லை மீட்டமைக்க மின்னஞ்சல் தேவை.',
+      resetEmailSent: 'கடவுச்சொல் மீட்டமை வழிமுறைகள் உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்டன.',
+      // Admin auth
+      adminAuthRequired: 'நிர்வாகி அங்கீகாரம்',
+      adminAuthSuccess: 'அங்கீகாரம் வெற்றிகரமாக முடிந்தது',
+      adminDashboard: 'நிர்வாகி டாஷ்போர்ட்',
+      redirectingToDashboard: 'டாஷ்போர்டுக்கு திருப்பி அனுப்பப்படுகிறது...',
     },
     si: {
       title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
@@ -728,6 +792,8 @@ export default function App(){
       premiumActive: 'ප්‍රීමියම් පහසුකම ක්‍රියාත්මකයි',
       logout: 'ලොග් අවුට් වන්න',
       login: 'ලොග් වන්න / ලියාපදිංචි වන්න',
+      guestMember: 'අමුත්තන් සාමාජිකයෙක්',
+      trialUses: 'නිහාල් භාවිතයන්',
       customLocations: 'ස්ථාන',
       ownerNames: 'අයිතිකරුවන්ගේ නම්',
       contractorSharePercentage: 'කොන්ත්‍රාත්කරුගේ කොටස (%)',
@@ -777,6 +843,36 @@ export default function App(){
       period: 'කාලය',
       saveStockReserved: 'සංරක්ෂිත ලුණු සුරකින්න',
       approxBagFormat: 'සుමාරු {qty} මලු (50kg/මල්ල)',
+      // Auth translations
+      memberAccess: 'සාමාජික ප්‍රවේශය',
+      signIn: 'ලොග් වන්න',
+      createAccount: 'ගිණුම් එකක් සාදන්න',
+      register: 'ලියාපදිංචි වන්න',
+      close: 'වසන්න',
+      email: 'ඊමේල්',
+      password: 'මුරපදය',
+      confirmPassword: 'මුරපදය තහවුරු කරන්න',
+      forgotPassword: 'මුරපදය අමතක වුණා ද?',
+      backToSignIn: 'ලොග් වීමට නැවත යන්න',
+      pleaseWait: 'කරුණාකර රැඳී සිටින්න...',
+      sendResetInstructions: 'නැවත සකසුම් උපදෙස් එවන්න',
+      signInToDashboard: 'ඩෑෂ්බෝර්ඩ් එකට ලොග් වන්න',
+      authFooterNote: 'මෙම ඩෑෂ්බෝර්ඩ් එක සෝල්ටර්න් වෙල්ෆෙයා සොසයිටියේ ජීවිත කාලීන සාමාජිකයින් සඳහා නිර්මාණය කර ඇත. ලොග් වීමෙන් පසු ගණකයන්ත්‍රයේ තර්කය වෙනස් නොවේ.',
+      supabaseNotConfigured: 'සුපාබේස් තවමත් දේශීයව වින්‍යාස කර නොමැත. උදාහරණ ගොනුවෙන් එකක් සාදන්න',
+      supabaseNotConfiguredSuffix: 'උදාහරණ ගොනුවෙන්.',
+      authSupabaseMissing: 'සුපාබේස් අක්තපත්‍ර නොමැත. ඔබේ env ගොනුවට VITE_SUPABASE_URL සහ VITE_SUPABASE_ANON_KEY එකතු කරන්න.',
+      authPasswordsMismatch: 'මුරපද නොගැලපේ.',
+      authAccountCreated: 'ගිණුම් සාර්ථකව නිර්මාණය විය!',
+      authConfirmationEmailSent: 'තහවුරු කිරීමේ ඊමේල් එකක් එවන ලදී:',
+      authVerifyThenSignIn: 'ඊමේල් එකේ සම්බන්ධතාවය ක්ලික් කර ගිණුම් තහවුරු කර ඊළඟට ලොග් වන්න.',
+      authFailedTryAgain: 'සත්‍යාපනය අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න.',
+      emailRequired: 'මුරපදය නැවත සකස් කිරීමට ඊමේල් අවශ්‍යයි.',
+      resetEmailSent: 'මුරපදය නැවත සකස් කිරීමේ උපදෙස් ඔබේ ඊමේල් එකට එවන ලදී.',
+      // Admin auth
+      adminAuthRequired: 'පරිපාලක සත්‍යාපනය',
+      adminAuthSuccess: 'සත්‍යාපනය සාර්ථකයි',
+      adminDashboard: 'පරිපාලක ඩෑෂ්බෝර්ඩ්',
+      redirectingToDashboard: 'ඩෑෂ්බෝර්ඩ් එකට යොමු කරමින්...',
     }
   }
 
@@ -1212,9 +1308,9 @@ export default function App(){
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 pb-14 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-14 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
-        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-4 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:px-6 sm:pb-6 sm:pt-5">
+        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-5">
           <div className="absolute left-3 top-3 sm:left-5 sm:top-4">
             <select 
               value={lang} 
@@ -1269,7 +1365,7 @@ export default function App(){
             </button>
 
             {/* Phase 1 Dashboard Grid Prototype */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-2 gap-2 mb-8">
               {[
                 { id: 'setup', title: 'Setup', sub: 'Location, Date & Buyer', icon: '📋', color: 'bg-blue-50' },
                 { id: 'revenue', title: 'Revenue', sub: 'Bags, Price & Source', icon: '📦', color: 'bg-green-50' },
@@ -1281,7 +1377,7 @@ export default function App(){
                 <button
                   key={module.id}
                   onClick={() => setActiveModule(module.id)}
-                  className={`relative p-5 rounded-[32px] ${module.color} border-none android-shadow flex flex-col items-start text-left active:scale-95 transition-all group overflow-hidden h-[140px]`}
+                  className={`relative p-3 rounded-[32px] ${module.color} border-none android-shadow flex flex-col items-start text-left active:scale-95 transition-all group overflow-hidden h-[140px]`}
                 >
                   <div className="absolute -top-2 -right-2 w-20 h-20 bg-slate-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
                   <div className="w-12 h-12 rounded-2xl bg-slate-900/5 flex items-center justify-center text-2xl mb-3 z-10">
@@ -1339,6 +1435,7 @@ export default function App(){
                       results={results}
                       activeModule={activeModule}
                       bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
+                      contractorSharePercentage={contractorSharePercentage}
                     />
                   </div>
 
@@ -1383,6 +1480,7 @@ export default function App(){
               saveStockReserved={saveStockReserved}
               results={results}
               bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
+              contractorSharePercentage={contractorSharePercentage}
             />
             </div>
 

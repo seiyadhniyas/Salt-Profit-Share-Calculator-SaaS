@@ -32,9 +32,9 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
 
   return (
     <div className="mt-2">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 lg:gap-4">
         {/* Detailed Breakdown */}
-        <div className="android-card p-6" style={{ backgroundColor: "#fff0f0" }}>
+        <div className="android-card p-2 lg:p-6" style={{ backgroundColor: "#fff0f0" }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">📊</span>
             <h3 className="text-lg font-bold text-slate-800">{t ? t('calculationBreakdown') : 'Calculation Breakdown'}</h3>
@@ -95,7 +95,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
         </div>
 
         {/* Final Results */}
-        <div className="android-card p-6" style={{ backgroundColor: "#f0fdf4" }}>
+        <div className="android-card p-2 lg:p-6" style={{ backgroundColor: "#f0fdf4" }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-lg">🥇</span>
             <h3 className="text-lg font-bold text-slate-800">{t ? t('finalResults') : 'Final Results'}</h3>

@@ -67,11 +67,15 @@ export function computeAll(inputs, options = {}) {
   const initialPrice = netBags * pricePerBag
 
   // contractor_total_spent
-  // Allow a manual override: if the user provides `contractorTotalSpentManual` then
-  // use that value directly (treats contractor expenses as strictly user-controlled).
-  // Otherwise compute from per-bag rates and other expenses as before.
-  // IMPORTANT: Labour costs are ALWAYS added to contractor expenses (regardless of expense payment mode)
-  const contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0) + (is5050 ? totalOtherExpenses : 0) + labourCostsTotal
+  // If contractor share is 0%, all contractor expenses and shares should be zero
+  let contractorTotalSpent = 0
+  if (contractorSharePercentage > 0) {
+    // Allow a manual override: if the user provides `contractorTotalSpentManual` then
+    // use that value directly (treats contractor expenses as strictly user-controlled).
+    // Otherwise compute from per-bag rates and other expenses as before.
+    // IMPORTANT: Labour costs are ALWAYS added to contractor expenses (regardless of expense payment mode)
+    contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0) + (is5050 ? totalOtherExpenses : 0) + labourCostsTotal
+  }
 
   // total loan (sum of both owners' loans)
   const totalLoan = loanInaya + loanShakira
@@ -98,12 +102,14 @@ export function computeAll(inputs, options = {}) {
   // If 50/50: contractor_share = (InitialPrice - Spent) * contractorShareFactor
   // Uses packedBags-based spent calculation defined above; blanks are treated as 0 via safeNum
   let contractorShare = 0
-  if (expensePayment === 'owners') {
-    contractorShare = (initialPrice * contractorShareFactor) + contractorTotalSpent
-  } else if (expensePayment === 'contractor') {
-    contractorShare = (initialPrice - contractorTotalSpent) * contractorShareFactor
-  } else if (is5050) {
-    contractorShare = (initialPrice - contractorTotalSpent) * contractorShareFactor
+  if (contractorSharePercentage > 0) {
+    if (expensePayment === 'owners') {
+      contractorShare = (initialPrice * contractorShareFactor) + contractorTotalSpent
+    } else if (expensePayment === 'contractor') {
+      contractorShare = (initialPrice - contractorTotalSpent) * contractorShareFactor
+    } else if (is5050) {
+      contractorShare = (initialPrice - contractorTotalSpent) * contractorShareFactor
+    }
   }
 
   // owner_pool (Owners Group Amount)

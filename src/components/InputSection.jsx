@@ -3,13 +3,13 @@ import AccordionCard from './AccordionCard'
 import StockReservedCard from './StockReservedCard'
 import DisasterRecoveryCard from './DisasterRecoveryCard'
 
-function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip }) {
+function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip, disabled = false }) {
   const displayValue = value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
   
   return (
     <label className="block mb-3">
       <div className="flex items-center gap-3 mb-2 ml-1">
-        <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight">{label}</div>
+        <div className={`text-[10px] font-semibold uppercase tracking-tight ${disabled ? 'text-slate-300' : 'text-slate-500'}`}>{label}</div>
         {tooltip && (
           <div className="relative group">
             <span className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-slate-300 border border-slate-200 rounded-full cursor-help hover:text-slate-500 transition">?</span>
@@ -26,18 +26,24 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
         min={min}
         value={displayValue}
         onChange={(e) => onChange(name, e.target.value)}
-        className="w-full bg-slate-50 border-2 border-slate-400 rounded-[28px] px-6 py-4 text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:ring-0 transition-all outline-none font-bold text-sm uppercase"
+        disabled={disabled}
+        className={`w-full rounded-[28px] px-6 py-4 text-slate-900 placeholder-slate-400 focus:ring-0 transition-all outline-none font-bold text-sm uppercase border-2 ${disabled ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' : 'bg-slate-50 border-slate-400 focus:border-slate-900'}`}
       />
     </label>
   )
 }
 
-export default function InputSection({ inputs = {}, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2, stockReserved = {}, setStockReserved, stockSource = 'freshly-harvested', setStockSource, saveStockReserved, results, bagCostPerUnit, activeModule, recoveryPercentage, setRecoveryPercentage }) {
+export default function InputSection({ inputs = {}, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2, stockReserved = {}, setStockReserved, stockSource = 'freshly-harvested', setStockSource, saveStockReserved, results, bagCostPerUnit, activeModule, recoveryPercentage, setRecoveryPercentage, contractorSharePercentage = 50 }) {
+  const contractorSectionDisabled = contractorSharePercentage === 0
   const isSingleOwner = ownerCount === 1
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
   const [disasterRecovery, setDisasterRecovery] = useState({})
 
   const onChange = (name, val) => {
+    // Prevent changes to contractor expense fields when contractor share is 0%
+    if (contractorSectionDisabled && ['packingFeePerBag', 'bagCostPerUnit', 'otherExpenses', 'expensePayment'].includes(name)) {
+      return
+    }
     if (typeof setInput === 'function') {
       setInput(prev => ({ ...prev, [name]: val }))
     }
@@ -117,7 +123,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
         bgColor="#e0f2fe" 
         defaultOpen={true}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-2">
           <label className="block">
             <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('locationDay', 'LOCATION')} <span className="text-rose-600">*</span></div>
             {Array.isArray(customLocations) && customLocations.length > 0 ? (
@@ -198,9 +204,9 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
           {(activeModule === 'revenue' || !activeModule) && (
-          <div className="space-y-6">
+          <div className={`space-y-6 ${contractorSectionDisabled ? 'opacity-50 pointer-events-none select-none' : ''}`}> 
             <div className="flex items-center gap-2 mb-2 p-3 bg-blue-50 rounded-2xl border-2 border-blue-100">
               <span className="text-xl">📦</span>
               <div className="text-xs font-semibold text-blue-900 tracking-tight">{tr('totalCurrentSaltSale')}</div>
@@ -209,7 +215,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
             <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs?.deductedBags} onChange={onChange} decimals={null} />
             <NumberInput label={tr('pricePerBag', 'PRICE PER BAG (LKR)')} name="pricePerBag" value={inputs?.pricePerBag} onChange={onChange} decimals={2} />
 
-            <div className="bg-slate-50 p-6 rounded-[28px] border-2 border-blue-100">
+            <div className="bg-slate-50 p-4 lg:p-6 rounded-[28px] border-2 border-blue-100">
               <div className="text-[10px] text-blue-500 uppercase tracking-tight mb-4">{tr('stockSource', 'STOCK SOURCE')}</div>
               <div className="flex flex-col gap-3">
                 {[
@@ -260,11 +266,11 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
           {(activeModule === 'costs' || !activeModule) && (
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2 p-3 bg-purple-50 rounded-2xl border-2 border-purple-100">
-               <span className="text-xl">🏭</span>
-               <div className="text-xs font-semibold text-purple-900 uppercase tracking-tight">{tr('contractorExpenses', 'OPERATIONAL COSTS')}</div>
+              <span className="text-xl">🏭</span>
+              <div className="text-xs font-semibold text-purple-900 uppercase tracking-tight">{tr('contractorExpenses', 'OPERATIONAL COSTS')}</div>
             </div>
             
-            <div className="bg-slate-50 p-6 rounded-[28px] border-2 border-slate-100">
+            <div className={`bg-slate-50 p-4 lg:p-6 rounded-[28px] border-2 border-slate-100 ${contractorSectionDisabled ? 'opacity-60 pointer-events-none' : ''}`}>
               <div className="text-[10px] text-slate-500 uppercase tracking-tight mb-4">{tr('costResponsibility')}</div>
               <div className="flex flex-col gap-4">
                 {[
@@ -273,28 +279,28 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                   { id: 'shared5050', label: tr('expenseShared5050', '50/50 shared') }
                 ].map(opt => (
                   <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
-                    <input type="radio" name="expensePayment" value={opt.id} checked={(inputs?.expensePayment || 'owners') === opt.id} onChange={(e) => onChange('expensePayment', e.target.value)} className="w-5 h-5 text-purple-600 focus:ring-0 border-2 border-slate-300" />
+                    <input type="radio" name="expensePayment" value={opt.id} checked={(inputs?.expensePayment || 'owners') === opt.id} onChange={(e) => onChange('expensePayment', e.target.value)} disabled={contractorSectionDisabled} className={`w-5 h-5 text-purple-600 focus:ring-0 border-2 border-slate-300 ${contractorSectionDisabled ? 'cursor-not-allowed opacity-50' : ''}`} />
                     <span className="text-[10px] text-slate-500 group-hover:text-slate-900 tracking-tight transition-colors normal-case font-normal">{opt.label}</span>
                   </label>
                 ))}
               </div>
             </div>
             
-            <NumberInput label={tr('packingFeePerBag', 'PACKING WAGE /BAG')} name="packingFeePerBag" value={inputs?.packingFeePerBag} onChange={onChange} decimals={2} />
-            <NumberInput label={tr('bagCostPerUnit', 'PLASTIC BAG COST')} name="bagCostPerUnit" value={inputs?.bagCostPerUnit} onChange={onChange} decimals={2} />
-            <NumberInput label={tr('otherExpenses', 'FIXED OVERHEADS')} name="otherExpenses" value={inputs?.otherExpenses} onChange={onChange} decimals={2} />
+            <NumberInput label={tr('packingFeePerBag', 'PACKING WAGE /BAG')} name="packingFeePerBag" value={inputs?.packingFeePerBag} onChange={onChange} decimals={2} disabled={contractorSectionDisabled} />
+            <NumberInput label={tr('bagCostPerUnit', 'PLASTIC BAG COST')} name="bagCostPerUnit" value={inputs?.bagCostPerUnit} onChange={onChange} decimals={2} disabled={contractorSectionDisabled} />
+            <NumberInput label={tr('otherExpenses', 'FIXED OVERHEADS')} name="otherExpenses" value={inputs?.otherExpenses} onChange={onChange} decimals={2} disabled={contractorSectionDisabled} />
             
-            <button type="button" onClick={addExpense} className="w-full bg-slate-100 hover:bg-slate-200 border-2 border-dashed border-slate-300 rounded-[28px] px-6 py-4 text-slate-600 font-bold transition-all uppercase tracking-widest text-[10px]">
+            <button type="button" onClick={addExpense} disabled={contractorSectionDisabled} className={`w-full bg-slate-100 hover:bg-slate-200 border-2 border-dashed border-slate-300 rounded-[28px] px-6 py-4 text-slate-600 font-bold transition-all uppercase tracking-widest text-[10px] ${contractorSectionDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
               + {tr('addOperationalCost')}
             </button>
 
             {(inputs?.extraExpenses || []).length > 0 && (
-              <div className="space-y-3">
+              <div className={`space-y-3 ${contractorSectionDisabled ? 'opacity-50 pointer-events-none' : ''}`}>
                 {(inputs?.extraExpenses || []).map(exp => (
                   <div key={exp.id} className="flex gap-2 p-4 bg-white border-2 border-slate-100 rounded-[24px]">
-                    <input className="flex-1 bg-transparent text-[10px] font-black uppercase outline-none focus:text-purple-600" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value.toUpperCase())} />
-                    <input type="number" step="any" className="w-24 bg-transparent text-[10px] font-black text-right outline-none" value={exp.amount === 0 ? '' : Number(exp.amount).toFixed(2)} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} />
-                    <button type="button" onClick={() => removeExpense(exp.id)} className="text-rose-400 font-bold hover:scale-110 transition">✕</button>
+                    <input className="flex-1 bg-transparent text-[10px] font-black uppercase outline-none focus:text-purple-600" value={exp.label} onChange={(e) => updateExpense(exp.id, 'label', e.target.value.toUpperCase())} disabled={contractorSectionDisabled} />
+                    <input type="number" step="any" className="w-24 bg-transparent text-[10px] font-black text-right outline-none" value={exp.amount === 0 ? '' : Number(exp.amount).toFixed(2)} onChange={(e) => updateExpense(exp.id, 'amount', e.target.value)} disabled={contractorSectionDisabled} />
+                    <button type="button" onClick={() => removeExpense(exp.id)} disabled={contractorSectionDisabled} className={`text-rose-400 font-bold hover:scale-110 transition ${contractorSectionDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>✕</button>
                   </div>
                 ))}
               </div>
