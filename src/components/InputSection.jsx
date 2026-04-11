@@ -30,7 +30,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   )
 }
 
-export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2 }) {
+export default function InputSection({ inputs, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2, stockReserved = {}, stockSource = 'freshly-harvested', setStockSource }) {
   const isSingleOwner = ownerCount === 1
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
 
@@ -102,13 +102,14 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
           <label className="block">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('locationDay', 'LOCATION')}</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('locationDay', 'LOCATION')} <span className="text-rose-600">*</span></div>
             {Array.isArray(customLocations) && customLocations.length > 0 ? (
               <div className="relative">
                 <select 
                   name="location" 
                   value={inputs.location || '' } 
                   onChange={(e) => onChange('location', e.target.value)} 
+                  required
                   className="w-full bg-slate-50 border-2 border-slate-400 rounded-[28px] px-6 py-4 text-slate-900 focus:border-slate-900 outline-none appearance-none cursor-pointer font-bold text-sm uppercase"
                 >
                   <option value=''>{tr('selectLocation', 'SELECT...')}</option>
@@ -131,11 +132,12 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
           </label>
 
           <label className="block">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('date', 'DATE')}</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{tr('date', 'DATE')} <span className="text-rose-600">*</span></div>
             <input
               type="date"
               value={inputs.date || ''}
               onChange={(e) => onChange('date', e.target.value)}
+              required
               className="w-full bg-slate-50 border-2 border-slate-400 rounded-[28px] px-6 py-4 text-slate-900 focus:border-slate-900 outline-none font-bold text-sm"
             />
           </label>
@@ -186,6 +188,52 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
             <NumberInput label={tr('totalSaltPackedBags', 'PACKED BAGS')} name="packedBags" value={inputs.packedBags} onChange={onChange} decimals={null} />
             <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs.deductedBags} onChange={onChange} decimals={null} />
             <NumberInput label={tr('pricePerBag', 'PRICE PER BAG (LKR)')} name="pricePerBag" value={inputs.pricePerBag} onChange={onChange} decimals={2} />
+
+            {/* Stock Source Selector */}
+            <div className="bg-slate-50 p-6 rounded-[28px] border-2 border-blue-100">
+              <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4">{tr('stockSource', 'STOCK SOURCE')}</div>
+              <div className="flex flex-col gap-3">
+                {[
+                  { id: 'freshly-harvested', label: tr('freshlyHarvested', 'Freshly Harvested'), desc: 'New salt from harvest' },
+                  { id: 'sold-reserved', label: tr('soldReservedStock', 'Sold Reserved Stock'), desc: 'From stored inventory' },
+                  { id: 'mixed', label: tr('mixedStockReservedAndFresh', 'Mixed (Reserved + Fresh)'), desc: 'Combination of both' }
+                ].map(opt => (
+                  <label key={opt.id} className="flex items-start gap-3 cursor-pointer group">
+                    <input 
+                      type="radio" 
+                      name="stockSource" 
+                      value={opt.id} 
+                      checked={stockSource === opt.id} 
+                      onChange={(e) => setStockSource(e.target.value)} 
+                      className="w-5 h-5 text-blue-600 focus:ring-0 border-2 border-slate-300 mt-0.5" 
+                    />
+                    <div className="flex-1">
+                      <span className="text-[10px] font-black text-slate-700 group-hover:text-slate-900 uppercase tracking-tighter transition-colors block">{opt.label}</span>
+                      <span className="text-[9px] text-slate-500 group-hover:text-slate-600">{opt.desc}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {/* Show available reserved stock if applicable */}
+              {stockSource === 'sold-reserved' && (Array.isArray(stockReserved.selectedLocations) && stockReserved.selectedLocations.length > 0) && (
+                <div className="mt-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
+                  <div className="text-[10px] font-bold text-blue-800">
+                    Available Reserved: {stockReserved.stockLevel || 0} {stockReserved.stockUnit || 'bags'}
+                  </div>
+                  <div className="text-[9px] text-blue-700 mt-1">
+                    Locations: {stockReserved.selectedLocations.join(', ')}
+                  </div>
+                </div>
+              )}
+              {stockSource === 'sold-reserved' && !(Array.isArray(stockReserved.selectedLocations) && stockReserved.selectedLocations.length > 0) && (
+                <div className="mt-4 p-3 bg-yellow-100 rounded-lg border-l-4 border-yellow-500">
+                  <div className="text-[10px] font-bold text-yellow-800">
+                    ⚠️ No reserved stock available. Add stock in 'Stock Reserved' card first.
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="space-y-6">

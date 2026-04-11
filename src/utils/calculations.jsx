@@ -16,8 +16,12 @@ export function computeAll(inputs, options = {}) {
   const contractorShareFactor = contractorSharePercentage / 100
   const ownerShareFactor = 1 - contractorShareFactor
   
+  // Stock source for rotation system
+  const stockSource = options?.stockSource || 'freshly-harvested'
+  const stockReserved = options?.stockReserved || {}
+  
   // parse inputs safely
-  const packedBags = Math.max(0, Math.floor(safeNum(inputs.packedBags)))
+  let packedBags = Math.max(0, Math.floor(safeNum(inputs.packedBags)))
   const deductedBags = Math.max(0, Math.floor(safeNum(inputs.deductedBags)))
   const pricePerBag = safeNum(inputs.pricePerBag)
   const cashReceived = safeNum(inputs.cashReceived)
@@ -25,6 +29,24 @@ export function computeAll(inputs, options = {}) {
   const packingFeePerBag = safeNum(inputs.packingFeePerBag)
   const bagCostPerUnit = safeNum(inputs.bagCostPerUnit)
   const otherExpenses = safeNum(inputs.otherExpenses)
+  
+  // Stock source tracking - deduct from reserved if applicable
+  let reservedStockDeducted = 0
+  if (stockSource === 'sold-reserved' && stockReserved.stockLevel) {
+    const reservedQty = stockReserved.stockUnit === 'kg' 
+      ? (Number(stockReserved.stockLevel) || 0) / 50 
+      : (Number(stockReserved.stockLevel) || 0)
+    reservedStockDeducted = Math.min(packedBags, reservedQty)
+    packedBags = Math.max(0, packedBags - reservedStockDeducted)
+  } else if (stockSource === 'mixed' && stockReserved.stockLevel) {
+    // For mixed, calculate how much is from reserved vs fresh (future enhancement)
+    // For now, treat similar to sold-reserved
+    const reservedQty = stockReserved.stockUnit === 'kg' 
+      ? (Number(stockReserved.stockLevel) || 0) / 50 
+      : (Number(stockReserved.stockLevel) || 0)
+    reservedStockDeducted = Math.min(packedBags, reservedQty / 2) // Use 50% of reserved for mixed
+  }
+  
   // extra expenses array: [{id, label, amount}]
   const extraExpenses = Array.isArray(inputs.extraExpenses) ? inputs.extraExpenses : []
   const extraExpensesTotal = extraExpenses.reduce((s, it) => s + safeNum(it.amount), 0)
@@ -184,6 +206,8 @@ export function computeAll(inputs, options = {}) {
     finalInayaAfterZakat: round2(finalInayaAfterZakat),
     finalShakiraAfterZakat: round2(finalShakiraAfterZakat),
     highlights,
+    stockSource,
+    reservedStockDeducted: Math.round(reservedStockDeducted),
   }
 }
 

@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react'
 import InputSection from './components/InputSection.jsx'
 import DisasterRecoveryCard from './components/DisasterRecoveryCard.jsx'
+import StockReservedCard from './components/StockReservedCard.jsx'
 import ResultSection from './components/ResultSection.jsx'
 import DashboardSummary from './components/DashboardSummary.jsx'
 import AuthModal from './components/AuthModal.jsx'
@@ -9,6 +10,7 @@ import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFilesFromSupabase, savePdfFileToSupabase } from './api/reports.js'
+import { saveStockReservedToSupabase } from './api/stockReserved.js'
 import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment, getAdminPendingPayments, activatePaymentRequestAsAdmin } from './api/billing.js'
 import { useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
@@ -229,6 +231,42 @@ export default function App(){
     return defaultInputs
   })
 
+  // Stock Reserved state
+  const [stockReserved, setStockReserved] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stockReserved')
+      return saved ? JSON.parse(saved) : {
+        stockLevel: '',
+        stockUnit: 'bags',
+        estimatedPrice: '',
+        selectedLocations: [],
+        fromDate: '',
+        toDate: '',
+      }
+    } catch {
+      return {
+        stockLevel: '',
+        stockUnit: 'bags',
+        estimatedPrice: '',
+        selectedLocations: [],
+        fromDate: '',
+        toDate: '',
+      }
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stockReserved', JSON.stringify(stockReserved))
+    } catch (e) {}
+  }, [stockReserved])
+
+  // Stock source selection (for stock rotation system)
+  const [stockSource, setStockSource] = useState('freshly-harvested')
+
+  // Ref for scrolling to input section
+  const inputSectionRef = useRef(null)
+
   // Auto-set contractorSharePercentage to 0% when Labour Costs are added
   useEffect(() => {
     const labourCosts = Array.isArray(inputs.labourCosts) ? inputs.labourCosts : []
@@ -368,6 +406,36 @@ export default function App(){
       monthly: 'Monthly',
       quarterly: 'Quarterly',
       yearly: 'Yearly',
+      stockReserved: 'Stock Reserved',
+      quantityUnit: 'QUANTITY UNIT',
+      stockLevel: 'STOCK LEVEL',
+      stockLevelPlaceholder: '0',
+      estimatedPriceLKR: 'ESTIMATED PRICE (LKR)',
+      estimatedPricePlaceholder: '0.00',
+      locationsMultiple: 'LOCATIONS (MULTIPLE)',
+      selectLocationToAdd: '+ SELECT LOCATION TO ADD...',
+      addNewLocation: '+ OR ADD NEW LOCATION',
+      cancelManualEntry: '- CANCEL MANUAL ENTRY',
+      enterLocationName: 'Enter location name',
+      add: 'ADD',
+      noLocationsAvailable: 'No locations available. Add locations in Dashboard.',
+      fromDate: 'FROM DATE',
+      toDate: 'TO DATE',
+      packingCostBreakdown: 'PACKING COST BREAKDOWN',
+      fromLabourCard: 'from Labour Cost card',
+      labourCost: 'Labour Cost',
+      totalPackingCost: 'TOTAL PACKING COST',
+      stockSummary: 'STOCK SUMMARY',
+      locations: 'Locations',
+      totalEstimatedPrice: 'Total Estimated Price',
+      period: 'Period',
+      saveStockReserved: 'Save Stock Reserved',
+      approxBagFormat: 'Approx {qty} bags (50kg/bag)',
+      bagsFromKg: 'bags (kg÷50)',
+      stockSource: 'STOCK SOURCE',
+      soldReservedStock: 'Sold Reserved Stock',
+      freshlyHarvested: 'Freshly Harvested',
+      mixedStockReservedAndFresh: 'Mixed (Reserved + Fresh)',
     },
     ta: {
       title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
@@ -501,6 +569,36 @@ export default function App(){
       yearly: 'ஆண்டு',
       amount: 'மொத்த தொகை (LKR)',
       noRecordsLabourLog: 'தொழிலாளர் பதிவுகள் எதுவும் இல்லை',
+      stockReserved: 'பதிவுசெய்யப்பட்ட உப்பு',
+      quantityUnit: 'அளவு அலகு',
+      stockLevel: 'உப்பு அளவு',
+      stockLevelPlaceholder: '0',
+      estimatedPriceLKR: 'மதிப்பிடப்பட்ட விலை (LKR)',
+      estimatedPricePlaceholder: '0.00',
+      locationsMultiple: 'இடங்கள் (பல)',
+      selectLocationToAdd: '+ சேர்க்க இடத்தைத் தேர்ந்தெடுக்கவும்...',
+      addNewLocation: '+ அல்லது புதிய இடத்தைச் சேர்க்கவும்',
+      cancelManualEntry: '- கைமுறை உள்ளீட்டை ரத்து செய்க',
+      enterLocationName: 'இடப் பெயரை உள்ளிடவும்',
+      add: 'சேர்க்க',
+      noLocationsAvailable: 'இடங்கள் கிடைக்கவில்லை. டாஷ்போர்டில் இடங்களைச் சேர்க்கவும்.',
+      fromDate: 'தொடக்க தேதி',
+      toDate: 'முடிவு தேதி',
+      packingCostBreakdown: 'பதிவு செலவு உடைப்பு',
+      fromLabourCard: 'தொழிலாளர் செலவு கார்டிலிருந்து',
+      labourCost: 'தொழிலாளர் செலவு',
+      totalPackingCost: 'மொத்த பதிவு செலவு',
+      stockSummary: 'உப்பு சுருக்கம்',
+      locations: 'இடங்கள்',
+      totalEstimatedPrice: 'மொத்த மதிப்பிடப்பட்ட விலை',
+      period: 'காலம்',
+      saveStockReserved: 'பதிவுசெய்யப்பட்ட உப்பைச் சேமிக்கவும்',
+      approxBagFormat: 'சுமார் {qty} மூட்டைகள் (50கிலோ/மூட்டை)',
+      bagsFromKg: 'மூட்டைகள் (கிலோ÷50)',
+      stockSource: 'உப்பு மூலம்',
+      soldReservedStock: 'விற்கப்பட்ட பதிவுசெய்யப்பட்ட உப்பு',
+      freshlyHarvested: 'புதிதாக அறுவடை செய்யப்பட்ட',
+      mixedStockReservedAndFresh: 'கலவை (பதிவுசெய்யப்பட்ட + உப்பு)',
     },
     si: {
       title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
@@ -634,6 +732,31 @@ export default function App(){
       monthly: 'මාසිකව',
       quarterly: 'කාර්තුවකට වරක්',
       yearly: 'වාර්ෂිකව',
+      stockReserved: 'සංරක්ෂිත ලුණු',
+      quantityUnit: 'ප්‍රමාණ ඒකක',
+      stockLevel: 'ලුණු ප්‍රමාණය',
+      stockLevelPlaceholder: '0',
+      estimatedPriceLKR: 'ස්ථිර මිල (LKR)',
+      estimatedPricePlaceholder: '0.00',
+      locationsMultiple: 'ස්ථාන (බහුවිධ)',
+      selectLocationToAdd: '+ එක් කිරීමට ස්ථානය තෝරන්න...',
+      addNewLocation: '+ හෝ නව ස්ථානය එක් කරන්න',
+      cancelManualEntry: '- සручно අත්‍යාવශ්‍යත සම්පાදනය අවලංඩු කරන්න',
+      enterLocationName: 'ස්ථාන නම ඇතුළත් කරන්න',
+      add: 'එක් කරන්න',
+      noLocationsAvailable: 'ස්ථාන ලබා ගැනීමට නොහැකි විය. ඩෑෂ්බෝර්ඩ් එකෙහි ස්ථාන එක් කරන්න.',
+      fromDate: 'ආරම්භක දිනය',
+      toDate: 'අවසාන දිනය',
+      packingCostBreakdown: 'ඇසිරීමේ මිල බිඩීම',
+      fromLabourCard: 'සේවක වියදම් කාඩ්පත සිට',
+      labourCost: 'සේවක වියදම',
+      totalPackingCost: 'මුළු ඇසිරීමේ මිල',
+      stockSummary: 'ලුණු සාරාංශය',
+      locations: 'ස්ථාන',
+      totalEstimatedPrice: 'මුළු ස්ථිර මිල',
+      period: 'කාලය',
+      saveStockReserved: 'සංරක්ෂිත ලුණු සුරකින්න',
+      approxBagFormat: 'සుමාරු {qty} මලු (50kg/මල්ල)',
     }
   }
 
@@ -893,13 +1016,13 @@ export default function App(){
   // compute on every input change or when contractor share percentage changes
   useEffect(()=>{
     try {
-      const res = computeAll(inputs, { contractorSharePercentage, ownerCount })
+      const res = computeAll(inputs, { contractorSharePercentage, ownerCount, stockSource, stockReserved })
       setResults(res)
       localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs))
     } catch (e) {
       console.error('Error in computeAll or localStorage:', e)
     }
-  }, [inputs, contractorSharePercentage, ownerCount])
+  }, [inputs, contractorSharePercentage, ownerCount, stockSource, stockReserved])
 
   // Single-owner mode: ensure second owner loan does not affect persisted inputs/reports.
   useEffect(() => {
@@ -909,7 +1032,22 @@ export default function App(){
   }, [ownerCount, inputs.loanShakira])
 
   const reset = () => {
-    setInputs(defaultInputs)
+    // Check if location and date are provided (mandatory fields)
+    if (!inputs.location || !inputs.date) {
+      // Scroll to input section
+      inputSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      alert('Please fill in Location and Date in Document Details before resetting.')
+      return
+    }
+    
+    // Reset inputs but keep location and date for context
+    setInputs(prev => ({
+      ...defaultInputs,
+      location: prev.location,
+      date: prev.date,
+      buyerName: '',
+      billNumber: '',
+    }))
     setResults(null)
     try { localStorage.removeItem(STORAGE_KEY) } catch(e){}
   }
@@ -989,6 +1127,41 @@ export default function App(){
         return
       }
       alert(`${t('saveError')}: ${e.message || e}`)
+    }
+  }
+
+  const saveStockReserved = async () => {
+    if (!session?.user?.id) {
+      alert('Please sign in to save stock reserved records')
+      handleOpenAuth('signin')
+      return
+    }
+
+    if (!stockReserved.stockLevel || !stockReserved.estimatedPrice || !stockReserved.fromDate || !stockReserved.toDate) {
+      alert('Please fill in Stock Level, Estimated Price, and Date Range to save')
+      return
+    }
+
+    try {
+      const totalEstimatedPrice = (Number(stockReserved.stockLevel) || 0) * (Number(stockReserved.estimatedPrice) || 0)
+      const payload = {
+        ...stockReserved,
+        totalEstimatedPrice,
+      }
+
+      const resp = await saveStockReservedToSupabase(payload, session)
+      if (resp && resp.ok) {
+        alert('Stock Reserved record saved successfully!')
+        // Clear or reset the form if desired
+        return true
+      } else {
+        alert(`Failed to save: ${resp.error}`)
+        return false
+      }
+    } catch (e) {
+      console.error('Error saving stock reserved:', e)
+      alert(`Error saving stock reserved: ${e.message || e}`)
+      return false
     }
   }
 
@@ -1072,24 +1245,39 @@ export default function App(){
               </div>
             </button>
 
-            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} />
+            <InputSection inputs={inputs} setInput={setInputs} reset={reset} toggleLoans={toggleLoans} t={t} lang={lang} setLang={setLang} customLocations={customLocations} ownerNames={activeOwnerNames} ownerCount={ownerCount} stockReserved={stockReserved} stockSource={stockSource} setStockSource={setStockSource} />
+            
             {/* Disaster Recovery toggle and card */}
             <div className="mt-4 flex flex-col items-center w-full">
               <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
-                <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
-                  <AccordionCard
-                    title={t('disasterExpenses')}
-                    icon={<span className="text-2xl">🌊</span>}
-                    defaultOpen={showDisasterRecovery}
-                    bgColor="#ffe4ef"
-                  >
-                    <DisasterRecoveryCard
-                      value={disasterRecovery}
-                      onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
-                      t={t}
-                    />
-                  </AccordionCard>
-                </div>
+                <AccordionCard
+                  title={t('disasterExpenses')}
+                  icon={<span className="text-2xl">🌊</span>}
+                  defaultOpen={showDisasterRecovery}
+                  bgColor="#ffe4ef"
+                >
+                  <DisasterRecoveryCard
+                    value={disasterRecovery}
+                    onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
+                    t={t}
+                  />
+                </AccordionCard>
+              </div>
+            </div>
+
+            {/* Stock Reserved Card */}
+            <div className="mt-4 flex flex-col items-center w-full">
+              <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+                <StockReservedCard
+                  stockReserved={stockReserved}
+                  onStockReservedChange={(field, val) => setStockReserved(prev => ({ ...prev, [field]: val }))}
+                  customLocations={customLocations}
+                  onAddLocation={(location) => setCustomLocations([...customLocations, location])}
+                  onSave={saveStockReserved}
+                  t={t}
+                  labourCostsTotal={results?.labourCostsTotal || 0}
+                  bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
+                />
               </div>
             </div>
           </div>
