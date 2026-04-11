@@ -284,7 +284,7 @@ export default function InputSection({ inputs, setInput, reset, toggleLoans, t, 
 
         {(inputs.labourCosts || []).length > 0 && (
           <div className="space-y-4">
-            {(inputs.labourCosts || []).map(labour => (
+            {[...(inputs.labourCosts || [])].reverse().map(labour => (
               <div key={labour.id} className="relative bg-white/50 border-2 border-purple-100 rounded-[28px] p-4 md:p-5 shadow-xl rounded-[28px] backdrop-blur-md">
                 <button
                   type="button"

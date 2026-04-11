@@ -78,7 +78,7 @@ export default function DashboardSummary({
           <button onClick={onClose} className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 hover:bg-purple-100 transition active:scale-95 text-lg font-bold">✕</button>
         </div>
 
-        <div className="overflow-y-auto p-4 sm:p-6 space-y-6">
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-6 pb-9">
           {/* User Profile and Auth */}
           <section className="overflow-hidden rounded-3xl border border-purple-100 bg-white shadow-sm">
             <div className="flex flex-col gap-4 bg-gradient-to-r from-purple-700 to-indigo-600 px-6 py-5 text-white">
@@ -263,6 +263,13 @@ export default function DashboardSummary({
                </table>
              </div>
           </section>
+
+          {/* Copyright Footer */}
+          <div className="text-center py-6 border-t border-purple-100 mt-2">
+            <p className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase">
+              Copyright © {new Date().getFullYear()} | Fixmation (Pvt) Ltd
+            </p>
+          </div>
         </div>
       </div>
     </div>
