@@ -119,7 +119,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
             </div>
 
             {!isSingleOwner && (
-              <div className="android-card p-6 bg-emerald-50 border border-emerald-100">
+              <div className="android-card p-6 border border-emerald-100" style={{ backgroundColor: "#d0fedd" }}>
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm font-bold text-slate-700">{owner2Name} - {t ? t('finalShare') : 'Final Share'}</span>
                   {results.loanShakira > 0 && (

@@ -1367,12 +1367,12 @@ export default function App(){
             {/* Phase 1 Dashboard Grid Prototype */}
             <div className="grid grid-cols-2 gap-2 mb-8">
               {[
-                { id: 'setup', title: 'Setup', sub: 'Location, Date & Buyer', icon: '📋', color: 'bg-blue-50' },
-                { id: 'revenue', title: 'Revenue', sub: 'Bags, Price & Source', icon: '📦', color: 'bg-green-50' },
-                { id: 'costs', title: 'Costs', sub: 'Expenses & Fees', icon: '🏭', color: 'bg-purple-50' },
-                { id: 'labour', title: 'Labour', sub: 'Service Log', icon: '👷', color: 'bg-orange-50' },
-                { id: 'inventory', title: 'Inventory', sub: 'Stock Reserved', icon: '💾', color: 'bg-cyan-50' },
-                { id: 'disaster', title: 'Disaster', sub: 'Recovery Costs', icon: '🌊', color: 'bg-red-50' }
+                { id: 'setup', title: 'Setup', sub: 'Location, Date & Buyer', icon: '📋', color: 'bg-[#cdebf9]' },
+                { id: 'revenue', title: 'Revenue', sub: 'Bags, Price & Source', icon: '📦', color: 'bg-[#ffe4c4]' },
+                { id: 'costs', title: 'Costs', sub: 'Expenses & Fees', icon: '🏭', color: 'bg-[#ffffd8]' },
+                { id: 'labour', title: 'Labour', sub: 'Service Log', icon: '👷', color: 'bg-[#fad8fa]' },
+                { id: 'inventory', title: 'Inventory', sub: 'Stock Reserved', icon: '💾', color: 'bg-[#ecffb1]' },
+                { id: 'disaster', title: 'Disaster', sub: 'Recovery Costs', icon: '🌊', color: 'bg-[#ffe4ee]' }
               ].map(module => (
                 <button
                   key={module.id}
@@ -1559,7 +1559,7 @@ export default function App(){
         </div>
 
 
-        {results && <ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} />}
+        {results && <div className="mb-5"><ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} /></div>}
 
         {/* Hidden/off-screen printable area */}
         {results && (
