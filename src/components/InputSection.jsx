@@ -263,19 +263,19 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
         icon="📝"
         onReset={resetRevenueAndExpenses}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
           {(activeModule === 'revenue' || !activeModule) && (
           <div className={`space-y-6 ${contractorSectionDisabled ? 'opacity-50 pointer-events-none select-none' : ''}`}> 
             <div className="flex items-center gap-2 mb-2 p-3 bg-blue-50 rounded-2xl border-2 border-blue-100">
               <span className="text-xl">📦</span>
-              <div className="text-xs font-semibold text-blue-900 tracking-tight">{tr('totalCurrentSaltSale')}</div>
+              <div className="text-base font-semibold text-blue-900 tracking-tight">{tr('totalCurrentSaltSale')}</div>
             </div>
             <NumberInput label={tr('totalSaltPackedBags', 'PACKED BAGS')} name="packedBags" value={inputs?.packedBags} onChange={onChange} decimals={null} />
             <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs?.deductedBags} onChange={onChange} decimals={null} />
             <NumberInput label={tr('pricePerBag', 'PRICE PER BAG (LKR)')} name="pricePerBag" value={inputs?.pricePerBag} onChange={onChange} decimals={2} />
 
             <div className="bg-slate-50 p-4 lg:p-6 rounded-[28px] border-2 border-blue-100">
-              <div className="text-[10px] text-blue-500 uppercase tracking-tight mb-4">{tr('stockSource', 'STOCK SOURCE')}</div>
+              <div className="text-sm font-semibold text-blue-500 uppercase tracking-tight mb-4">{tr('stockSource', 'STOCK SOURCE')}</div>
               <div className="flex flex-col gap-3">
                 {[
                   { id: 'freshly-harvested', label: tr('freshlyHarvested', 'Freshly harvested'), desc: tr('freshlyHarvestedDesc', 'New salt from harvest') },
@@ -292,8 +292,8 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                       className="w-5 h-5 text-blue-600 focus:ring-0 border-2 border-slate-300 mt-0.5" 
                     />
                     <div className="flex-1">
-                      <span className="text-[10px] text-slate-700 group-hover:text-slate-900 tracking-tight transition-colors block normal-case font-normal">{opt.label}</span>
-                      <span className="text-[9px] text-slate-500 group-hover:text-slate-600 normal-case font-normal">{opt.desc}</span>
+                      <span className="text-xs text-slate-700 group-hover:text-slate-900 tracking-tight transition-colors block normal-case font-semibold">{opt.label}</span>
+                      <span className="text-[10px] text-slate-500 group-hover:text-slate-600 normal-case font-normal">{opt.desc}</span>
                     </div>
                   </label>
                 ))}
@@ -330,7 +330,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
             </div>
             
             <div className={`bg-slate-50 p-4 lg:p-6 rounded-[28px] border-2 border-slate-100 ${contractorSectionDisabled ? 'opacity-60 pointer-events-none' : ''}`}>
-              <div className="text-[10px] text-slate-500 uppercase tracking-tight mb-4">{tr('costResponsibility')}</div>
+              <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-4">{tr('costResponsibility')}</div>
               <div className="flex flex-col gap-4">
                 {[
                   { id: 'owners', label: tr('expenseOwners', 'Owners responsibility') },
@@ -339,7 +339,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                 ].map(opt => (
                   <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
                     <input type="radio" name="expensePayment" value={opt.id} checked={(inputs?.expensePayment || 'owners') === opt.id} onChange={(e) => onChange('expensePayment', e.target.value)} disabled={contractorSectionDisabled} className={`w-5 h-5 text-purple-600 focus:ring-0 border-2 border-slate-300 ${contractorSectionDisabled ? 'cursor-not-allowed opacity-50' : ''}`} />
-                    <span className="text-[10px] text-slate-500 group-hover:text-slate-900 tracking-tight transition-colors normal-case font-normal">{opt.label}</span>
+                    <span className="text-xs text-slate-500 group-hover:text-slate-900 tracking-tight transition-colors normal-case font-semibold">{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -373,7 +373,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                <span className="text-xl">💰</span>
                <div className="text-xs font-semibold text-emerald-900 uppercase tracking-tight">{tr('income', 'NET SETTLEMENT')}</div>
             </div>
-            <NumberInput label={tr('cashReceived', 'PHYSICAL CASH (LKR)')} name="cashReceived" value={inputs?.cashReceived} onChange={onChange} decimals={2} tooltip={tr('cashAutoHint', 'AUTO-CALCULATED FROM NET SALES; OVERRIDE IF NEEDED')} />
+            <NumberInput label={tr('cashReceived', 'PHYSICAL CASH (LKR)')} name="cashReceived" value={inputs?.cashReceived} onChange={onChange} decimals={2} tooltip={tr('cashAutoHint', 'Automatically displayed, you may override the amount')} />
             <NumberInput label={tr('chequeReceived', 'BANK CHEQUES (LKR)')} name="chequeReceived" value={inputs?.chequeReceived} onChange={onChange} decimals={2} />
             
             <div className={`mt-12 bg-indigo-50/50 rounded-[28px] border-2 border-indigo-100 transition-all duration-300 ${(inputs?.bothOwnersHaveLoans) ? 'p-6' : 'p-0 flex items-center min-h-[64px]'}`}>
@@ -424,98 +424,89 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
 
       {(activeModule === 'labour' || !activeModule) && (
       <AccordionCard 
-        title={tr('labourCosts', 'Labour Costs')} 
-        bgColor="#eed3ff" 
-        defaultOpen={!activeModule ? false : true}
+        title={tr('labour', 'LABOUR DETAILS')} 
+        bgColor="#ffe4ff" 
+        defaultOpen={true}
         icon="👷"
         onReset={resetLabourCosts}
       >
-        <div className="mb-6">
+        <div className="space-y-4">
           <button 
-            type="button" 
+            type="button"
             onClick={addLabourCost} 
-            className="w-full bg-white/40 hover:bg-white/60 border-2 border-dashed border-purple-300 rounded-[28px] px-6 py-5 text-purple-700 font-black transition-all active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-widest text-[11px] shadow-sm"
+            className="w-full bg-white border-2 border-dashed border-purple-200 rounded-[28px] px-6 py-4 text-purple-600 font-bold hover:bg-purple-50 transition-all uppercase tracking-widest text-[10px]"
           >
-            {tr('addLabourCostEntry', '+ ADD LABOUR COST ENTRY')}
+            + {tr('addLabourCostEntry', 'ADD LABOUR COST ENTRY')}
           </button>
-        </div>
 
-        {(inputs?.labourCosts || []).length > 0 && (
-          <div className="space-y-4">
-            {[...(inputs?.labourCosts || [])].reverse().map(labour => (
-              <div key={labour.id} className="relative bg-white/50 border-2 border-purple-100 rounded-[28px] p-4 md:p-5 shadow-xl rounded-[28px] backdrop-blur-md">
-                <button
-                  type="button"
-                  onClick={() => removeLabourCost(labour.id)}
-                  className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 transition-transform hover:rotate-90 shadow-sm font-bold z-10"
-                  title="REMOVE"
-                >
-                  ✕
-                </button>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                  <label className="block w-full">
-                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('labourNameRole', 'Labour Name / Role')}</div>
-                    <input
-                      type="text"
-                      value={labour.name || ''}
-                      onChange={(e) => updateLabourCost(labour.id, 'name', e.target.value)}
-                      placeholder="e.g., Master Worker"
-                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 placeholder-slate-300 focus:border-slate-900 outline-none transition-all font-semibold text-sm"
-                    />
-                  </label>
+          {(inputs?.labourCosts || []).length === 0 ? (
+            <div className="text-center py-8 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+              {tr('noRecordsInLabourLog', 'NO RECORDS IN LABOUR LOG')}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(inputs?.labourCosts || []).map(entry => (
+                <div key={entry.id} className="bg-white/50 border-2 border-purple-100 rounded-[24px] p-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-purple-900 tracking-tighter"># {entry.id.toString().slice(-4)}</span>
+                    <button type="button" onClick={() => removeLabourCost(entry.id)} className="text-rose-400 hover:text-rose-600 font-bold transition">✕</button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <label className="block">
+                      <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('labourNameRole', 'Name / Role')}</div>
+                      <input 
+                        type="text" 
+                        value={entry.name || ''} 
+                        onChange={(e) => updateLabourCost(entry.id, 'name', e.target.value.toUpperCase())}
+                        placeholder="..."
+                        className="w-full bg-white border-2 border-slate-200 rounded-[20px] px-4 py-3 text-slate-900 focus:border-purple-500 outline-none font-bold text-xs uppercase"
+                      />
+                    </label>
 
-                  <label className="block w-full">
-                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('dateOfService', 'Date of Service')}</div>
-                    <input
-                      type="date"
-                      value={labour.date || ''}
-                      onChange={(e) => updateLabourCost(labour.id, 'date', e.target.value)}
-                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 focus:border-slate-900 outline-none transition-all font-semibold text-sm"
-                    />
-                  </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="block">
+                        <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('dateOfService', 'Date')}</div>
+                        <input 
+                          type="date" 
+                          value={entry.date || ''} 
+                          onChange={(e) => updateLabourCost(entry.id, 'date', e.target.value)}
+                          className="w-full bg-white border-2 border-slate-200 rounded-[20px] px-4 py-3 text-slate-900 focus:border-purple-500 outline-none font-bold text-xs"
+                        />
+                      </label>
 
-                  <label className="block w-full">
-                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('paymentFrequency', 'Payment Frequency')}</div>
-                    <div className="relative w-full">
-                      <select
-                        value={labour.frequency || 'Weekly'}
-                        onChange={(e) => updateLabourCost(labour.id, 'frequency', e.target.value)}
-                        className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 focus:border-slate-900 outline-none transition-all appearance-none cursor-pointer font-semibold text-sm"
-                      >
-                        <option value="Weekly">{tr('weekly', 'Weekly')}</option>
-                        <option value="Fortnightly">{tr('fortnightly', 'Fortnightly')}</option>
-                        <option value="Monthly">{tr('monthly', 'Monthly')}</option>
-                        <option value="Quarterly">{tr('quarterly', 'Quarterly')}</option>
-                        <option value="Yearly">{tr('yearly', 'Yearly')}</option>
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 text-xs">
-                        ▼
-                      </div>
+                      <label className="block">
+                        <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('paymentFrequency', 'Frequency')}</div>
+                        <select 
+                          value={entry.frequency || 'Weekly'} 
+                          onChange={(e) => updateLabourCost(entry.id, 'frequency', e.target.value)}
+                          className="w-full bg-white border-2 border-slate-200 rounded-[20px] px-4 py-3 text-slate-900 focus:border-purple-500 outline-none appearance-none font-bold text-xs"
+                        >
+                          <option value="Weekly">{tr('weekly', 'Weekly')}</option>
+                          <option value="Fortnightly">{tr('fortnightly', 'Fortnightly')}</option>
+                          <option value="Monthly">{tr('monthly', 'Monthly')}</option>
+                          <option value="Yearly">{tr('yearly', 'Yearly')}</option>
+                        </select>
+                      </label>
                     </div>
-                  </label>
 
-                  <label className="block w-full">
-                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('amount', 'Total Amount (LKR)')}</div>
-                    <input
-                      type="number"
-                      step="any"
-                      value={labour.amount === '' ? '' : labour.amount}
-                      onChange={(e) => updateLabourCost(labour.id, 'amount', e.target.value)}
-                      placeholder="0.00"
-                      className="w-full bg-slate-50/50 border-2 border-slate-400 rounded-[24px] px-4 py-4 text-slate-900 placeholder-slate-300 focus:border-slate-900 outline-none transition-all font-semibold text-sm"
-                    />
-                  </label>
+                    <label className="block">
+                      <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('totalAmountLkr', 'Total Amount (LKR)')}</div>
+                      <input 
+                        type="number" 
+                        step="any" 
+                        value={entry.amount || ''} 
+                        onChange={(e) => updateLabourCost(entry.id, 'amount', e.target.value)}
+                        placeholder="0.00"
+                        className="w-full bg-white border-2 border-slate-200 rounded-[20px] px-4 py-3 text-slate-900 focus:border-purple-500 outline-none font-bold text-xs"
+                      />
+                    </label>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {(inputs?.labourCosts || []).length === 0 && (
-          <div className="py-12 text-center">
-             <div className="text-[10px] text-purple-400 font-black uppercase tracking-[0.2em] italic">{tr('noRecordsLabourLog', 'NO RECORDS IN LABOUR LOG')}</div>
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </AccordionCard>
       )}
 

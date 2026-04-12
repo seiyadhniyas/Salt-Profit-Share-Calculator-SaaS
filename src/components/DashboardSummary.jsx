@@ -8,11 +8,12 @@ function StatCard({ title, value, note, accent = 'slate', isTamil }) {
     green: 'from-emerald-600 to-teal-500',
     purple: 'from-purple-600 to-indigo-500',
     amber: 'from-amber-500 to-orange-400',
+    gradient: 'from-pink-500 via-purple-500 to-indigo-500',
   }
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-      <div className={`inline-flex rounded-full bg-gradient-to-r ${accentMap[accent]} px-3 py-1 ${isTamil ? 'text-[0.6rem]' : 'text-xs'} font-semibold uppercase tracking-[0.05em] text-white`}>
+      <div className={`inline-flex rounded-full bg-gradient-to-r ${accentMap[accent] || accentMap['gradient']} px-3 py-1 ${isTamil ? 'text-[0.6rem]' : 'text-xs'} font-semibold uppercase tracking-[0.05em] text-white`}>
         {title}
       </div>
       <div className={`mt-3 ${isTamil ? 'text-lg' : 'text-2xl'} font-bold text-slate-900 break-words`}>{value}</div>
@@ -72,13 +73,13 @@ export default function DashboardSummary({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center p-0 sm:p-4">
-      <div className="w-full max-w-4xl max-h-[95vh] overflow-hidden rounded-t-[32px] sm:rounded-[32px] bg-[#fdf2ff] shadow-2xl flex flex-col transition-all">
+      <div className="w-full max-w-4xl max-h-[95vh] flex flex-col rounded-t-[32px] sm:rounded-[32px] bg-[#fdf2ff] shadow-2xl transition-all">
         <div className="flex items-center justify-between px-6 py-4 border-b border-purple-100 bg-white">
           <h2 className="text-lg font-black text-purple-900 uppercase tracking-tight">{tr('dashboard', 'Dashboard')}</h2>
           <button onClick={onClose} className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 hover:bg-purple-100 transition active:scale-95 text-lg font-bold">✕</button>
         </div>
 
-        <div className="overflow-y-auto p-4 sm:p-6 space-y-6 pb-9">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 pb-9 custom-scrollbar">
           {/* User Profile and Auth */}
           <section className="overflow-hidden rounded-3xl border border-purple-100 bg-white shadow-sm">
             <div className="flex flex-col gap-4 bg-gradient-to-r from-purple-700 to-indigo-600 px-6 py-5 text-white">

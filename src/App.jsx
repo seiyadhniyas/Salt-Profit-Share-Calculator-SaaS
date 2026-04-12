@@ -427,8 +427,8 @@ export default function App(){
       noLocationsAvailable: 'No locations available. Add locations in Dashboard.',
       fromDate: 'FROM DATE',
       toDate: 'TO DATE',
-      packingCostBreakdown: 'PACKING COST BREAKDOWN',
-      fromLabourCard: 'from Labour Cost card',
+      packingCostBreakdown: 'PACKING COST DETAILS',
+      fromLabourCard: 'from Labour Cost section',
       labourCost: 'Labour Cost',
       totalPackingCost: 'TOTAL PACKING COST',
       stockSummary: 'STOCK SUMMARY',
@@ -1449,7 +1449,7 @@ export default function App(){
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-14 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
         <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-5">
-          <div className="absolute left-3 top-3 sm:left-5 sm:top-4">
+          <div className="absolute left-3 top-3 sm:left-5 sm:top-4" style={{paddingLeft: '10px'}}>
             <select 
               value={lang} 
               onChange={(e) => setLang(e.target.value)} 
@@ -1466,6 +1466,7 @@ export default function App(){
             onClick={() => setMenuOpen(true)}
             className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-5 sm:top-4"
             aria-label={t('openDashboardMenu')}
+            style={{paddingRight: '10px'}}
           >
             <span className="text-lg leading-none">☰</span>
             <span className="hidden sm:inline">{t('dashboard')}</span>
@@ -1505,18 +1506,23 @@ export default function App(){
             {/* Phase 1 Dashboard Grid Prototype */}
             <div className="grid grid-cols-2 gap-2 mb-8">
               {[
-                { id: 'setup', title: t('setup'), sub: t('locationDateBuyer'), icon: '📋', color: 'bg-[#cdebf9]' },
-                { id: 'revenue', title: t('revenue'), sub: t('bagsPriceSource'), icon: '📦', color: 'bg-[#ffe4c4]' },
-                { id: 'costs', title: t('costs'), sub: t('expensesFees'), icon: '🏭', color: 'bg-[#ffffd8]' },
-                { id: 'labour', title: t('labour'), sub: t('serviceLog'), icon: '👷', color: 'bg-[#fad8fa]' },
-                { id: 'inventory', title: t('inventory'), sub: t('stockReservedSub'), icon: '💾', color: 'bg-[#ecffb1]' },
-                { id: 'disaster', title: t('disaster'), sub: t('recoveryCosts'), icon: '🌊', color: 'bg-[#ffe4ee]' }
+                { id: 'setup', title: t('setup'), sub: t('locationDateBuyer'), icon: '📋', color: 'bg-[#cdebf9]', num: '1' },
+                { id: 'revenue', title: t('revenue'), sub: t('bagsPriceSource'), icon: '📦', color: 'bg-[#ffe4c4]', num: '2' },
+                { id: 'costs', title: t('costs'), sub: t('expensesFees'), icon: '🏭', color: 'bg-[#ffffd8]', num: '3' },
+                { id: 'labour', title: t('labour'), sub: t('serviceLog'), icon: '👷', color: 'bg-[#fad8fa]', num: '4' },
+                { id: 'inventory', title: t('inventory'), sub: t('stockReservedSub'), icon: '💾', color: 'bg-[#ecffb1]', num: '2a' },
+                { id: 'disaster', title: t('disaster'), sub: t('recoveryCosts'), icon: '🌊', color: 'bg-[#ffe4ee]', num: '3a' }
               ].map(module => (
                 <button
                   key={module.id}
                   onClick={() => setActiveModule(module.id)}
                   className={`relative p-3 rounded-[32px] ${module.color} border-none android-shadow flex flex-col items-start text-left active:scale-95 transition-all group overflow-hidden h-[140px]`}
                 >
+                  <div className="absolute top-4 right-5 z-20">
+                    <span className="text-xl font-black text-slate-900/20 group-hover:text-slate-900/40 transition-colors">
+                      {module.num}
+                    </span>
+                  </div>
                   <div className="absolute -top-2 -right-2 w-20 h-20 bg-slate-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
                   <div className="w-12 h-12 rounded-2xl bg-slate-900/5 flex items-center justify-center text-2xl mb-3 z-10">
                     {module.icon}
@@ -1533,7 +1539,8 @@ export default function App(){
             {activeModule && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4">
                 <div 
-                  className="w-full h-[92vh] sm:h-auto sm:max-w-4xl bg-[#f8fafc] rounded-t-[40px] sm:rounded-[40px] shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom duration-300"
+                  className="w-full h-[92vh] sm:h-auto sm:max-w-4xl bg-[#f8fafc] rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300"
+                  style={{overflow: 'hidden'}}
                 >
                   <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200 bg-white">
                     <div className="flex items-center gap-3">

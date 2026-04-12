@@ -23,7 +23,7 @@ export default function BottomAccessMenu({ onDownloadPDF, onSave, onCloud, onPL,
         <span className="text-xs">P & L</span>
       </button>
       <button onClick={onDashboard} className="flex flex-col items-center text-slate-700 hover:text-blue-600 focus:outline-none">
-        <span className="text-2xl">🏠</span>
+        <span className="text-2xl">🗂️</span>
         <span className="text-xs">Dashboard</span>
       </button>
     </nav>

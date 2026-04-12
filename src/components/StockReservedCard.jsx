@@ -156,12 +156,11 @@ export default function StockReservedCard({
               >
                 {isManualEntry ? tr('cancelManualEntry', '- CANCEL MANUAL ENTRY') : tr('addNewLocation', '+ OR ADD NEW LOCATION')}
               </button>
-
               {isManualEntry && (
-                <div className="mt-3 flex flex-col sm:flex-row gap-2">
+                <div className="mt-3 flex gap-2">
                   <input
                     type="text"
-                    value={manualLocation}
+                    value={manualLocation || ''}
                     onChange={(e) => setManualLocation(e.target.value)}
                     placeholder={tr('enterLocationName', 'Enter location name')}
                     className="flex-1 bg-slate-50 border-2 border-slate-400 rounded-[28px] px-6 py-4 text-slate-900 placeholder-slate-400 focus:border-slate-900 outline-none font-bold text-sm uppercase"
@@ -253,7 +252,7 @@ export default function StockReservedCard({
         </div>
 
         {/* Stock Summary */}
-        {stockReserved.stockLevel && (
+        {Boolean(stockReserved.stockLevel) && (
           <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-[24px] border-2 border-blue-200">
             <div className="text-[10px] font-black text-blue-900 uppercase tracking-tight mb-4">{tr('stockSummary', 'STOCK SUMMARY')}</div>
             <div className="space-y-3">
