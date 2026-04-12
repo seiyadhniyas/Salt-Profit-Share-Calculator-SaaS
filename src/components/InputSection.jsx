@@ -33,11 +33,42 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   )
 }
 
-export default function InputSection({ inputs = {}, setInput, reset, toggleLoans, t, lang, setLang, customLocations = [], ownerNames = ['', ''], ownerCount = 2, stockReserved = {}, setStockReserved, stockSource = 'freshly-harvested', setStockSource, saveStockReserved, results, bagCostPerUnit, activeModule, recoveryPercentage, setRecoveryPercentage, contractorSharePercentage = 50 }) {
+export default function InputSection({ 
+  inputs = {}, 
+  setInput, 
+  reset, 
+  toggleLoans, 
+  t, 
+  lang, 
+  setLang, 
+  customLocations = [], 
+  ownerNames = ['', ''], 
+  ownerCount = 2, 
+  stockReserved = {}, 
+  setStockReserved, 
+  stockSource = 'freshly-harvested', 
+  setStockSource, 
+  saveStockReserved, 
+  results, 
+  bagCostPerUnit, 
+  activeModule, 
+  recoveryPercentage, 
+  setRecoveryPercentage, 
+  contractorSharePercentage = 50,
+  disasterRecovery: dashboardDisasterRecovery,
+  setDisasterRecovery: setDashboardDisasterRecovery
+}) {
   const contractorSectionDisabled = contractorSharePercentage === 0
   const isSingleOwner = ownerCount === 1
   const [cashReceivedManuallySet, setCashReceivedManuallySet] = useState(false)
-  const [disasterRecovery, setDisasterRecovery] = useState({})
+  const [localDisasterRecovery, setLocalDisasterRecovery] = useState(dashboardDisasterRecovery || {})
+
+  // Sync back to dashboard state periodically or when module closes
+  useEffect(() => {
+    if (setDashboardDisasterRecovery) {
+      setDashboardDisasterRecovery(localDisasterRecovery)
+    }
+  }, [localDisasterRecovery, setDashboardDisasterRecovery])
 
   const onChange = (name, val) => {
     // Prevent changes to contractor expense fields when contractor share is 0%
@@ -304,7 +335,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                 </div>
               )}
                {(stockSource === 'sold-reserved' || stockSource === 'mixed') && (
-                (!Array.isArray(stockReserved?.selectedLocations) || stockReserved?.selectedLocations.length === 0 || !stockReserved?.stockLevel || stockReserved?.stockLevel <= 0 || !stockReserved?.estimatedPrice || !stockReserved?.fromDate || !stockReserved?.toDate) && (
+                (!Array.isArray(stockReserved?.selectedLocations) || stockReserved?.selectedLocations.length === 0 || !stockReserved?.stockLevel || stockReserved?.stockLevel <= 0) && (
                   <div className="mt-4 p-3 bg-yellow-100 rounded-lg border-l-4 border-yellow-500">
                     <div className="text-[10px] font-bold text-yellow-800">
                       ⚠️ No reserved stock available. Add details in 'Stock Reserved' card first.
@@ -539,11 +570,23 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
         bgColor="#fce4ec" 
         defaultOpen={false}
         icon="🏘️"
-        onReset={resetDisasterRecovery}
+        onReset={() => {
+          const empty = {
+            lossQuantity: '',
+            lossUnit: 'bags',
+            pondsReconstruction: '',
+            hutReconstruction: '',
+            electricityBills: '',
+            compensationReceived: '',
+            donationsReceived: ''
+          };
+          setLocalDisasterRecovery(empty);
+          if (setDashboardDisasterRecovery) setDashboardDisasterRecovery(empty);
+        }}
       >
         <DisasterRecoveryCard
-          value={disasterRecovery}
-          onChange={(field, val) => setDisasterRecovery(prev => ({ ...prev, [field]: val }))}
+          value={localDisasterRecovery}
+          onChange={(field, val) => setLocalDisasterRecovery(prev => ({ ...prev, [field]: val }))}
           t={t}
         />
       </AccordionCard>

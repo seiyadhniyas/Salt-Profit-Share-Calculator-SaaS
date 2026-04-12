@@ -442,8 +442,8 @@ export default function App(){
       soldReservedStock: 'Sold Reserved Stock',
       freshlyHarvested: 'Freshly Harvested',
       mixedStockReservedAndFresh: 'Mixed (Reserved + Fresh)',
-      freshAmount: 'FRESH HARVEST AMOUNT (BAGS)',
-      reservedAmount: 'RESERVED STOCK AMOUNT (BAGS)',
+      freshAmount: 'New Salt from Harvest',
+      reservedAmount: 'From Stored Inventory',
       freshlyHarvestedDesc: 'New salt from harvest',
       soldReservedStockDesc: 'From stored inventory',
       mixedStockDesc: 'Combination of both',
@@ -693,6 +693,8 @@ export default function App(){
       soldReservedStock: 'சேமிக்கப்பட்ட இருப்பு',
       freshlyHarvested: 'புதிதாக அறுவடை செய்யப்பட்ட',
       mixedStockReservedAndFresh: 'கலவை (சேமிக்கப்பட்ட + புதிய)',
+      freshAmount: 'அறுவடையில் இருந்து புதிய உப்பு',
+      reservedAmount: 'சேமிக்கப்பட்ட இருப்பில் இருந்து',
       freshlyHarvestedDesc: 'அறுவடையில் இருந்து புதிய உப்பு',
       soldReservedStockDesc: 'சேமிக்கப்பட்ட இருப்பில் இருந்து',
       mixedStockDesc: 'இரண்டின் கலவையும்',
@@ -936,7 +938,17 @@ export default function App(){
       totalEstimatedPrice: 'මුළු ස්ථිර මිල',
       period: 'කාලය',
       saveStockReserved: 'සංරක්ෂිත ලුණු සුරකින්න',
-      approxBagFormat: 'සుමාරු {qty} මලු (50kg/මල්ල)',
+      approxBagFormat: 'සමීප වශයෙන් මලු {qty} (50kg/මල්ල)',
+      bagsFromKg: 'මලු (kg÷50)',
+      stockSource: 'ලුණු ප‍්‍රභවය',
+      soldReservedStock: 'ගබඩා කර ඇති තොග',
+      freshlyHarvested: 'අලුත් අස්වැන්න',
+      mixedStockReservedAndFresh: 'මිශ්‍ර තොග (ගබඩා කළ + අලුත්)',
+      freshAmount: 'අස්වැන්නෙන් ලැබුණු අලුත් ලුණු',
+      reservedAmount: 'ගබඩා කර ඇති තොගයෙන්',
+      freshlyHarvestedDesc: 'අස්වැන්නෙන් ලැබුණු අලුත් ලුණු',
+      soldReservedStockDesc: 'ගබඩා කර ඇති තොගයෙන්',
+      mixedStockDesc: 'දෙකෙහිම එකතුව',
       // Auth translations
       memberAccess: 'සාමාජික ප්‍රවේශය',
       signIn: 'ලොග් වන්න',
@@ -1686,6 +1698,8 @@ export default function App(){
                       activeModule={activeModule}
                       bagCostPerUnit={results?.bagCostPerUnit || inputs.bagCostPerUnit || 0}
                       contractorSharePercentage={contractorSharePercentage}
+                      disasterRecovery={disasterRecovery}
+                      setDisasterRecovery={setDisasterRecovery}
                     />
                   </div>
 
