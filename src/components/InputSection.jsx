@@ -129,7 +129,9 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
         extraExpenses: [],
         bothOwnersHaveLoans: false,
         loanInaya: 0,
-        loanShakira: 0
+        loanShakira: 0,
+        freshAmount: 0,
+        reservedAmount: 0
       }))
     }
     setCashReceivedManuallySet(false)
@@ -265,16 +267,8 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
       >
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
           {(activeModule === 'revenue' || !activeModule) && (
-          <div className={`space-y-6 ${contractorSectionDisabled ? 'opacity-50 pointer-events-none select-none' : ''}`}> 
-            <div className="flex items-center gap-2 mb-2 p-3 bg-blue-50 rounded-2xl border-2 border-blue-100">
-              <span className="text-xl">📦</span>
-              <div className="text-base font-semibold text-blue-900 tracking-tight">{tr('totalCurrentSaltSale')}</div>
-            </div>
-            <NumberInput label={tr('totalSaltPackedBags', 'PACKED BAGS')} name="packedBags" value={inputs?.packedBags} onChange={onChange} decimals={null} />
-            <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs?.deductedBags} onChange={onChange} decimals={null} />
-            <NumberInput label={tr('pricePerBag', 'PRICE PER BAG (LKR)')} name="pricePerBag" value={inputs?.pricePerBag} onChange={onChange} decimals={2} />
-
-            <div className="bg-slate-50 p-4 lg:p-6 rounded-[28px] border-2 border-blue-100">
+          <div className="space-y-6"> 
+            <div className="bg-slate-50 p-4 lg:p-6 rounded-[28px] border-2 border-blue-100 mb-6">
               <div className="text-sm font-semibold text-blue-500 uppercase tracking-tight mb-4">{tr('stockSource', 'STOCK SOURCE')}</div>
               <div className="flex flex-col gap-3">
                 {[
@@ -299,7 +293,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                 ))}
               </div>
 
-              {(stockSource === 'sold-reserved' || stockSource === 'mixed') && (Array.isArray(stockReserved?.selectedLocations) && stockReserved?.selectedLocations.length > 0) && (
+              {(stockSource === 'sold-reserved' || stockSource === 'mixed') && (Array.isArray(stockReserved?.selectedLocations) && stockReserved?.selectedLocations.length > 0 && stockReserved?.stockLevel > 0) && (
                 <div className="mt-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
                   <div className="text-[10px] font-bold text-blue-800">
                     Available Reserved: {stockReserved?.stockLevel || 0} {stockReserved?.stockUnit || 'bags'}
@@ -310,7 +304,7 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                 </div>
               )}
                {(stockSource === 'sold-reserved' || stockSource === 'mixed') && (
-                (!Array.isArray(stockReserved?.selectedLocations) || stockReserved?.selectedLocations.length === 0 || !stockReserved?.stockLevel || !stockReserved?.estimatedPrice || !stockReserved?.fromDate || !stockReserved?.toDate) && (
+                (!Array.isArray(stockReserved?.selectedLocations) || stockReserved?.selectedLocations.length === 0 || !stockReserved?.stockLevel || stockReserved?.stockLevel <= 0 || !stockReserved?.estimatedPrice || !stockReserved?.fromDate || !stockReserved?.toDate) && (
                   <div className="mt-4 p-3 bg-yellow-100 rounded-lg border-l-4 border-yellow-500">
                     <div className="text-[10px] font-bold text-yellow-800">
                       ⚠️ No reserved stock available. Add details in 'Stock Reserved' card first.
@@ -319,6 +313,35 @@ export default function InputSection({ inputs = {}, setInput, reset, toggleLoans
                 )
               )}
             </div>
+
+            <div className="flex items-center gap-2 mb-2 p-3 bg-blue-50 rounded-2xl border-2 border-blue-100">
+              <span className="text-xl">📦</span>
+              <div className="text-base font-semibold text-blue-900 tracking-tight">{tr('totalCurrentSaltSale')}</div>
+            </div>
+            
+            <NumberInput label={tr('totalSaltPackedBags', 'PACKED BAGS')} name="packedBags" value={inputs?.packedBags} onChange={onChange} decimals={null} />
+
+            {stockSource === 'mixed' && (
+              <div className="bg-indigo-50/50 p-4 rounded-3xl border-2 border-indigo-100 space-y-4 animate-in fade-in slide-in-from-top-2">
+                <NumberInput 
+                  label={tr('freshAmount', 'FRESH HARVEST AMOUNT (BAGS)')} 
+                  name="freshAmount" 
+                  value={inputs?.freshAmount} 
+                  onChange={onChange} 
+                  decimals={null} 
+                />
+                <NumberInput 
+                  label={tr('reservedAmount', 'RESERVED STOCK AMOUNT (BAGS)')} 
+                  name="reservedAmount" 
+                  value={inputs?.reservedAmount} 
+                  onChange={onChange} 
+                  decimals={null} 
+                />
+              </div>
+            )}
+
+            <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs?.deductedBags} onChange={onChange} decimals={null} />
+            <NumberInput label={tr('pricePerBag', 'PRICE PER BAG (LKR)')} name="pricePerBag" value={inputs?.pricePerBag} onChange={onChange} decimals={2} />
           </div>
           )}
 

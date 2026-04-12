@@ -10,7 +10,7 @@ import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFilesFromSupabase, savePdfFileToSupabase } from './api/reports.js'
-import { saveStockReservedToSupabase } from './api/stockReserved.js'
+import { saveStockReservedToSupabase, getStockReservedRecords } from './api/stockReserved.js'
 import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment, getAdminPendingPayments, activatePaymentRequestAsAdmin } from './api/billing.js'
 import { useCallback } from 'react'
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.js'
@@ -442,6 +442,8 @@ export default function App(){
       soldReservedStock: 'Sold Reserved Stock',
       freshlyHarvested: 'Freshly Harvested',
       mixedStockReservedAndFresh: 'Mixed (Reserved + Fresh)',
+      freshAmount: 'FRESH HARVEST AMOUNT (BAGS)',
+      reservedAmount: 'RESERVED STOCK AMOUNT (BAGS)',
       freshlyHarvestedDesc: 'New salt from harvest',
       soldReservedStockDesc: 'From stored inventory',
       mixedStockDesc: 'Combination of both',
@@ -1077,6 +1079,27 @@ export default function App(){
     }
   }, [session, isProdSupabase])
 
+  const loadStockReserved = useCallback(async (activeSession = session) => {
+    if (!isProdSupabase || !activeSession?.user?.id) return
+
+    try {
+      const resp = await getStockReservedRecords(activeSession)
+      if (resp.ok && resp.records?.length > 0) {
+        const latest = resp.records[0]
+        setStockReserved({
+          stockLevel: latest.stock_level,
+          stockUnit: latest.stock_unit,
+          estimatedPrice: latest.estimated_price,
+          selectedLocations: latest.selected_locations || [],
+          fromDate: latest.from_date,
+          toDate: latest.to_date,
+        })
+      }
+    } catch (e) {
+      console.error('Error loading stock reserved:', e)
+    }
+  }, [session, isProdSupabase])
+
   const loadSavedFiles = useCallback(async (activeSession = session) => {
     if (isProdSupabase && !activeSession?.user?.id) {
       setSavedFiles([])
@@ -1109,6 +1132,7 @@ export default function App(){
   useEffect(() => {
     if (session) {
       loadReports(session)
+      loadStockReserved(session)
       loadSavedFiles(session)
       refreshBillingStatus(session)
       refreshAdminStatus(session)
@@ -1286,20 +1310,20 @@ export default function App(){
     }
   }, [ownerCount, inputs.loanShakira])
 
-  const reset = () => {
+  const reset = (force = false) => {
     // Check if location and date are provided (mandatory fields)
-    if (!inputs.location || !inputs.date) {
+    if (!force && (!inputs.location || !inputs.date)) {
       // Scroll to input section
       inputSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       alert('Please fill in Location and Date in Document Details before resetting.')
       return
     }
     
-    // Reset inputs but keep location and date for context
+    // Reset inputs
     setInputs(prev => ({
       ...defaultInputs,
-      location: prev.location,
-      date: prev.date,
+      location: force ? '' : prev.location,
+      date: force ? '' : prev.date,
       buyerName: '',
       billNumber: '',
     }))
@@ -1408,7 +1432,7 @@ export default function App(){
       const resp = await saveStockReservedToSupabase(payload, session)
       if (resp && resp.ok) {
         alert('Stock Reserved record saved successfully!')
-        // Refresh local records if needed
+        await loadStockReserved(session)
         return true
       } else {
         console.error('Save failed:', resp.error)
@@ -1487,31 +1511,107 @@ export default function App(){
             <button
               type="button"
               onClick={() => setOwnerCount(ownerCount === 1 ? 2 : 1)}
-              className="w-full mb-6 py-4 px-6 rounded-[28px] bg-white border-none android-shadow flex items-center justify-between group transition-all active:scale-[0.98] hover:bg-slate-50"
+              className="w-full mb-6 py-4 px-6 rounded-[28px] border-none android-shadow flex items-center justify-between group transition-all active:scale-[0.98] hover:opacity-95"
+              style={{ backgroundColor: '#511600' }}
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-xl shadow-lg transform group-hover:rotate-12 transition-transform">
+                <div 
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-lg transform group-hover:rotate-12 transition-transform"
+                  style={{ backgroundColor: '#ffedd5' }}
+                >
                   {ownerCount === 1 ? '👤' : '👥'}
                 </div>
                 <div className="text-left">
-                  <div className="text-base font-bold text-slate-900 tracking-tight">{ownerCount === 1 ? (t ? t('singleOwner') : 'Single Owner') : (t ? t('twoOwners') : 'Two Owners')}</div>
-                  <div className="text-xs text-slate-500 font-medium opacity-80">{t ? t('toggleOwnerCount') : 'Tap to switch owner count'}</div>
+                  <div className="text-base font-bold text-white tracking-tight">{ownerCount === 1 ? (t ? t('singleOwner') : 'Single Owner') : (t ? t('twoOwners') : 'Two Owners')}</div>
+                  <div className="text-xs text-white/70 font-medium opacity-80">{t ? t('toggleOwnerCount') : 'Tap to switch owner count'}</div>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all shadow-inner">
+              <div className="w-10 h-10 rounded-full bg-orange-200/20 flex items-center justify-center text-orange-200 group-hover:bg-orange-200 group-hover:text-[#511600] transition-all shadow-inner">
                 <span className="text-lg">⇄</span>
               </div>
             </button>
 
+            <div className="flex justify-center my-4">
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to reset all data?')) {
+                    reset(true);
+                    setStockReserved({ stockLevel: '', stockUnit: 'bags', estimatedPrice: '', selectedLocations: [], fromDate: '', toDate: '' });
+                    setDisasterRecovery({
+                      lossQuantity: '',
+                      lossUnit: 'bags',
+                      pondsReconstruction: '',
+                      hutReconstruction: '',
+                      electricityBills: '',
+                      compensationReceived: '',
+                      donationsReceived: '',
+                    });
+                  }
+                }}
+                className="px-8 py-3 bg-rose-600 text-white rounded-full font-bold text-sm uppercase tracking-widest shadow-lg hover:bg-rose-700 transition-all active:scale-95 flex items-center gap-2"
+              >
+                <span>🔄</span> Reset All
+              </button>
+            </div>
+
             {/* Phase 1 Dashboard Grid Prototype */}
             <div className="grid grid-cols-2 gap-2 mb-8">
               {[
-                { id: 'setup', title: t('setup'), sub: t('locationDateBuyer'), icon: '📋', color: 'bg-[#cdebf9]', num: '1' },
-                { id: 'revenue', title: t('revenue'), sub: t('bagsPriceSource'), icon: '📦', color: 'bg-[#ffe4c4]', num: '2' },
-                { id: 'costs', title: t('costs'), sub: t('expensesFees'), icon: '🏭', color: 'bg-[#ffffd8]', num: '3' },
-                { id: 'labour', title: t('labour'), sub: t('serviceLog'), icon: '👷', color: 'bg-[#fad8fa]', num: '4' },
-                { id: 'inventory', title: t('inventory'), sub: t('stockReservedSub'), icon: '💾', color: 'bg-[#ecffb1]', num: '2a' },
-                { id: 'disaster', title: t('disaster'), sub: t('recoveryCosts'), icon: '🌊', color: 'bg-[#ffe4ee]', num: '3a' }
+                { 
+                  id: 'setup', 
+                  title: t('setup'), 
+                  sub: t('locationDateBuyer'), 
+                  icon: '📋', 
+                  color: 'bg-[#cdebf9]', 
+                  num: '1',
+                  filled: Boolean(inputs.location || inputs.date)
+                },
+                { 
+                  id: 'revenue', 
+                  title: t('revenue'), 
+                  sub: t('bagsPriceSource'), 
+                  icon: '📦', 
+                  color: 'bg-[#ffe4c4]', 
+                  num: '2',
+                  filled: Boolean(inputs.packedBags > 0 || inputs.pricePerBag > 0)
+                },
+                { 
+                  id: 'costs', 
+                  title: t('costs'), 
+                  sub: t('expensesFees'), 
+                  icon: '🏭', 
+                  color: 'bg-[#ffffd8]', 
+                  num: '3',
+                  filled: Boolean(inputs.packingFeePerBag > 0 || inputs.bagCostPerUnit > 0 || inputs.otherExpenses > 0 || (inputs.extraExpenses && inputs.extraExpenses.length > 0))
+                },
+                { 
+                  id: 'labour', 
+                  title: t('labour'), 
+                  sub: t('serviceLog'), 
+                  icon: '👷', 
+                  color: 'bg-[#fad8fa]', 
+                  num: '4',
+                  filled: Boolean(inputs.labourCosts && inputs.labourCosts.length > 0)
+                },
+                { 
+                  id: 'inventory', 
+                  title: t('inventory'), 
+                  sub: t('stockReservedSub'), 
+                  icon: '💾', 
+                  color: 'bg-[#ecffb1]', 
+                  num: '2a',
+                  filled: Boolean(stockReserved.stockLevel > 0)
+                },
+                { 
+                  id: 'disaster', 
+                  title: t('disaster'), 
+                  sub: t('recoveryCosts'), 
+                  icon: '🌊', 
+                  color: 'bg-[#ffe4ee]', 
+                  num: '3a',
+                  filled: Boolean(disasterRecovery.lossQuantity > 0 || disasterRecovery.pondsReconstruction > 0)
+                }
               ].map(module => (
                 <button
                   key={module.id}
@@ -1523,6 +1623,11 @@ export default function App(){
                       {module.num}
                     </span>
                   </div>
+                  {module.filled && (
+                    <div className="absolute bottom-2 right-2 z-20 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px] shadow-sm animate-in zoom-in duration-300">
+                      ✓
+                    </div>
+                  )}
                   <div className="absolute -top-2 -right-2 w-20 h-20 bg-slate-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
                   <div className="w-12 h-12 rounded-2xl bg-slate-900/5 flex items-center justify-center text-2xl mb-3 z-10">
                     {module.icon}

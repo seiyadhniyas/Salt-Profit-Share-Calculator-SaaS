@@ -39,12 +39,16 @@ export function computeAll(inputs, options = {}) {
     reservedStockDeducted = Math.min(packedBags, reservedQty)
     packedBags = Math.max(0, packedBags - reservedStockDeducted)
   } else if (stockSource === 'mixed' && stockReserved.stockLevel) {
-    // For mixed, calculate how much is from reserved vs fresh (future enhancement)
-    // For now, treat similar to sold-reserved
+    // For mixed, deduct the specific reserved amount entered by the user
+    const userReservedAmount = safeNum(inputs.reservedAmount)
     const reservedQty = stockReserved.stockUnit === 'kg' 
       ? (Number(stockReserved.stockLevel) || 0) / 50 
       : (Number(stockReserved.stockLevel) || 0)
-    reservedStockDeducted = Math.min(packedBags, reservedQty / 2) // Use 50% of reserved for mixed
+    
+    // Ensure we don't deduct more than what's available in the reserved stock record
+    // and not more than the total packed bags
+    reservedStockDeducted = Math.min(packedBags, userReservedAmount, reservedQty)
+    packedBags = Math.max(0, packedBags - reservedStockDeducted)
   }
   
   // extra expenses array: [{id, label, amount}]
