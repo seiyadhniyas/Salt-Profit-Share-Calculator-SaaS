@@ -152,9 +152,17 @@ export default function StockReservedCard({
               <button
                 type="button"
                 onClick={() => setIsManualEntry(!isManualEntry)}
-                className="text-[10px] text-amber-600 font-bold uppercase hover:text-amber-700 transition"
+                className={`w-full py-3 px-6 rounded-[20px] font-bold text-xs uppercase transition-all duration-200 flex items-center justify-center gap-2 border-2 ${
+                  isManualEntry 
+                    ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' 
+                    : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 shadow-sm'
+                }`}
               >
-                {isManualEntry ? tr('cancelManualEntry', '- CANCEL MANUAL ENTRY') : tr('addNewLocation', '+ OR ADD NEW LOCATION')}
+                {isManualEntry ? (
+                  <><span>✕</span> {tr('cancelManualEntry', 'CANCEL MANUAL ENTRY')}</>
+                ) : (
+                  <>{tr('addNewLocation', 'ADD NEW LOCATION')}</>
+                )}
               </button>
               {isManualEntry && (
                 <div className="mt-3 flex gap-2">

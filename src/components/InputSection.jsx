@@ -404,7 +404,7 @@ export default function InputSection({
             <NumberInput label={tr('otherExpenses', 'FIXED OVERHEADS')} name="otherExpenses" value={inputs?.otherExpenses} onChange={onChange} decimals={2} disabled={contractorSectionDisabled} />
             
             <button type="button" onClick={addExpense} disabled={contractorSectionDisabled} className={`w-full bg-slate-100 hover:bg-slate-200 border-2 border-dashed border-slate-300 rounded-[28px] px-6 py-4 text-slate-600 font-bold transition-all uppercase tracking-widest text-[10px] ${contractorSectionDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              + {tr('addOperationalCost')}
+              {tr('addOperationalCost')}
             </button>
 
             {(inputs?.extraExpenses || []).length > 0 && (
@@ -490,7 +490,7 @@ export default function InputSection({
             onClick={addLabourCost} 
             className="w-full bg-white border-2 border-dashed border-purple-200 rounded-[28px] px-6 py-4 text-purple-600 font-bold hover:bg-purple-50 transition-all uppercase tracking-widest text-[10px]"
           >
-            + {tr('addLabourCostEntry', 'ADD LABOUR COST ENTRY')}
+            {tr('addLabourCostEntry', 'ADD LABOUR COST ENTRY')}
           </button>
 
           {(inputs?.labourCosts || []).length === 0 ? (

@@ -289,8 +289,8 @@ export default function App(){
       totalCurrentSaltSale: 'Total Current Salt Sale',
         // Disaster Recovery
           disasterRecovery: 'Disaster Recovery Expenses',
-          addDisasterRecovery: '+ Add Disaster Recovery Expenses',
-          disasterExpenses: '+ Disaster Expenses',
+          addDisasterRecovery: 'Add Disaster Recovery Expenses',
+          disasterExpenses: 'Disaster Expenses',
         lossQuantity: 'Loss Quantity of Salt',
         lossQuantityPlaceholder: 'e.g. 100',
         bags: 'Bags',
@@ -318,9 +318,9 @@ export default function App(){
       expenseOwners: 'Owners Pay Expenses',
       expenseContractor: 'Contractor Pays Expenses',
       expenseShared5050: 'Owner & Contractor Shared 50%',
-      addExpenses: '+ add expenses',
+      addExpenses: 'add expenses',
       costResponsibility: 'COST RESPONSIBILITY',
-      addOperationalCost: '+ ADD OPERATIONAL COST',
+      addOperationalCost: 'ADD OPERATIONAL COST',
       remove: 'Remove',
       bothOwnersHaveLoans: 'Owners have loans',
       oneOwnerHasLoan: 'Owner has loan',
@@ -401,7 +401,7 @@ export default function App(){
       twoOwners: 'Two Owners',
       toggleOwnerCount: 'Tap to switch owner count',
       labourCosts: 'Labour Costs',
-      addLabourCostEntry: '+ ADD LABOUR COST ENTRY',
+      addLabourCostEntry: 'ADD LABOUR COST ENTRY',
       labourNameRole: 'Labour Name / Role',
       dateOfService: 'Date of Service',
       paymentFrequency: 'Payment Frequency',
@@ -419,8 +419,8 @@ export default function App(){
       estimatedPriceLKR: 'ESTIMATED PRICE (LKR)',
       estimatedPricePlaceholder: '0.00',
       locationsMultiple: 'LOCATIONS (MULTIPLE)',
-      selectLocationToAdd: '+ SELECT LOCATION TO ADD...',
-      addNewLocation: '+ OR ADD NEW LOCATION',
+      selectLocationToAdd: 'SELECT LOCATION TO ADD...',
+      addNewLocation: 'OR ADD NEW LOCATION',
       cancelManualEntry: '- CANCEL MANUAL ENTRY',
       enterLocationName: 'Enter location name',
       add: 'ADD',
@@ -538,8 +538,8 @@ export default function App(){
       totalCurrentSaltSale: 'மொத்த தற்போதைய உப்பு விற்பனை',
         // Disaster Recovery
           disasterRecovery: 'பேரழிவு மீட்பு செலவுகள்',
-          addDisasterRecovery: '+ பேரழிவு மீட்பு செலவுகளைச் சேர்க்கவும்',
-          disasterExpenses: '+ பேரழிவு செலவுகள்',
+          addDisasterRecovery: 'பேரழிவு மீட்பு செலவுகளைச் சேர்க்கவும்',
+          disasterExpenses: 'பேரழிவு செலவுகள்',
         lossQuantity: 'உப்பு இழப்பு அளவு',
         lossQuantityPlaceholder: 'எ.கா. 100',
         bags: 'மூட்டைகள்',
@@ -567,9 +567,9 @@ export default function App(){
       expenseOwners: 'உரிமையாளர்கள் செலுத்துதல்',
       expenseContractor: 'ஒப்பந்ததாரர் செலுத்துதல்',
       expenseShared5050: 'உரிமையாளர் & ஒப்பந்ததாரர் 50/50',
-      addExpenses: '+ செலவுகளை சேர்க்க',
+      addExpenses: 'செலவுகளை சேர்க்க',
       costResponsibility: 'செலவு பொறுப்பு',
-      addOperationalCost: '+ செயல்பாட்டு செலவைச் சேர்க்கவும்',
+      addOperationalCost: 'செயல்பாட்டு செலவைச் சேர்க்கவும்',
       remove: 'அகற்று',
       bothOwnersHaveLoans: 'உரிமையாளர்களுக்கு கடன் உள்ளது',
       oneOwnerHasLoan: 'உரிமையாளருக்கு கடன் உள்ளது',
@@ -650,7 +650,7 @@ export default function App(){
       twoOwners: 'இரண்டு உரிமையாளர்கள்',
       toggleOwnerCount: 'உரிமையாளர் எண்ணிக்கையை மாற்ற தட்டவும்',
       labourCosts: 'தொழிலாளர் செலவுகள்',
-      addLabourCostEntry: '+ தொழிலாளர் செலவுப் பதிவைச் சேர்க்கவும்',
+      addLabourCostEntry: 'தொழிலாளர் செலவுப் பதிவைச் சேர்க்கவும்',
       labourNameRole: 'தொழிலாளர் பெயர் / பதவி',
       dateOfService: 'பணி வழங்கப்பட்ட தேதி',
       paymentFrequency: 'கொடுப்பனவு இடைவெளி',
@@ -670,8 +670,8 @@ export default function App(){
       estimatedPriceLKR: 'மதிப்பிடப்பட்ட விலை (LKR)',
       estimatedPricePlaceholder: '0.00',
       locationsMultiple: 'இடங்கள் (பல)',
-      selectLocationToAdd: '+ சேர்க்க இடத்தைத் தேர்ந்தெடுக்கவும்...',
-      addNewLocation: '+ அல்லது புதிய இடத்தைச் சேர்க்கவும்',
+      selectLocationToAdd: 'சேர்க்க இடத்தைத் தேர்ந்தெடுக்கவும்...',
+      addNewLocation: 'அல்லது புதிய இடத்தைச் சேர்க்கவும்',
       cancelManualEntry: '- கைமுறை உள்ளீட்டை ரத்து செய்க',
       enterLocationName: 'இடப் பெயரை உள்ளிடவும்',
       add: 'சேர்க்க',
@@ -789,8 +789,8 @@ export default function App(){
       totalCurrentSaltSale: 'මුළු වත්මන් ලුණු විකිණීම',
         // Disaster Recovery
           disasterRecovery: 'ආපදා ප්‍රතිසාධන වියදම්',
-          addDisasterRecovery: '+ ආපදා ප්‍රතිසාධන වියදම් එක් කරන්න',
-          disasterExpenses: '+ ආපදා වියදම්',
+          addDisasterRecovery: 'ආපදා ප්‍රතිසාධන වියදම් එක් කරන්න',
+          disasterExpenses: 'ආපදා වියදම්',
         lossQuantity: 'ලුණු අලාභ ප්‍රමාණය',
         lossQuantityPlaceholder: 'උදා: 100',
         bags: 'මලු',
@@ -818,9 +818,9 @@ export default function App(){
       expenseOwners: 'අයිතිකරුවන් ගෙවීම',
       expenseContractor: 'කොන්ත්‍රාත්කරු ගෙවීම',
       expenseShared5050: 'අයිතිකරු සහ කොන්ත්‍රාත්කරු 50% බැගින්',
-      addExpenses: '+ වියදම් එක් කරන්න',
+      addExpenses: 'වියදම් එක් කරන්න',
       costResponsibility: 'වියදම් පිළිබඳ වගකීම',
-      addOperationalCost: '+ ක්‍රියාකාරක වියදමක් එක් කරන්න',
+      addOperationalCost: 'ක්‍රියාකාරක වියදමක් එක් කරන්න',
       remove: 'ඉවත් කරන්න',
       bothOwnersHaveLoans: 'ණය තිබේ',
       oneOwnerHasLoan: 'ණය තිබේ',
@@ -903,7 +903,7 @@ export default function App(){
       toggleOwnerCount: 'අයිතිකරුවන් ගණන වෙනස් කරන්න',
       dashboard: 'සාරාංශය',
       labourCosts: 'සේවක වියදම්',
-      addLabourCostEntry: '+ සේවක වියදමක් එක් කරන්න',
+      addLabourCostEntry: 'සේවක වියදමක් එක් කරන්න',
       labourNameRole: 'සේවක නම / භූමිකාව',
       dateOfService: 'සේවා දිනය',
       paymentFrequency: 'ගෙවීමේ වාර ගණන',
@@ -921,8 +921,8 @@ export default function App(){
       estimatedPriceLKR: 'ස්ථිර මිල (LKR)',
       estimatedPricePlaceholder: '0.00',
       locationsMultiple: 'ස්ථාන (බහුවිධ)',
-      selectLocationToAdd: '+ එක් කිරීමට ස්ථානය තෝරන්න...',
-      addNewLocation: '+ හෝ නව ස්ථානය එක් කරන්න',
+      selectLocationToAdd: 'එක් කිරීමට ස්ථානය තෝරන්න...',
+      addNewLocation: 'හෝ නව ස්ථානය එක් කරන්න',
       cancelManualEntry: '- සручно අත්‍යාવශ්‍යත සම්පાදනය අවලංඩු කරන්න',
       enterLocationName: 'ස්ථාන නම ඇතුළත් කරන්න',
       add: 'එක් කරන්න',
@@ -1656,7 +1656,7 @@ export default function App(){
             {activeModule && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4">
                 <div 
-                  className="w-full h-[92vh] sm:h-auto sm:max-w-4xl bg-[#f8fafc] rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300"
+                  className="w-full h-[92vh] sm:h-[85vh] sm:max-w-4xl bg-[#f8fafc] rounded-t-[40px] sm:rounded-[40px] shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300"
                   style={{overflow: 'hidden'}}
                 >
                   <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200 bg-white">
@@ -1703,7 +1703,7 @@ export default function App(){
                     />
                   </div>
 
-                  <div className="p-6 bg-white border-t border-slate-200" style={{ marginBottom: '64px' }}>
+                  <div className="p-6 bg-white border-t border-slate-200 sm:mb-0" style={{ marginBottom: '34px' }}>
                     <button 
                       onClick={() => setActiveModule(null)}
                       className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-lg active:scale-[0.98] transition-all uppercase"
