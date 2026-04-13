@@ -1753,6 +1753,11 @@ export default function App(){
           <div>
             {results ? (
                 <div className="android-shadow rounded-[32px] p-6 bg-slate-900 text-white relative overflow-hidden group border border-white/10">
+                <div className="absolute top-4 right-5 z-20">
+                  <span className="text-xl font-black text-white/20 group-hover:text-white/40 transition-colors">
+                    5
+                  </span>
+                </div>
                 <div className="absolute top-0 right-0 w-32 h-32 bg-sky-400 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700"></div>
                 <h3 className="text-base font-black text-sky-400 mb-5 uppercase tracking-widest">{t('summary')}</h3>
                 <div className="space-y-4 relative z-10">
