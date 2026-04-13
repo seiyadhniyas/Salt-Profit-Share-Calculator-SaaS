@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient.js'
 
 export default function AdminAuthModal({ open, onClose, onSuccess, t }) {
   const tr = (key, fallback) => (t ? t(key) : fallback)
-  const [stage, setStage] = useState('login') // 'login' | 'verify' | 'authenticated'
+  const [stage, setStage] = useState('login') // 'login' | 'verify' | 'authenticated' | 'register'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [adminSecret, setAdminSecret] = useState('')
@@ -68,13 +68,39 @@ export default function AdminAuthModal({ open, onClose, onSuccess, t }) {
     }
   }
 
+  const handleRegister = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const response = await fetch('/.netlify/functions/adminRegister', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, adminSecret }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed')
+      }
+
+      // Automatically sign in after successful registration
+      await handleSignIn(e)
+    } catch (err) {
+      setError(err.message || 'Admin registration failed.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSecretVerification = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
     try {
-      const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'AdminSecret123'
+      const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'SALT_ADMIN_2024_PROTECT'
       if (adminSecret !== ADMIN_SECRET) {
         throw new Error('Invalid admin secret.')
       }
@@ -156,6 +182,92 @@ export default function AdminAuthModal({ open, onClose, onSuccess, t }) {
                 className="flex-1 bg-slate-300 hover:bg-slate-400 text-slate-900 font-semibold py-2 rounded-lg transition"
               >
                 {tr('close', 'Close')}
+              </button>
+            </div>
+            <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setStage('register')
+                  setError('')
+                }}
+                className="text-sm text-blue-600 hover:text-blue-700 font-bold"
+              >
+                + Register New Admin Account
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Stage: Register */}
+        {stage === 'register' && (
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                New Admin Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="new-admin@example.com"
+                required
+                disabled={loading}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Create Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                disabled={loading}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Admin Secret Key
+              </label>
+              <input
+                type="password"
+                value={adminSecret}
+                onChange={(e) => setAdminSecret(e.target.value)}
+                placeholder="Enter registration secret"
+                required
+                disabled={loading}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-400 text-white font-semibold py-2 rounded-lg transition"
+              >
+                {loading ? 'Creating...' : 'Register'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStage('login')}
+                disabled={loading}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2 rounded-lg transition"
+              >
+                Cancel
               </button>
             </div>
           </form>
