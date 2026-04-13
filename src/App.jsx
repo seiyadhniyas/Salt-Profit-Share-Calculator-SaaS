@@ -278,6 +278,8 @@ export default function App(){
     en: {
       title: 'Salt Profit Share Calculator',
       subtitle: 'Financial calculator for owners and contractors',
+      profitShare: 'Profit Share',
+      dashboard: 'Dashboard',
       documentDetails: "Document Details",
       locationDay: 'Location',
       date: 'Date',
@@ -527,6 +529,8 @@ export default function App(){
     ta: {
       title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
       subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்தக்காரர்களுக்கான நிதி கணக்கீடு',
+      profitShare: 'இலாபப் பங்கு',
+      dashboard: 'டாஷ்போர்டு',
       documentDetails: "ஆவண விவரங்கள்",
       locationDay: 'இடம்',
       date: 'தேதி',
@@ -778,6 +782,8 @@ export default function App(){
     si: {
       title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
       subtitle: 'අයිතිකරුවන් සහ කොන්ත්‍රාත්කරුවන් සඳහා මූල්‍ය ගණක යන්ත්‍රය',
+      profitShare: 'ලාභ බෙදාගැනීම',
+      dashboard: 'මුහුණුත',
       documentDetails: "ලේඛන විස්තර",
       locationDay: 'ස්ථානය',
       date: 'දිනය',
@@ -1484,7 +1490,7 @@ export default function App(){
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-14 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
-        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-5">
+        <header className="relative mb-6 rounded-3xl border border-white/70 bg-gradient-to-r from-purple-100/50 to-indigo-100/50 px-1 sm:px-6 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-5 border-b-4 border-purple-200">
           <div className="absolute left-3 top-3 sm:left-5 sm:top-4" style={{paddingLeft: '10px'}}>
             <select 
               value={lang} 
@@ -1509,10 +1515,10 @@ export default function App(){
           </button>
 
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className={`font-bold leading-tight text-gray-800 ${lang === 'ta' ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+            <h1 className={`font-black leading-tight bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 bg-clip-text text-transparent drop-shadow-sm ${lang === 'ta' ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
               {t('title')}
             </h1>
-            <p className={`mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base ${lang === 'ta' ? 'text-xs sm:text-sm' : ''}`}>
+            <p className={`mx-auto mt-3 max-w-2xl text-sm font-bold leading-relaxed text-indigo-900/70 sm:text-base ${lang === 'ta' ? 'text-xs sm:text-sm' : ''}`}>
               {t('subtitle')}
             </p>
           </div>
