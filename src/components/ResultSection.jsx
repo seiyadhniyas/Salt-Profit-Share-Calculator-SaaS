@@ -175,15 +175,6 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
                   </>
                 )}
               </div>
-              <div className="mt-8 pt-6 border-t border-orange-200/50">
-                <button
-                  type="button"
-                  className="w-full py-4 px-6 rounded-[24px] bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white font-black text-lg uppercase tracking-wider shadow-[0_8px_20px_-4px_rgba(79,70,229,0.4)] active:scale-95 transition-all hover:shadow-[0_12px_25px_-4px_rgba(79,70,229,0.5)] hover:brightness-110 flex items-center justify-center gap-3 border border-white/20"
-                >
-                  <span className="text-2xl">💰</span>
-                  {t ? t('profitShare') : 'Profit Share'}
-                </button>
-              </div>
             </div>
           </div>
         </div>

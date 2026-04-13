@@ -82,7 +82,10 @@ export default function DashboardSummary({
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 pb-9 custom-scrollbar">
           {/* User Profile and Auth */}
           <section className="overflow-hidden rounded-3xl border border-purple-100 bg-white shadow-sm">
-            <div className="flex flex-col gap-4 bg-gradient-to-r from-purple-700 to-indigo-600 px-6 py-5 text-white">
+            <div 
+              className="flex flex-col gap-4 px-6 py-5 text-white"
+              style={{ background: 'linear-gradient(to right, #6b21a8, #4f46e5)' }}
+            >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl border border-white/30 backdrop-blur-md">👤</div>
@@ -104,7 +107,10 @@ export default function DashboardSummary({
 
             <div className="p-4 sm:p-6 space-y-6">
                {/* Billing & Premium */}
-               <div className="rounded-2xl border-2 border-purple-100 p-5 bg-gradient-to-br from-purple-50 to-white shadow-inner">
+               <div 
+                  className="rounded-2xl border-2 border-purple-100 p-5 shadow-inner"
+                  style={{ background: 'linear-gradient(to bottom right, #faf5ff, #ffffff)' }}
+               >
                   <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                     <div className="text-[10px] font-black uppercase text-purple-400 tracking-widest">{tr('pricingAndAccess', 'PRICING & ACCESS')}</div>
                     <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold uppercase">{tr('oneOffPrice', 'ONE-OFF: LKR 30,000')}</div>
@@ -226,11 +232,17 @@ export default function DashboardSummary({
                       className="w-full h-3 rounded-lg bg-purple-100 accent-purple-600 mb-4 sm:mb-8 cursor-pointer shadow-inner"
                     />
                     <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                      <div className="bg-gradient-to-br from-slate-900 to-slate-700 p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600">
+                      <div 
+                        className="p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600"
+                        style={{ background: 'linear-gradient(to bottom right, #1e293b, #334155)' }}
+                      >
                         <div className="text-[9px] sm:text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1 sm:mb-2">CONTRACTOR SHARE</div>
                         <div className="text-2xl sm:text-4xl font-black text-white">{contractorSharePercentage}%</div>
                       </div>
-                      <div className="bg-gradient-to-br from-purple-700 to-indigo-600 p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400">
+                      <div 
+                        className="p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400"
+                        style={{ background: 'linear-gradient(to bottom right, #6b21a8, #4f46e5)' }}
+                      >
                         <div className="text-[9px] sm:text-[10px] font-black text-purple-200 uppercase tracking-widest mb-1 sm:mb-2">OWNERS SHARE</div>
                         <div className="text-2xl sm:text-4xl font-black text-white">{100 - contractorSharePercentage}%</div>
                       </div>
