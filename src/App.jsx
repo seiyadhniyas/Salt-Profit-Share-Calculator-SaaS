@@ -1378,6 +1378,151 @@ export default function App(){
     }
   }
 
+  const downloadCSV = async () => {
+    const allowed = await ensurePremiumAccess()
+    if (!allowed) return
+
+    if (!results) return alert(t('noResultsToSave'))
+    try {
+      const csvData = []
+      
+      // Title
+      csvData.push([t('title')])
+      csvData.push(['Generated on', new Date().toLocaleDateString()])
+      csvData.push([''])
+
+      // Document Details Section
+      csvData.push(['DOCUMENT DETAILS'])
+      csvData.push(['Location', inputs.location || '-'])
+      csvData.push(['Date', inputs.date || '-'])
+      csvData.push(['Buyer Name', inputs.buyerName || '-'])
+      csvData.push(['Bill Number', inputs.billNumber || '-'])
+      csvData.push([''])
+
+      // Revenue & Expenses Summary
+      csvData.push(['SALT SALE SUMMARY'])
+      csvData.push(['Packed Bags', inputs.packedBags || 0])
+      csvData.push(['Deducted Bags', inputs.deductedBags || 0])
+      csvData.push(['Net Bags', results.netBags || 0])
+      csvData.push(['Price Per Bag (LKR)', inputs.pricePerBag || 0])
+      csvData.push(['Initial Price (LKR)', results.initialPrice || 0])
+      csvData.push([''])
+
+      // Operational Costs Section
+      csvData.push(['OPERATIONAL COSTS'])
+      csvData.push(['Packing Fee Per Bag (LKR)', inputs.packingFeePerBag || 0])
+      csvData.push(['Plastic Bag Cost (LKR)', inputs.bagCostPerUnit || 0])
+      csvData.push(['Fixed Overheads (LKR)', inputs.otherExpenses || 0])
+      
+      if (results.extraExpensesTotal > 0) {
+        csvData.push(['Extra Expenses (LKR)', results.extraExpensesTotal])
+      }
+      
+      if (results.labourCostsTotal > 0) {
+        csvData.push(['Labour Costs Total (LKR)', results.labourCostsTotal])
+      }
+      
+      csvData.push(['Total Contractor Spent (LKR)', results.contractorTotalSpent || 0])
+      csvData.push([''])
+
+      // Settlement
+      csvData.push(['NET SETTLEMENT'])
+      csvData.push(['Physical Cash (LKR)', inputs.cashReceived || 0])
+      csvData.push(['Bank Cheques (LKR)', inputs.chequeReceived || 0])
+      csvData.push([''])
+
+      // Profit Share Calculations
+      csvData.push(['PROFIT SHARE CALCULATIONS'])
+      csvData.push(['Contractor Share %', contractorSharePercentage || 0])
+      csvData.push(['Expense Payment Mode', inputs.expensePayment === 'owners' ? 'Owners Responsibility' : inputs.expensePayment === 'contractor' ? 'Contractor Responsibility' : '50/50 Shared'])
+      csvData.push([''])
+
+      csvData.push(['GRAND TOTALS'])
+      csvData.push(['Grand Total Received (LKR)', results.grandTotalReceived || 0])
+      csvData.push(['Contractor Share (LKR)', results.contractorShare || 0])
+      csvData.push(['Owners Group Amount (LKR)', results.ownerPool || 0])
+      csvData.push(['Per Owner Share (LKR)', results.generalSharePerOwner || 0])
+      csvData.push([''])
+
+      // Owner Distribution
+      if (ownerCount === 1) {
+        csvData.push(['SINGLE OWNER DISTRIBUTION'])
+        csvData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
+        csvData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        if (inputs.bothOwnersHaveLoans) {
+          csvData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
+          csvData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
+        }
+      } else {
+        csvData.push(['TWO OWNERS DISTRIBUTION'])
+        csvData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
+        csvData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        if (inputs.bothOwnersHaveLoans) {
+          csvData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
+        }
+        csvData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
+        
+        csvData.push([''])
+        csvData.push(['Owner 2 Name', ownerNames[1] || 'Owner 2'])
+        csvData.push(['Owner 2 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        if (inputs.bothOwnersHaveLoans) {
+          csvData.push(['Owner 2 Loan (LKR)', inputs.loanShakira || 0])
+        }
+        csvData.push(['Owner 2 Final Share (LKR)', results.finalShakira || 0])
+      }
+      csvData.push([''])
+
+      // Zakat Information (if applicable)
+      if (results.zakatInaya > 0 || results.zakatShakira > 0) {
+        csvData.push(['ZAKAT CALCULATIONS'])
+        if (ownerCount === 1) {
+          csvData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
+          csvData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
+        } else {
+          csvData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
+          csvData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
+          csvData.push(['Owner 2 Zakat (LKR)', results.zakatShakira || 0])
+          csvData.push(['Owner 2 After Zakat (LKR)', results.finalShakiraAfterZakat || 0])
+        }
+        csvData.push([''])
+      }
+
+      // Society Service Charge (if applicable)
+      if (results.societyServiceCharge > 0) {
+        csvData.push(['SOCIETY SERVICE CHARGES'])
+        csvData.push(['Service Charge Amount (LKR)', results.societyServiceCharge || 0])
+        csvData.push(['Reserved 30% (LKR)', (results.societyServiceCharge * 0.30) || 0])
+        csvData.push([''])
+      }
+
+      // Convert to CSV string
+      const csvContent = csvData.map(row => 
+        row.map(cell => {
+          const cellStr = String(cell || '')
+          // Quote cells that contain commas
+          return cellStr.includes(',') ? `"${cellStr}"` : cellStr
+        }).join(',')
+      ).join('\n')
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      const fileName = `Report-${(inputs.location || 'Report').replace(/\s+/g, '-')}-${inputs.date || new Date().toISOString().split('T')[0]}.csv`
+      
+      link.setAttribute('href', url)
+      link.setAttribute('download', fileName)
+      link.style.visibility = 'hidden'
+      
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (err) {
+      console.error(err)
+      alert(t('couldNotCreatePdf'))
+    }
+  }
+
   const saveCurrentReport = async () => {
     if (!results) return alert(t('noResultsToSave'))
     const allowed = await ensurePremiumAccess()
@@ -1832,52 +1977,126 @@ export default function App(){
 
         {/* Hidden/off-screen printable area */}
         {results && (
-          <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: '12pt 12pt', background: '#fff' }}>
+          <div id="print-area" ref={printRef} style={{ position: 'absolute', left: '-10000px', top: 0, padding: '12pt 12pt', background: '#fff', width: '210mm', boxSizing: 'border-box' }}>
             <style>{`
-              #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.1; color: #000; }
-              #print-area h1 { font-size: 13pt; margin: 0 0 8pt 0; font-weight: 700; text-align: center; }
-              #print-area h2 { font-size: 11pt; margin: 4pt 0; font-weight: 700 }
-              #print-area .section { margin-bottom: 6pt; }
-              #print-area .row { display: flex; justify-content: space-between; gap: 8pt; margin-bottom: 2pt; }
-              #print-area .muted { color: #444; font-size: 8.5pt }
-              #print-area .value { font-weight: 700; font-size: 9pt }
+              #print-area { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.2; color: #000; }
+              #print-area h1 { font-size: 14pt; margin: 0 0 8pt 0; font-weight: 700; text-align: center; }
+              #print-area h2 { font-size: 11pt; margin: 8pt 0 4pt 0; font-weight: 700; border-bottom: 0.5pt solid #999; padding-bottom: 2pt; }
+              #print-area .section { margin-bottom: 8pt; }
+              #print-area .row { display: flex; justify-content: space-between; gap: 12pt; margin-bottom: 3pt; padding: 0 4pt; }
+              #print-area .label { color: #333; font-size: 8.5pt; flex: 1; }
+              #print-area .value { font-weight: 700; font-size: 8.5pt; text-align: right; white-space: nowrap; }
+              #print-area .subrow { display: flex; justify-content: space-between; gap: 12pt; margin-bottom: 2pt; padding: 0 8pt; margin-left: 8pt; }
+              #print-area .sublabel { color: #666; font-size: 8pt; flex: 1; }
+              #print-area .subvalue { font-weight: 600; font-size: 8pt; text-align: right; }
             `}</style>
-            <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', padding: '0' }}>
-              <h1>{t('title')}</h1>
-              <div className="section">
-                <div className="row"><div className="muted">{t('locationDay')}</div><div className="value">{inputs.location || '-'}</div></div>
-                <div className="row"><div className="muted">{t('date')}</div><div className="value">{inputs.date || '-'}</div></div>
-                <div className="row"><div className="muted">{t('buyerName')}</div><div className="value">{inputs.buyerName || '-'}</div></div>
-                <div className="row"><div className="muted">{t('billNumber')}</div><div className="value">{inputs.billNumber || '-'}</div></div>
-              </div>
-              <div className="section" style={{ borderTop: '0.5pt solid #eee', paddingTop: '4pt' }}>
-                <div className="row"><div className="muted">{t('netBags')}</div><div className="value">{results.netBags}</div></div>
-                <div className="row"><div className="muted">{t('initialPrice')}</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
-                <div className="row"><div className="muted">{t('contractorSpent')}</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div></div>
-                <div className="row"><div className="muted">{t('contractorShare')}</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
-                <div className="row"><div className="muted">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
-              </div>
+            
+            <h1>{t('title')}</h1>
+            
+            <div className="section">
+              <h2>📋 DOCUMENT DETAILS</h2>
+              <div className="row"><div className="label">{t('locationDay')}</div><div className="value">{inputs.location || '-'}</div></div>
+              <div className="row"><div className="label">{t('date')}</div><div className="value">{inputs.date || '-'}</div></div>
+              <div className="row"><div className="label">{t('buyerName')}</div><div className="value">{inputs.buyerName || '-'}</div></div>
+              <div className="row"><div className="label">{t('billNumber')}</div><div className="value">{inputs.billNumber || '-'}</div></div>
+            </div>
 
-              <div className="section" style={{ borderTop: '0.5pt solid #eee', paddingTop: '4pt' }}>
-                <h2>{t('finalResults')}</h2>
-                <div className="row"><div className="muted">{activeOwnerNames[0] || t('owner') + ' 1'} - {t('finalShare')}</div><div className="value" style={{color: results.highlights.finalInayaNegative ? '#e11d48' : '#0ea5e9'}}>{formatLKR(results.finalInaya)}</div></div>
-                {ownerCount === 2 && (
-                  <div className="row"><div className="muted">{activeOwnerNames[1] || t('owner') + ' 2'} - {t('finalShare')}</div><div className="value" style={{color: results.highlights.finalShakiraNegative ? '#e11d48' : '#10b981'}}>{formatLKR(results.finalShakira)}</div></div>
+            <div className="section">
+              <h2>📦 SALT SALE SUMMARY</h2>
+              <div className="row"><div className="label">{t('totalSaltPackedBags')}</div><div className="value">{inputs.packedBags || 0}</div></div>
+              <div className="row"><div className="label">{t('deductedBags')}</div><div className="value">{inputs.deductedBags || 0}</div></div>
+              <div className="row"><div className="label">{t('netBags')}</div><div className="value">{results.netBags}</div></div>
+              <div className="row"><div className="label">{t('pricePerBag')} (LKR)</div><div className="value">{formatLKR(inputs.pricePerBag || 0)}</div></div>
+              <div className="row"><div className="label">{t('initialPrice')} (LKR)</div><div className="value">{formatLKR(results.initialPrice)}</div></div>
+            </div>
+
+            <div className="section">
+              <h2>🏭 OPERATIONAL COSTS</h2>
+              <div className="row"><div className="label">{t('packingFeePerBag')} (LKR)</div><div className="value">{formatLKR(inputs.packingFeePerBag || 0)}</div></div>
+              <div className="row"><div className="label">{t('bagCostPerUnit')} (LKR)</div><div className="value">{formatLKR(inputs.bagCostPerUnit || 0)}</div></div>
+              <div className="row"><div className="label">{t('otherExpenses')} (LKR)</div><div className="value">{formatLKR(inputs.otherExpenses || 0)}</div></div>
+              {results.extraExpensesTotal > 0 && (
+                <div className="row"><div className="label">Extra Expenses (LKR)</div><div className="value">{formatLKR(results.extraExpensesTotal)}</div></div>
+              )}
+              {results.labourCostsTotal > 0 && (
+                <div className="row"><div className="label">Labour Costs Total (LKR)</div><div className="value">{formatLKR(results.labourCostsTotal)}</div></div>
+              )}
+              <div className="row" style={{ fontWeight: 'bold', borderTop: '0.5pt solid #ddd', paddingTop: '2pt', marginTop: '2pt' }}>
+                <div className="label">{t('contractorSpent')}</div><div className="value">{formatLKR(results.contractorTotalSpent)}</div>
+              </div>
+            </div>
+
+            <div className="section">
+              <h2>💰 NET SETTLEMENT</h2>
+              <div className="row"><div className="label">Physical Cash (LKR)</div><div className="value">{formatLKR(inputs.cashReceived || 0)}</div></div>
+              <div className="row"><div className="label">Bank Cheques (LKR)</div><div className="value">{formatLKR(inputs.chequeReceived || 0)}</div></div>
+            </div>
+
+            <div className="section">
+              <h2>📊 PROFIT SHARE CALCULATIONS</h2>
+              <div className="row"><div className="label">Contractor Share %</div><div className="value">{contractorSharePercentage || 0}%</div></div>
+              <div className="row"><div className="label">Expense Payment Mode</div><div className="value">{inputs.expensePayment === 'owners' ? 'Owners' : inputs.expensePayment === 'contractor' ? 'Contractor' : '50/50'}</div></div>
+              <div className="row"><div className="label">{t('grandTotalReceived')} (LKR)</div><div className="value">{formatLKR(results.grandTotalReceived || 0)}</div></div>
+              <div className="row"><div className="label">{t('contractorShare')} (LKR)</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
+              <div className="row"><div className="label">Owners Group Amount (LKR)</div><div className="value">{formatLKR(results.ownerPool || 0)}</div></div>
+              <div className="row"><div className="label">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')} (LKR)</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+            </div>
+
+            <div className="section">
+              <h2>👥 OWNER DISTRIBUTION & FINAL RESULTS</h2>
+              <div style={{ marginBottom: '6pt' }}>
+                <div style={{ fontWeight: 'bold', marginBottom: '3pt' }}>{activeOwnerNames[0] || t('owner') + ' 1'}</div>
+                <div className="row"><div className="label">Share Before Loan (LKR)</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+                {inputs.bothOwnersHaveLoans && (
+                  <div className="row"><div className="label">Loan (LKR)</div><div className="value">{formatLKR(inputs.loanInaya || 0)}</div></div>
                 )}
-                {results.loanInaya > 0 && <div className="row"><div className="muted">{activeOwnerNames[0]} {t('loan')}</div><div className="value">{formatLKR(results.loanInaya)}</div></div>}
-                {ownerCount === 2 && results.loanShakira > 0 && <div className="row"><div className="muted">{activeOwnerNames[1]} {t('loan')}</div><div className="value">{formatLKR(results.loanShakira)}</div></div>}
+                <div className="row" style={{ fontWeight: 'bold', color: results.highlights.finalInayaNegative ? '#e11d48' : '#0ea5e9' }}>
+                  <div className="label">{t('finalShare')} (LKR)</div><div className="value">{formatLKR(results.finalInaya)}</div>
+                </div>
+                {results.zakatInaya > 0 && (
+                  <>
+                    <div className="row"><div className="label">Zakat (LKR)</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
+                    <div className="row"><div className="label">After Zakat (LKR)</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
+                  </>
+                )}
               </div>
 
-              <div className="section" style={{ borderTop: '0.5pt solid #eee', paddingTop: '4pt' }}>
-                 <div className="row"><div className="muted">{activeOwnerNames[0]} {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatInaya)}</div></div>
-                 <div className="row"><div className="muted">{activeOwnerNames[0]} {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalInayaAfterZakat)}</div></div>
-                 {ownerCount === 2 && (
-                   <>
-                     <div className="row"><div className="muted">{activeOwnerNames[1]} {t('zakatLabel')}</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
-                     <div className="row"><div className="muted">{activeOwnerNames[1]} {t('afterZakatLabel')}</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
-                   </>
-                 )}
+              {ownerCount === 2 && (
+                <div>
+                  <div style={{ fontWeight: 'bold', marginBottom: '3pt' }}>{activeOwnerNames[1] || t('owner') + ' 2'}</div>
+                  <div className="row"><div className="label">Share Before Loan (LKR)</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
+                  {inputs.bothOwnersHaveLoans && (
+                    <div className="row"><div className="label">Loan (LKR)</div><div className="value">{formatLKR(inputs.loanShakira || 0)}</div></div>
+                  )}
+                  <div className="row" style={{ fontWeight: 'bold', color: results.highlights.finalShakiraNegative ? '#e11d48' : '#10b981' }}>
+                    <div className="label">{t('finalShare')} (LKR)</div><div className="value">{formatLKR(results.finalShakira)}</div>
+                  </div>
+                  {results.zakatShakira > 0 && (
+                    <>
+                      <div className="row"><div className="label">Zakat (LKR)</div><div className="value">{formatLKR(results.zakatShakira)}</div></div>
+                      <div className="row"><div className="label">After Zakat (LKR)</div><div className="value">{formatLKR(results.finalShakiraAfterZakat)}</div></div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {(Number(disasterRecovery.pondsReconstruction) || Number(disasterRecovery.hutReconstruction) || Number(disasterRecovery.electricityBills) || Number(disasterRecovery.compensationReceived) || Number(disasterRecovery.donationsReceived) || Number(disasterRecovery.lossQuantity)) && (
+              <div className="section">
+                <h2>🌊 DISASTER RECOVERY EXPENSES</h2>
+                {Number(disasterRecovery.lossQuantity) > 0 && (
+                  <div className="row"><div className="label">Loss Quantity</div><div className="value">{disasterRecovery.lossQuantity} {disasterRecovery.lossUnit}</div></div>
+                )}
+                <div className="row"><div className="label">Ponds Reconstruction (LKR)</div><div className="value">{formatLKR(disasterRecovery.pondsReconstruction || 0)}</div></div>
+                <div className="row"><div className="label">Hut Reconstruction (LKR)</div><div className="value">{formatLKR(disasterRecovery.hutReconstruction || 0)}</div></div>
+                <div className="row"><div className="label">Electricity Bills (LKR)</div><div className="value">{formatLKR(disasterRecovery.electricityBills || 0)}</div></div>
+                <div className="row"><div className="label">Compensation Received (LKR)</div><div className="value">{formatLKR(disasterRecovery.compensationReceived || 0)}</div></div>
+                <div className="row"><div className="label">Donations Received (LKR)</div><div className="value">{formatLKR(disasterRecovery.donationsReceived || 0)}</div></div>
               </div>
+            )}
+
+            <div style={{ marginTop: '12pt', paddingTop: '12pt', borderTop: '1pt solid #000', fontSize: '8pt', color: '#666', textAlign: 'center' }}>
+              {t('generatedOn')} {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
             </div>
           </div>
         )}
@@ -1944,7 +2163,7 @@ export default function App(){
 
       <BottomAccessMenu
         onDownloadPDF={downloadPDF}
-        onDownloadExcel={downloadPDF}
+        onDownloadExcel={downloadCSV}
         onSave={saveCurrentReport}
         onCloud={() => {
           setMenuOpen(true);
