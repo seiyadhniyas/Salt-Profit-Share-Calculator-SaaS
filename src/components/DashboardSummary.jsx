@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { formatLKR } from '../utils/calculations.jsx'
+import ContactFormModal from './ContactFormModal.jsx'
 
 function StatCard({ title, value, note, accent = 'slate', isTamil }) {
   const accentMap = {
@@ -53,6 +54,8 @@ export default function DashboardSummary({
 
   const [showVaultExpanded, setShowVaultExpanded] = useState(false)
   const [newLoc, setNewLoc] = useState('')
+  const [showContactForm, setShowContactForm] = useState(false)
+  const [contactFormBusy, setContactFormBusy] = useState(false)
   
   if (!open) return null
 
@@ -70,6 +73,19 @@ export default function DashboardSummary({
   const isTamil = (t && typeof t === 'function' && t('lang') === 'ta')
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || tr('guestMember', 'Guest member')
+
+  // Handle contact form submission
+  const handleContactFormSubmit = async (formData) => {
+    try {
+      setContactFormBusy(true)
+      // Call the parent handler with the form data
+      await onRequestCashPayment?.(formData)
+    } catch (error) {
+      throw error
+    } finally {
+      setContactFormBusy(false)
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm sm:items-center p-0 sm:p-4">
@@ -128,7 +144,7 @@ export default function DashboardSummary({
                     {!billingStatus?.full_access_enabled && (
                       <div className="flex gap-3">
                         <button onClick={() => onStartCardPayment?.()} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">{tr('payByCard', 'PAY BY CARD')}</button>
-                        <button onClick={() => onRequestCashPayment?.()} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
+                        <button onClick={() => setShowContactForm(true)} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
                       </div>
                     )}
                   </div>
@@ -295,6 +311,16 @@ export default function DashboardSummary({
             </p>
           </div>
         </div>
+
+        {/* Contact Form Modal */}
+        <ContactFormModal
+          open={showContactForm}
+          onClose={() => setShowContactForm(false)}
+          onSubmit={handleContactFormSubmit}
+          isLoading={contactFormBusy}
+          t={t}
+          session={session}
+        />
       </div>
     </div>
   )

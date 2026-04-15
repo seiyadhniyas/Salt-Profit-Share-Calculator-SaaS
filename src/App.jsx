@@ -522,6 +522,33 @@ export default function App(){
       labourData: 'Labour Data',
       inventoryData: 'Inventory Data',
       disasterData: 'Disaster Data',
+      // Contact Form Translations
+      contactUs: 'Contact Us',
+      fullName: 'Full Name',
+      fullNameRequired: 'Please enter your full name',
+      enterFullName: 'Enter your full name',
+      email: 'Email',
+      emailRequired: 'Please enter your email',
+      enterEmail: 'Enter your email address',
+      phoneNumber: 'Phone Number',
+      phoneRequired: 'Please enter your phone number',
+      enterPhone: 'Enter your phone number',
+      phone: 'Phone',
+      company: 'Company/Business Name',
+      enterCompany: 'Enter company/business name (optional)',
+      preferredContactMethod: 'Preferred Contact Method',
+      whatsapp: 'WhatsApp',
+      message: 'Message (Optional)',
+      enterMessage: 'Tell us about your inquiry...',
+      note: 'Note',
+      adminWillVerify: 'Our team will verify your details and contact you within 24 hours to discuss your payment options.',
+      adminWillContact: 'Our admin team will contact you within 24 hours.',
+      cancel: 'Cancel',
+      submit: 'Submit',
+      submitting: 'Submitting...',
+      submitError: 'Error submitting form. Please try again.',
+      thankYou: 'Thank You!',
+      contactFormSubmitted: 'Your request has been submitted successfully.',
       done: 'Done',
     },
     ta: {
@@ -635,7 +662,7 @@ export default function App(){
       premiumActive: 'பிரீமியம் அணுகல் செயல்பாட்டில் உள்ளது',
       logout: 'வெளியேறு',
       login: 'உள்நுழைய / பதிவு செய்ய',
-      guestMember: 'விருந்தினர் உறுப்பினர்',
+      guestMember: 'பார்வையாளர் உறுப்பினர்',
       trialUses: 'சோதனை பயன்பாடுகள்',
       customLocations: 'பணி இடங்கள்',
       ownerNames: 'உரிமையாளர் பெயர்கள்',
@@ -773,6 +800,33 @@ export default function App(){
       labourData: 'தொழிலாளர் தரவு',
       inventoryData: 'இருப்பு தரவு',
       disasterData: 'பேரழிவு தரவு',
+      // Contact Form Translations
+      contactUs: 'எங்களைத் தொடர்பு கொள்ளுங்கள்',
+      fullName: 'முழு பெயர்',
+      fullNameRequired: 'தயவு செய்து உங்கள் முழு பெயரை உள்ளிடவும்',
+      enterFullName: 'உங்கள் முழு பெயரை உள்ளிடவும்',
+      email: 'மின்னஞ்சல்',
+      emailRequired: 'தயவு செய்து உங்கள் மின்னஞ்சலை உள்ளிடவும்',
+      enterEmail: 'உங்கள் மின்னஞ்சல் முகவரியை உள்ளிடவும்',
+      phoneNumber: 'தொலைபேசி எண்',
+      phoneRequired: 'தயவு செய்து உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்',
+      enterPhone: 'உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்',
+      phone: 'தொலைபேசி',
+      company: 'நிறுவனம்/வணிக பெயர்',
+      enterCompany: 'நிறுவனம்/வணிக பெயரை உள்ளிடவும் (விருப்பம்)',
+      preferredContactMethod: 'விருப்பமான தொடர்பு முறை',
+      whatsapp: 'WhatsApp',
+      message: 'செய்தி (விருப்பம்)',
+      enterMessage: 'உங்கள் விசாரணையைப் பற்றி எங்களுக்கு சொல்லுங்கள்...',
+      note: 'குறிப்பு',
+      adminWillVerify: 'எங்கள் குழு உங்கள் விவரங்களை சரிபார்த்து 24 மணிநேரத்தில் உங்களைத் தொடர்பு கொள்ளும்.',
+      adminWillContact: 'எங்கள் நிர்வாகக் குழு 24 மணிநேரத்தில் உங்களைத் தொடர்பு கொள்ளும்.',
+      cancel: 'ரத்து செய்',
+      submit: 'சமர்ப்பி',
+      submitting: 'சமர்ப்பிக்கப்பட்டு வருகிறது...',
+      submitError: 'படிவத்தை சமர்ப்பிக்கும் போது பிழை ஏற்பட்டது. மீண்டும் முயற்சி செய்யவும்.',
+      thankYou: 'நன்றி!',
+      contactFormSubmitted: 'உங்கள் கோரிக்கை வெற்றிகரமாக சமர்ப்பிக்கப்பட்டுவிட்டது.',
       done: 'முடிந்தது',
     },
     si: {
@@ -1024,6 +1078,33 @@ export default function App(){
       labourData: 'සේවක දත්ත',
       inventoryData: 'තොග දත්ත',
       disasterData: 'ආපදා දත්ත',
+      // Contact Form Translations
+      contactUs: 'අපට සම්බන්ධ වන්න',
+      fullName: 'සම්පූර්ණ නම',
+      fullNameRequired: 'කරුණාකර ඔබගේ සම්පූර්ණ නම ඇතුළත් කරන්න',
+      enterFullName: 'ඔබගේ සම්පූර්ණ නම ඇතුළත් කරන්න',
+      email: 'ඊමේල්',
+      emailRequired: 'කරුණාකර ඔබගේ ඊමේල් ඇතුළත් කරන්න',
+      enterEmail: 'ඔබගේ ඊමේල් ලිපිනය ඇතුළත් කරන්න',
+      phoneNumber: 'දුරකතන අංකය',
+      phoneRequired: 'කරුණාකර ඔබගේ දුරකතන අංකය ඇතුළත් කරන්න',
+      enterPhone: 'ඔබගේ දුරකතන අංකය ඇතුළත් කරන්න',
+      phone: 'දුරකතනය',
+      company: 'සමාගම/ව්‍යාපාර හි නම',
+      enterCompany: 'සමාගම/ව්‍යාපාර හි නම ඇතුළත් කරන්න (විකල්පක)',
+      preferredContactMethod: 'කැමති සම්බන්ධතා ක්‍රමය',
+      whatsapp: 'WhatsApp',
+      message: 'පණිවිඩය (විකල්පක)',
+      enterMessage: 'ඔබගේ ප්‍රශ්න ගැන අපට කියන්න...',
+      note: 'සටහන',
+      adminWillVerify: 'අපගේ කණ්ඩායම ඔබගේ විස්තර සත්‍යාපනය කර 24 ගණනාවට තුළ ඔබ සම්බන්ධ වනු ඇත.',
+      adminWillContact: 'අපගේ පරිපාලක කණ්ඩායම 24 ගණනාවට තුළ ඔබ සම්බන්ධ වනු ඇත.',
+      cancel: 'අවලංඝනය කරන්න',
+      submit: 'ඉදිරිපත් කරන්න',
+      submitting: 'ඉදිරිපත් කරමින් පවතී...',
+      submitError: 'ෆෝරම ඉදිරිපත් කිරීමේ දී දෝෂ ඇතිවිය. කරුණාකර නැවත උත්සාහ කරන්න.',
+      thankYou: 'ස්තූතියි!',
+      contactFormSubmitted: 'ඔබගේ ඉල්ලීමය සফලව ඉදිරිපත් කරන ලදි.',
       done: 'අවසන්',
     },
   }
@@ -1290,15 +1371,30 @@ export default function App(){
     }
   }
 
-  const handleRequestCashPayment = async (buyerNote) => {
+  const handleRequestCashPayment = async (contactFormData) => {
     if (!session?.user?.id) return
     try {
       setPaymentBusy(true)
+      
+      // Handle both old format (string buyerNote) and new format (contact form object)
+      let buyerNote = ''
+      if (typeof contactFormData === 'string') {
+        buyerNote = contactFormData
+      } else if (typeof contactFormData === 'object' && contactFormData) {
+        // Build message from contact form data
+        buyerNote = `
+Name: ${contactFormData.fullName}
+Phone: ${contactFormData.phoneNumber}
+Company: ${contactFormData.company || 'N/A'}
+Preferred Contact: ${contactFormData.preferredContactMethod}
+Message: ${contactFormData.message || 'N/A'}
+        `.trim()
+      }
+      
       await requestCashPayment({ session, amount: ONE_OFF_PRICE_LKR, buyerNote })
-      alert('Cash payment request sent! We will verify your payment soon.')
-      await refreshBillingStatus(session)
+      // Success notification is shown in the ContactFormModal
     } catch (error) {
-      alert(error.message)
+      throw error
     } finally {
       setPaymentBusy(false)
     }
@@ -1627,9 +1723,9 @@ export default function App(){
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-14 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-8 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
-        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-12 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-5">
+        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-20 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-12">
           <div className="absolute left-3 top-3 sm:left-5 sm:top-4" style={{paddingLeft: '10px'}}>
             <select 
               value={lang} 
