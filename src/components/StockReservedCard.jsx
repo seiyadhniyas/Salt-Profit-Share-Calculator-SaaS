@@ -306,7 +306,7 @@ export default function StockReservedCard({
         <button
           type="button"
           onClick={onSave}
-          className="w-full mt-6 px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-black rounded-[28px] uppercase tracking-widest text-sm shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
+          className="w-full mt-6 px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-[28px] uppercase tracking-widest text-sm shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
         >
           💾 {tr('saveStockReserved', 'Save Stock Reserved')}
         </button>

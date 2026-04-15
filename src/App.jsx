@@ -1944,6 +1944,7 @@ export default function App(){
 
       <BottomAccessMenu
         onDownloadPDF={downloadPDF}
+        onDownloadExcel={downloadPDF}
         onSave={saveCurrentReport}
         onCloud={() => {
           setMenuOpen(true);

@@ -460,7 +460,7 @@ export default function InputSection({
 
       {(activeModule === 'inventory' || !activeModule) && (
       <div className="mt-4 flex flex-col items-center w-full">
-        <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+        <div className="w-full max-w-full">
           <StockReservedCard
             stockReserved={stockReserved}
             onStockReservedChange={(field, val) => setStockReserved(prev => ({ ...prev, [field]: val }))}
