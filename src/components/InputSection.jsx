@@ -9,11 +9,11 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
   return (
     <label className="block mb-3">
       <div className="flex items-center gap-3 mb-2 ml-1">
-        <div className={`text-[10px] font-semibold uppercase tracking-tight ${disabled ? 'text-slate-300' : 'text-slate-500'}`}>{label}</div>
+        <div className={`text-sm font-semibold uppercase tracking-tight ${disabled ? 'text-slate-300' : 'text-slate-500'}`}>{label}</div>
         {tooltip && (
           <div className="relative group">
-            <span className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-slate-300 border border-slate-200 rounded-full cursor-help hover:text-slate-500 transition">?</span>
-            <div className="hidden group-hover:block absolute z-50 bg-slate-900 text-white text-[10px] rounded-lg px-3 py-2 w-48 shadow-2xl leading-relaxed left-1/2 -translate-x-1/2 bottom-full mb-2 uppercase font-bold tracking-tighter">
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-slate-300 border border-slate-200 rounded-full cursor-help hover:text-slate-500 transition">?</span>
+            <div className="hidden group-hover:block absolute z-50 bg-slate-900 text-white text-xs rounded-lg px-3 py-2 w-48 shadow-2xl leading-relaxed left-1/2 -translate-x-1/2 bottom-full mb-2 uppercase font-bold tracking-tighter">
               {tooltip}
             </div>
           </div>
@@ -225,7 +225,7 @@ export default function InputSection({
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-2">
           <label className="block">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('locationDay', 'LOCATION')} <span className="text-rose-600">*</span></div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('locationDay', 'LOCATION')} <span className="text-rose-600">*</span></div>
             {Array.isArray(customLocations) && customLocations.length > 0 ? (
               <div className="relative">
                 <select 
@@ -255,7 +255,7 @@ export default function InputSection({
           </label>
 
           <label className="block">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('date', 'DATE')} <span className="text-rose-600">*</span></div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('date', 'DATE')} <span className="text-rose-600">*</span></div>
             <input
               type="date"
               value={inputs?.date || ''}
@@ -266,7 +266,7 @@ export default function InputSection({
           </label>
 
           <label className="block">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('buyerName', 'BUYER NAME')}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('buyerName', 'BUYER NAME')}</div>
             <input
               type="text"
               value={inputs?.buyerName || ''}
@@ -276,7 +276,7 @@ export default function InputSection({
           </label>
 
           <label className="block">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('billNumber', 'BILL NO.')}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('billNumber', 'BILL NO.')}</div>
             <input
               type="text"
               value={inputs?.billNumber || ''}
@@ -317,7 +317,7 @@ export default function InputSection({
                       className="w-5 h-5 text-blue-600 focus:ring-0 border-2 border-slate-300 mt-0.5" 
                     />
                     <div className="flex-1">
-                      <span className="text-xs text-slate-700 group-hover:text-slate-900 tracking-tight transition-colors block normal-case font-semibold">{opt.label}</span>
+                      <span className="text-sm text-slate-700 group-hover:text-slate-900 tracking-tight transition-colors block normal-case font-semibold">{opt.label}</span>
                       <span className="text-[10px] text-slate-500 group-hover:text-slate-600 normal-case font-normal">{opt.desc}</span>
                     </div>
                   </label>
@@ -380,7 +380,7 @@ export default function InputSection({
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2 p-3 bg-purple-50 rounded-2xl border-2 border-purple-100">
               <span className="text-xl">🏭</span>
-              <div className="text-xs font-semibold text-purple-900 uppercase tracking-tight">{tr('contractorExpenses', 'OPERATIONAL COSTS')}</div>
+              <div className="text-sm font-semibold text-purple-900 uppercase tracking-tight">{tr('contractorExpenses', 'OPERATIONAL COSTS')}</div>
             </div>
             
             <div className={`bg-slate-50 p-4 lg:p-6 rounded-[28px] border-2 border-slate-100 ${contractorSectionDisabled ? 'opacity-60 pointer-events-none' : ''}`}>
@@ -393,7 +393,7 @@ export default function InputSection({
                 ].map(opt => (
                   <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
                     <input type="radio" name="expensePayment" value={opt.id} checked={(inputs?.expensePayment || 'owners') === opt.id} onChange={(e) => onChange('expensePayment', e.target.value)} disabled={contractorSectionDisabled} className={`w-5 h-5 text-purple-600 focus:ring-0 border-2 border-slate-300 ${contractorSectionDisabled ? 'cursor-not-allowed opacity-50' : ''}`} />
-                    <span className="text-xs text-slate-500 group-hover:text-slate-900 tracking-tight transition-colors normal-case font-semibold">{opt.label}</span>
+                    <span className="text-sm text-slate-500 group-hover:text-slate-900 tracking-tight transition-colors normal-case font-semibold">{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -425,7 +425,7 @@ export default function InputSection({
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2 p-3 bg-emerald-50 rounded-2xl border-2 border-emerald-100">
                <span className="text-xl">💰</span>
-               <div className="text-xs font-semibold text-emerald-900 uppercase tracking-tight">{tr('income', 'NET SETTLEMENT')}</div>
+               <div className="text-sm font-semibold text-emerald-900 uppercase tracking-tight">{tr('income', 'NET SETTLEMENT')}</div>
             </div>
             <NumberInput label={tr('cashReceived', 'PHYSICAL CASH (LKR)')} name="cashReceived" value={inputs?.cashReceived} onChange={onChange} decimals={2} tooltip={tr('cashAutoHint', 'Automatically displayed, you may override the amount')} />
             <NumberInput label={tr('chequeReceived', 'BANK CHEQUES (LKR)')} name="chequeReceived" value={inputs?.chequeReceived} onChange={onChange} decimals={2} />
@@ -439,7 +439,7 @@ export default function InputSection({
                   onChange={(e) => toggleLoans(e.target.checked)}
                   className="h-5 w-5 text-indigo-600 rounded-lg border-2 border-indigo-200 focus:ring-0"
                 />
-                <label htmlFor="toggleLoans" className="text-[10px] font-semibold text-indigo-900 uppercase tracking-tight cursor-pointer">
+                <label htmlFor="toggleLoans" className="text-sm font-semibold text-indigo-900 uppercase tracking-tight cursor-pointer">
                   {tr(isSingleOwner ? 'oneOwnerHasLoan' : 'bothOwnersHaveLoans', isSingleOwner ? 'OWNER HAS LOAN' : 'BOTH OWNERS HAVE LOANS')}
                 </label>
               </div>
@@ -508,7 +508,7 @@ export default function InputSection({
                   
                   <div className="space-y-3">
                     <label className="block">
-                      <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('labourNameRole', 'Name / Role')}</div>
+                      <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('labourNameRole', 'Name / Role')}</div>
                       <input 
                         type="text" 
                         value={entry.name || ''} 
@@ -520,7 +520,7 @@ export default function InputSection({
 
                     <div className="grid grid-cols-2 gap-3">
                       <label className="block">
-                        <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('dateOfService', 'Date')}</div>
+                        <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('dateOfService', 'Date')}</div>
                         <input 
                           type="date" 
                           value={entry.date || ''} 
@@ -530,7 +530,7 @@ export default function InputSection({
                       </label>
 
                       <label className="block">
-                        <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('paymentFrequency', 'Frequency')}</div>
+                        <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('paymentFrequency', 'Frequency')}</div>
                         <select 
                           value={entry.frequency || 'Weekly'} 
                           onChange={(e) => updateLabourCost(entry.id, 'frequency', e.target.value)}
@@ -545,7 +545,7 @@ export default function InputSection({
                     </div>
 
                     <label className="block">
-                      <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('totalAmountLkr', 'Total Amount (LKR)')}</div>
+                      <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('totalAmountLkr', 'Total Amount (LKR)')}</div>
                       <input 
                         type="number" 
                         step="any" 

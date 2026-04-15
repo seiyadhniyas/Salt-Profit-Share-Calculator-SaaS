@@ -67,7 +67,7 @@ export default function StockReservedCard({
         <div className="bg-white/50 p-4 rounded-[24px] border-2 border-amber-100">
           {/* Quantity - Unit Selector at Top */}
           <label className="block mb-4">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('quantityUnit', 'QUANTITY UNIT')}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('quantityUnit', 'QUANTITY UNIT')}</div>
             <div className="relative">
               <select
                 value={stockReserved.stockUnit || 'bags'}
@@ -85,7 +85,7 @@ export default function StockReservedCard({
 
           {/* Stock Level Input */}
           <label className="block mb-4">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('stockLevel', 'STOCK LEVEL')}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('stockLevel', 'STOCK LEVEL')}</div>
             <input
               type="number"
               step="any"
@@ -104,7 +104,7 @@ export default function StockReservedCard({
 
           {/* Estimated Price Input */}
           <label className="block">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('estimatedPriceLKR', 'ESTIMATED PRICE (LKR)')}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('estimatedPriceLKR', 'ESTIMATED PRICE (LKR)')}</div>
             <input
               type="number"
               step="any"
@@ -120,7 +120,7 @@ export default function StockReservedCard({
         {/* Location Section */}
         <div className="bg-white/50 p-4 rounded-[24px] border-2 border-amber-100">
           <label className="block">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-3 ml-1">{tr('locationsMultiple', 'LOCATIONS (MULTIPLE)')}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-3 ml-1">{tr('locationsMultiple', 'LOCATIONS (MULTIPLE)')}</div>
             
             {/* Location Dropdown */}
             {customLocations.length > 0 && (
@@ -218,7 +218,7 @@ export default function StockReservedCard({
         <div className="bg-white/50 p-4 rounded-[24px] border-2 border-amber-100">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="block">
-              <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('fromDate', 'FROM DATE')}</div>
+              <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('fromDate', 'FROM DATE')}</div>
               <input
                 type="date"
                 value={stockReserved.fromDate || ''}
@@ -227,7 +227,7 @@ export default function StockReservedCard({
               />
             </label>
             <label className="block">
-              <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('toDate', 'TO DATE')}</div>
+              <div className="text-sm font-semibold text-slate-500 uppercase tracking-tight mb-2 ml-1">{tr('toDate', 'TO DATE')}</div>
               <input
                 type="date"
                 value={stockReserved.toDate || ''}
