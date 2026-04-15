@@ -149,7 +149,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
 
             <div className="android-card p-6 mt-4 bg-orange-50 border border-orange-200/50">
                 <div className="flex justify-between items-center mb-4">
-                <span className="text-sm font-bold text-slate-700">{t ? t('totalDistributed') : 'Total Distributed'}</span>
+                <span className="text-sm font-bold text-slate-700">{t ? t('totalDistributed') : 'Total Distribution'}</span>
                 <strong className="text-lg font-mono text-slate-900">{formatLKR(results.finalInaya + (isSingleOwner ? 0 : results.finalShakira))}</strong>
               </div>
               <div className="my-4 border-t border-orange-200/50"></div>
