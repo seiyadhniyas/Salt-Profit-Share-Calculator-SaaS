@@ -115,6 +115,12 @@ Total recommended timeline to full adoption: 6–10 weeks depending on training 
 - **Option A (Society License):** One-time setup fee + annual hosting/maintenance. Recommended for centralized societies.
 - **Option B (Per-Member Subscription):** Low monthly fee per producer (covers hosting, support, updates).
 
+### Pricing Estimate
+
+- **One-time Society License (recommended):** LKR **30,000** (one-time payment) — covers deployment, initial configuration, and the included training package.
+- **Card Payment Processing:** If paying by card, a bank processing charge of up to **LKR 1,100** may apply (charged by the payment provider).
+- **Notes:** This one-time price includes 3 months of post-launch support; ongoing hosting and maintenance fees will be proposed based on the agreed SLA.
+
 Pricing will be proposed after a short scoping call to confirm integration, expected PV load, and desired support SLA.
 
 ## Risks & Mitigation
