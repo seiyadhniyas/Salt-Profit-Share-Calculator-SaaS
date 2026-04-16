@@ -20,6 +20,11 @@ import { getUserRole, canEdit } from './api/roles.js'
 import RedesignedHeader from './components/RedesignedHeader.jsx'
 import BottomAccessMenu from './components/BottomAccessMenu.jsx'
 import AccordionCard from './components/AccordionCard.jsx'
+import validateModule from './utils/validator.js'
+import Toaster from './components/Toaster.jsx'
+import { logEvent, sanitizeInputs } from './utils/eventLogger.js'
+import AiEventsViewer from './components/AiEventsViewer.jsx'
+import { getLocalSuggestions } from './utils/aiAssistClient.js'
 
 const STORAGE_KEY = 'salt_profit_share_last'
 
@@ -549,6 +554,14 @@ export default function App(){
       submitError: 'Error submitting form. Please try again.',
       thankYou: 'Thank You!',
       contactFormSubmitted: 'Your request has been submitted successfully.',
+      missing_location: 'Please select a Location.',
+      missing_date: 'Please enter a Date.',
+      missing_packedBags: 'Enter total packed bags (must be > 0).',
+      missing_pricePerBag: 'Enter price per bag (must be > 0).',
+      missing_reserved_stock: "No reserved stock available. Add details in 'Stock Reserved' card first.",
+      recommended_costs: 'Consider adding packing fee, bag cost, or other expenses for accurate results.',
+      recommended_labour: 'No labour entries found. Add labour costs if applicable.',
+      missing_mixed_amounts: 'Provide both Fresh and Reserved amounts for Mixed stock.',
       done: 'Done',
     },
     ta: {
@@ -827,6 +840,14 @@ export default function App(){
       submitError: 'படிவத்தை சமர்ப்பிக்கும் போது பிழை ஏற்பட்டது. மீண்டும் முயற்சி செய்யவும்.',
       thankYou: 'நன்றி!',
       contactFormSubmitted: 'உங்கள் கோரிக்கை வெற்றிகரமாக சமர்ப்பிக்கப்பட்டுவிட்டது.',
+      missing_location: 'இடத்தைத் தேர்ந்தெடுக்கவும்.',
+      missing_date: 'தயவு செய்து தேதி உள்ளிடவும்.',
+      missing_packedBags: 'மொத்த மூட்டைகள் (0-இற்கு மேல்) என்பதைக் குறிப்பிடவும்.',
+      missing_pricePerBag: 'மூட்டை ஒன்றின் விலையை (LKR) உள்ளிடவும்.',
+      missing_reserved_stock: "காப்பிடப்பட்ட சரக்குகள் இல்லை. 'Stock Reserved' கார்டில் விவரங்களை சேர்க்கவும்.",
+      recommended_costs: 'துல்லியமான முடிவுகளுக்கு கட்டப்படுதல்/பை செலவுகளைச் சேர்க்க பரிந்துரைக்கப்படுகிறது.',
+      recommended_labour: 'தொழிலாளர் செலவுகள் இல்லை. தேவையானால் சேர்க்கவும்.',
+      missing_mixed_amounts: 'Mixed தேர்விற்கு Fresh மற்றும் Reserved அளவுகளை இரண்டையும் வழங்கவும்.',
       done: 'முடிந்தது',
     },
     si: {
@@ -1105,6 +1126,14 @@ export default function App(){
       submitError: 'ෆෝරම ඉදිරිපත් කිරීමේ දී දෝෂ ඇතිවිය. කරුණාකර නැවත උත්සාහ කරන්න.',
       thankYou: 'ස්තූතියි!',
       contactFormSubmitted: 'ඔබගේ ඉල්ලීමය සফලව ඉදිරිපත් කරන ලදි.',
+      missing_location: 'කරුණාකර ස්ථානය තෝරන්න.',
+      missing_date: 'කරුණාකර දිනය ඇතුලත් කරන්න.',
+      missing_packedBags: 'මුළු මලු ප්‍රමාණය ඇතුලත් කරන්න (0ට වඩා වැඩියෙන්).',
+      missing_pricePerBag: 'මොට්ටියකට මිල (LKR) ඇතුලත් කරන්න.',
+      missing_reserved_stock: "සුරකින්නා වූ ගබඩා නොමැත. 'Stock Reserved' කාඩ් එකේ විස්තර එකතු කරන්න.",
+      recommended_costs: 'නිවැරදි ප්‍රතිඵල සඳහා packing fee, bag cost හෝ වෙනත් වියදම් එකතු කරන්න.',
+      recommended_labour: 'වැඩ ගාස්තු නොමැත. අවශ්‍ය නම් එකතු කරන්න.',
+      missing_mixed_amounts: 'Mixed තෝරන විට Fresh සහ Reserved ප්‍රමාණ දෙකම ලබා දෙන්න.',
       done: 'අවසන්',
     },
   }
@@ -1113,6 +1142,14 @@ export default function App(){
     if (key === 'lang') return lang
     return (translations[lang] && translations[lang][key]) || key
   }
+
+  const [toasts, setToasts] = useState([])
+  const showToast = (message, type = 'info', timeout = 6000) => {
+    const id = Date.now() + Math.floor(Math.random() * 1000)
+    setToasts(prev => ([...prev, { id, message, type }]))
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), timeout)
+  }
+  const removeToast = (id) => setToasts(prev => prev.filter(t => t.id !== id))
 
   const [results, setResults] = useState(null)
   const [authModalOpen, setAuthModalOpen] = useState(false)
@@ -1131,6 +1168,7 @@ export default function App(){
   const [pendingPaymentRequests, setPendingPaymentRequests] = useState([])
   const [adminActionBusy, setAdminActionBusy] = useState(false)
   const [activeModule, setActiveModule] = useState(null)
+  const [aiEventsOpen, setAiEventsOpen] = useState(false)
   const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
   const ONE_OFF_PRICE_LKR = 30000
   const STRIPE_FEE_PERCENT = Number(import.meta.env.VITE_STRIPE_LKR_FEE_PERCENT || 3.4)
@@ -1721,6 +1759,212 @@ Message: ${contactFormData.message || 'N/A'}
     await supabase.auth.signOut()
     setSession(null)
   }
+  const handleCloseActiveModule = async () => {
+    if (!activeModule) return setActiveModule(null)
+    const issues = validateModule(activeModule, { inputs, stockReserved, ownerNames: activeOwnerNames, customLocations, ownerCount, stockSource })
+    const sanitizedInputs = sanitizeInputs(inputs)
+    const sanitizedStock = sanitizeInputs(stockReserved)
+    if (issues && issues.length > 0) {
+      issues.slice(0, 3).forEach(issue => {
+        const translated = t(issue.messageKey)
+        const message = (translated === issue.messageKey) ? issue.fallback : translated
+        showToast(message, issue.type === 'warning' ? 'warning' : issue.type === 'error' ? 'error' : 'info')
+      })
+
+      const requestId = Date.now() + Math.floor(Math.random() * 1000)
+
+      // Determine whether any issue should block closing the overlay
+      // Only treat setup's missing location/date as blocking; all other pricing cards are non-blocking.
+      const blockingKeys = ['missing_location', 'missing_date']
+      const hasBlocking = activeModule === 'setup' && issues.some(i => blockingKeys.includes(i.messageKey))
+
+      // Log validation event (differentiate blocking vs non-blocking)
+      try {
+        await logEvent({
+          type: hasBlocking ? 'validation_failure' : 'validation_warning',
+          module: activeModule,
+          action: hasBlocking ? 'close_attempt' : 'close_with_warnings',
+          sessionUserId: session?.user?.id || null,
+          lang,
+          issues: issues.slice(0, 10),
+          inputs: sanitizedInputs,
+          stockReserved: sanitizedStock,
+          requestId
+        })
+      } catch (e) {
+        console.error('logEvent error', e)
+      }
+
+      // Request AI suggestions. For blocking issues we wait and surface suggestions before returning.
+      const assistPayload = { module: activeModule, issues: issues.slice(0, 10), inputs: sanitizedInputs, lang, requestId }
+      try {
+        await logEvent({ type: 'assist_requested', module: activeModule, action: hasBlocking ? 'request' : 'request_non_blocking', sessionUserId: session?.user?.id || null, lang, issues: issues.slice(0, 5), requestId })
+      } catch (e) {
+        console.error('logEvent error', e)
+      }
+
+      if (hasBlocking) {
+        try {
+          const resp = await fetch('/.netlify/functions/aiAssist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(assistPayload)
+          })
+          const data = await resp.json()
+          if (data && data.ok) {
+            if (data.source === 'rules' && Array.isArray(data.suggestions)) {
+              data.suggestions.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+              await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules', sessionUserId: session?.user?.id || null, lang, suggestions: data.suggestions, requestId })
+            } else if (data.source === 'llm') {
+              const assistant = data.assistant || ''
+              if (assistant) showToast(assistant, 'info', 12000)
+              await logEvent({ type: 'assist_provided', module: activeModule, action: 'llm', sessionUserId: session?.user?.id || null, lang, assistant, requestId })
+            }
+          } else {
+            // Server returned a non-ok response; fallback to client-side deterministic suggestions
+            try {
+              const fallback = getLocalSuggestions(issues, lang)
+              fallback.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+              await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_fallback', sessionUserId: session?.user?.id || null, lang, suggestions: fallback, requestId })
+            } catch (e) {
+              console.error('fallback assist error', e)
+            }
+          }
+        } catch (e) {
+            console.error('AI assist error', e)
+            // fallback to local suggestions on network/error
+            try {
+              const fallback = getLocalSuggestions(issues, lang)
+              fallback.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+              await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_fallback', sessionUserId: session?.user?.id || null, lang, suggestions: fallback, requestId })
+            } catch (e2) {
+              console.error('fallback assist error', e2)
+            }
+        }
+
+        return
+      }
+
+      // Non-blocking: fire-and-forget AI assist, close the overlay
+      ;(async () => {
+        try {
+          const resp = await fetch('/.netlify/functions/aiAssist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(assistPayload)
+          })
+          const data = await resp.json()
+          if (data && data.ok) {
+            if (data.source === 'rules' && Array.isArray(data.suggestions)) {
+              data.suggestions.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+              await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_non_blocking', sessionUserId: session?.user?.id || null, lang, suggestions: data.suggestions, requestId })
+            } else if (data.source === 'llm') {
+              const assistant = data.assistant || ''
+              if (assistant) showToast(assistant, 'info', 12000)
+              await logEvent({ type: 'assist_provided', module: activeModule, action: 'llm_non_blocking', sessionUserId: session?.user?.id || null, lang, assistant, requestId })
+            }
+          } else {
+            // server returned non-ok; fallback
+            const fallback = getLocalSuggestions(issues, lang)
+            fallback.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+            await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_fallback_non_blocking', sessionUserId: session?.user?.id || null, lang, suggestions: fallback, requestId })
+          }
+        } catch (e) {
+          console.error('AI assist error (non-blocking)', e)
+          try {
+            const fallback = getLocalSuggestions(issues, lang)
+            fallback.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+            await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_fallback_non_blocking', sessionUserId: session?.user?.id || null, lang, suggestions: fallback, requestId })
+          } catch (e2) {
+            console.error('fallback assist error', e2)
+          }
+        }
+      })()
+
+      try {
+        await logEvent({
+          type: 'module_closed',
+          module: activeModule,
+          action: 'close_with_warnings',
+          sessionUserId: session?.user?.id || null,
+          lang,
+          inputs: sanitizedInputs,
+          stockReserved: sanitizedStock
+        })
+      } catch (e) {
+        console.error('logEvent error', e)
+      }
+
+      setActiveModule(null)
+      return
+    }
+
+    // Log successful close
+    try {
+      await logEvent({
+        type: 'module_closed',
+        module: activeModule,
+        action: 'close_success',
+        sessionUserId: session?.user?.id || null,
+        lang,
+        inputs: sanitizedInputs,
+        stockReserved: sanitizedStock
+      })
+    } catch (e) {
+      console.error('logEvent error', e)
+    }
+
+    setActiveModule(null)
+  }
+
+  const handleRequestHelp = async () => {
+    if (!activeModule) return
+    const issues = validateModule(activeModule, { inputs, stockReserved, ownerNames: activeOwnerNames, customLocations, ownerCount, stockSource }) || []
+    const sanitizedInputs = sanitizeInputs(inputs)
+    const sanitizedStock = sanitizeInputs(stockReserved)
+    const requestId = Date.now() + Math.floor(Math.random() * 1000)
+
+    try {
+      await logEvent({ type: 'assist_requested', module: activeModule, action: 'manual_request', sessionUserId: session?.user?.id || null, lang, issues: issues.slice(0, 10), inputs: sanitizedInputs, stockReserved: sanitizedStock, requestId })
+    } catch (e) {
+      console.error('logEvent error', e)
+    }
+
+    try {
+      const resp = await fetch('/.netlify/functions/aiAssist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ module: activeModule, issues: issues.slice(0, 10), inputs: sanitizedInputs, lang, requestId })
+      })
+      const data = await resp.json()
+      if (data && data.ok) {
+        if (data.source === 'rules' && Array.isArray(data.suggestions)) {
+          data.suggestions.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+          await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_manual', sessionUserId: session?.user?.id || null, lang, suggestions: data.suggestions, requestId })
+        } else if (data.source === 'llm') {
+          const assistant = data.assistant || ''
+          if (assistant) showToast(assistant, 'info', 12000)
+          await logEvent({ type: 'assist_provided', module: activeModule, action: 'llm_manual', sessionUserId: session?.user?.id || null, lang, assistant, requestId })
+        }
+      } else {
+        // Fallback to client-side suggestions when server returns non-ok
+        const fallback = getLocalSuggestions(issues, lang)
+        fallback.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+        await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_fallback_manual', sessionUserId: session?.user?.id || null, lang, suggestions: fallback, requestId })
+      }
+    } catch (e) {
+      console.error('AI assist error', e)
+      // Fallback to client-side deterministic suggestions
+      try {
+        const fallback = getLocalSuggestions(issues, lang)
+        fallback.slice(0, 3).forEach(s => showToast(s.suggestion || s, 'info', 10000))
+        await logEvent({ type: 'assist_provided', module: activeModule, action: 'rules_fallback_manual', sessionUserId: session?.user?.id || null, lang, suggestions: fallback, requestId })
+      } catch (e2) {
+        console.error('fallback assist error', e2)
+        showToast(t('assistFailed') || 'AI assist failed', 'warning')
+      }
+    }
+  }
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-8 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
@@ -1749,6 +1993,18 @@ Message: ${contactFormData.message || 'N/A'}
             <span className="hidden sm:inline">{t('dashboard')}</span>
           </button>
 
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setAiEventsOpen(true)}
+              className="absolute right-16 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-20 sm:top-4"
+              aria-label="AI Events"
+            >
+              <span className="text-lg leading-none">🧾</span>
+              <span className="hidden sm:inline">Events</span>
+            </button>
+          )}
+
           <div className="mx-auto max-w-3xl text-center">
             <h1 className={`font-bold leading-tight text-gray-800 ${lang === 'ta' ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
               {t('title')}
@@ -1758,6 +2014,8 @@ Message: ${contactFormData.message || 'N/A'}
             </p>
           </div>
         </header>
+
+        <AiEventsViewer isOpen={aiEventsOpen} onClose={() => setAiEventsOpen(false)} isAdmin={isAdmin} session={session} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
@@ -1907,12 +2165,21 @@ Message: ${contactFormData.message || 'N/A'}
                       </div>
                       <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight">{t(activeModule + 'Data')}</h2>
                     </div>
-                    <button 
-                      onClick={() => setActiveModule(null)}
-                      className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
-                    >
-                      ✕
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleRequestHelp}
+                        title="Get Help"
+                        className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors text-sm font-semibold"
+                      >
+                        💡 {(t && t('getHelp') && t('getHelp') !== 'getHelp') ? t('getHelp') : 'Get Help'}
+                      </button>
+                      <button 
+                        onClick={handleCloseActiveModule}
+                        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
@@ -1946,12 +2213,13 @@ Message: ${contactFormData.message || 'N/A'}
 
                   <div className="p-6 bg-white border-t border-slate-200 sm:mb-0" style={{ marginBottom: '34px' }}>
                     <button 
-                      onClick={() => setActiveModule(null)}
+                      onClick={handleCloseActiveModule}
                       className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-lg active:scale-[0.98] transition-all uppercase"
                     >
                       {t('done')}
                     </button>
                   </div>
+                  <Toaster toasts={toasts} onClose={removeToast} />
                 </div>
               </div>
             )}
