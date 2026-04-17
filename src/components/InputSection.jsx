@@ -144,6 +144,26 @@ export default function InputSection({
     }
   }
 
+  // Advance payments to contractor: [{id, date, amount, reason}]
+  const addAdvancePayment = () => {
+    const id = Date.now()
+    const next = [...(inputs?.advancePayments || []), { id, date: '', amountInaya: '', amountShakira: '', reason: '' }]
+  }
+
+  const updateAdvancePayment = (id, field, value) => {
+    const next = (inputs?.advancePayments || []).map(a => a.id === id ? { ...a, [field]: value } : a)
+    if (typeof setInput === 'function') {
+      setInput(prev => ({ ...prev, advancePayments: next }))
+    }
+  }
+
+  const removeAdvancePayment = (id) => {
+    const next = (inputs?.advancePayments || []).filter(a => a.id !== id)
+    if (typeof setInput === 'function') {
+      setInput(prev => ({ ...prev, advancePayments: next }))
+    }
+  }
+
   const resetRevenueAndExpenses = () => {
     if (typeof setInput === 'function') {
       setInput(prev => ({
@@ -158,6 +178,7 @@ export default function InputSection({
         chequeReceived: 0,
         expensePayment: 'owners',
         extraExpenses: [],
+        advancePayments: [],
         bothOwnersHaveLoans: false,
         loanInaya: 0,
         loanShakira: 0,
@@ -418,6 +439,54 @@ export default function InputSection({
                 ))}
               </div>
             )}
+
+            {/* Advance Payments Given to Contractor */}
+            <div className="mt-4">
+              <button type="button" onClick={addAdvancePayment} disabled={contractorSectionDisabled} className={`w-full bg-white border-2 border-dashed border-purple-200 rounded-[28px] px-6 py-4 text-purple-600 font-bold hover:bg-purple-50 transition-all uppercase tracking-widest text-[10px] ${contractorSectionDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                {tr('addAdvancePayment', 'ADD ADVANCE PAYMENT')}
+              </button>
+
+              {(inputs?.advancePayments || []).length === 0 ? (
+                <div className="text-center py-4 text-slate-400 font-bold text-[10px]">
+                  {tr('noAdvancePayments', 'No advance payments recorded')}
+                </div>
+              ) : (
+                <div className={`space-y-3 mt-3 ${contractorSectionDisabled ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <div className="text-[11px] font-bold text-slate-700 tracking-tight mb-1">{tr('advancePaymentsGiven', 'Contractor Advance Payment')}</div>
+                  {(inputs?.advancePayments || []).map(entry => (
+                    <div key={entry.id} className="bg-white p-3 rounded-xl border-2 border-slate-100 flex flex-col gap-2">
+                      <div className="flex justify-end">
+                        <button type="button" onClick={() => removeAdvancePayment(entry.id)} disabled={contractorSectionDisabled} className={`text-rose-400 hover:text-rose-600 font-bold transition ${contractorSectionDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>✕</button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                        <label className="block">
+                          <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1">{tr('dateOfPayment', 'Date')}</div>
+                          <input type="date" value={entry.date || ''} onChange={(e) => updateAdvancePayment(entry.id, 'date', e.target.value)} className="w-full bg-white border-2 border-slate-200 rounded-[10px] px-3 py-2 text-slate-900 outline-none text-xs" />
+                        </label>
+
+                        <label className="block">
+                          <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1">{ownerNames && ownerNames[0] ? `${ownerNames[0]} (${t ? t('amount') : 'Amount'})` : `${t ? t('owner') : 'Owner'} 1 (${t ? t('amount') : 'Amount'})`}</div>
+                          <input type="number" step="any" value={entry.amountInaya === 0 ? '' : entry.amountInaya} onChange={(e) => updateAdvancePayment(entry.id, 'amountInaya', e.target.value)} className="w-full bg-white border-2 border-slate-200 rounded-[10px] px-3 py-2 text-right text-slate-900 outline-none text-xs" />
+                        </label>
+
+                        {!isSingleOwner && (
+                          <label className="block">
+                            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1">{ownerNames && ownerNames[1] ? `${ownerNames[1]} (${t ? t('amount') : 'Amount'})` : `${t ? t('owner') : 'Owner'} 2 (${t ? t('amount') : 'Amount'})`}</div>
+                            <input type="number" step="any" value={entry.amountShakira === 0 ? '' : entry.amountShakira} onChange={(e) => updateAdvancePayment(entry.id, 'amountShakira', e.target.value)} className="w-full bg-white border-2 border-slate-200 rounded-[10px] px-3 py-2 text-right text-slate-900 outline-none text-xs" />
+                          </label>
+                        )}
+
+                        <label className="block md:col-span-4">
+                           <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1">{tr('reason', 'Reason')}</div>
+                           <input type="text" value={entry.reason || ''} onChange={(e) => updateAdvancePayment(entry.id, 'reason', e.target.value)} placeholder={tr('advanceReasonPlaceholder', 'e.g., partial mobilization')} className="w-full bg-white border-2 border-slate-200 rounded-[10px] px-3 py-2 text-slate-900 outline-none text-xs" />
+                         </label>
+                       </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           )}
 
@@ -498,11 +567,10 @@ export default function InputSection({
               {tr('noRecordsInLabourLog', 'NO RECORDS IN LABOUR LOG')}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {(inputs?.labourCosts || []).map(entry => (
                 <div key={entry.id} className="bg-white/50 border-2 border-purple-100 rounded-[24px] p-4 flex flex-col gap-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black text-purple-900 tracking-tighter"># {entry.id.toString().slice(-4)}</span>
+                  <div className="flex justify-end">
                     <button type="button" onClick={() => removeLabourCost(entry.id)} className="text-rose-400 hover:text-rose-600 font-bold transition">✕</button>
                   </div>
                   

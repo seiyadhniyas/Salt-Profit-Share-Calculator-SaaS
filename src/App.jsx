@@ -63,6 +63,7 @@ export default function App(){
     bothOwnersHaveLoans: false,
     extraExpenses: [],
     labourCosts: [],
+    advancePayments: [],
   }
 
   const [lang, setLang] = useState('en')
@@ -326,6 +327,13 @@ export default function App(){
       addExpenses: 'add expenses',
       costResponsibility: 'COST RESPONSIBILITY',
       addOperationalCost: 'ADD OPERATIONAL COST',
+      addAdvancePayment: 'ADD ADVANCE PAYMENT',
+      noAdvancePayments: 'No advance payments recorded',
+      advancePaymentsGiven: 'Contractor Advance Payment',
+      paidBy: 'Paid by',
+      advancePaid: 'Advance Paid',
+      dateOfPayment: 'Date',
+      advanceReasonPlaceholder: 'e.g., partial mobilization',
       remove: 'Remove',
       bothOwnersHaveLoans: 'Owners have loans',
       oneOwnerHasLoan: 'Owner has loan',
@@ -610,6 +618,10 @@ export default function App(){
       addExpenses: 'செலவுகளை சேர்க்க',
       costResponsibility: 'செலவு பொறுப்பு',
       addOperationalCost: 'செயல்பாட்டு செலவைச் சேர்க்கவும்',
+      noAdvancePayments: 'முன்கட்டணங்கள் பதிவாகவில்லை',
+      advancePaymentsGiven: 'ஒப்பந்ததாரருக்கான முன்கட்டணம்',
+      paidBy: 'இயற்றியவர்',
+      advancePaid: 'முன்கட்டணம்',
       remove: 'அகற்று',
       bothOwnersHaveLoans: 'உரிமையாளர்களுக்கு கடன் உள்ளது',
       oneOwnerHasLoan: 'உரிமையாளருக்கு கடன் உள்ளது',
@@ -896,6 +908,10 @@ export default function App(){
       addExpenses: 'වියදම් එක් කරන්න',
       costResponsibility: 'වියදම් පිළිබඳ වගකීම',
       addOperationalCost: 'ක්‍රියාකාරක වියදමක් එක් කරන්න',
+      noAdvancePayments: 'පෙර ගෙවීම් සටහන් වී නැත',
+      advancePaymentsGiven: 'කොන්ත්‍රාත්කරුට දෙන පෙර ගෙවීම',
+      paidBy: 'ගෙවන මිනිස්සු',
+      advancePaid: 'පෙර ගෙවීම්',
       remove: 'ඉවත් කරන්න',
       bothOwnersHaveLoans: 'ණය තිබේ',
       oneOwnerHasLoan: 'ණය තිබේ',
@@ -1573,7 +1589,9 @@ Message: ${contactFormData.message || 'N/A'}
 
       csvData.push(['GRAND TOTALS'])
       csvData.push(['Grand Total Received (LKR)', results.grandTotalReceived || 0])
-      csvData.push(['Contractor Share (LKR)', results.contractorShare || 0])
+      csvData.push(['Contractor Share (Gross) (LKR)', results.contractorShare || 0])
+      csvData.push(['Contractor Advance Payment (LKR)', results.advancesTotal || 0])
+      csvData.push(['Contractor Share (Net after Advances) (LKR)', results.contractorNetShare || 0])
       csvData.push(['Owners Group Amount (LKR)', results.ownerPool || 0])
       csvData.push(['Per Owner Share (LKR)', results.generalSharePerOwner || 0])
       csvData.push([''])
@@ -2319,7 +2337,7 @@ Message: ${contactFormData.message || 'N/A'}
                   ) : null}
                   <div className="flex justify-between items-center px-1">
                     <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{t('contractorShare')}</span>
-                    <strong className="text-sm sm:text-lg font-mono text-emerald-400 text-right">{formatLKR(results.contractorShare)}</strong>
+                    <strong className="text-sm sm:text-lg font-mono text-emerald-400 text-right">{formatLKR(results.contractorNetShare)}</strong>
                   </div>
                   <div className="flex justify-between items-center px-1">
                     <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')}</span>
@@ -2401,7 +2419,9 @@ Message: ${contactFormData.message || 'N/A'}
               <div className="row"><div className="label">Contractor Share %</div><div className="value">{contractorSharePercentage || 0}%</div></div>
               <div className="row"><div className="label">Expense Payment Mode</div><div className="value">{inputs.expensePayment === 'owners' ? 'Owners' : inputs.expensePayment === 'contractor' ? 'Contractor' : '50/50'}</div></div>
               <div className="row"><div className="label">{t('grandTotalReceived')} (LKR)</div><div className="value">{formatLKR(results.grandTotalReceived || 0)}</div></div>
-              <div className="row"><div className="label">{t('contractorShare')} (LKR)</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
+              <div className="row"><div className="label">{t('contractorShare')} (Gross) (LKR)</div><div className="value">{formatLKR(results.contractorShare)}</div></div>
+              <div className="row"><div className="label">Contractor Advance Payment (LKR)</div><div className="value">{formatLKR(results.advancesTotal || 0)}</div></div>
+              <div className="row"><div className="label">{t('contractorShare')} (Net after Advances) (LKR)</div><div className="value">{formatLKR(results.contractorNetShare)}</div></div>
               <div className="row"><div className="label">Owners Group Amount (LKR)</div><div className="value">{formatLKR(results.ownerPool || 0)}</div></div>
               <div className="row"><div className="label">{ownerCount === 1 ? t('ownerPool') : t('perOwnerShare')} (LKR)</div><div className="value">{formatLKR(results.generalSharePerOwner)}</div></div>
             </div>

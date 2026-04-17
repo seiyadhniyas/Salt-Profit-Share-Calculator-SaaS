@@ -116,13 +116,53 @@ export function computeAll(inputs, options = {}) {
     }
   }
 
+  // Advance payments given to contractor (array of entries)
+  // New shape supports per-owner contributions: { id, date, amountInaya, amountShakira, reason }
+  // Backwards-compatibility: older entries may have { amount, paidBy }
+  const advancePayments = Array.isArray(inputs.advancePayments) ? inputs.advancePayments : []
+  let ownerAdvanceInaya = 0
+  let ownerAdvanceShakira = 0
+  const advancesTotal = advancePayments.reduce((s, it) => {
+    let entryTotal = 0
+
+    const hasSplit = (typeof it.amountInaya !== 'undefined') || (typeof it.amountShakira !== 'undefined')
+    if (hasSplit) {
+      const a = safeNum(it.amountInaya)
+      const b = safeNum(it.amountShakira)
+      entryTotal = a + b
+      if (ownerCount === 1) {
+        ownerAdvanceInaya += entryTotal
+      } else {
+        ownerAdvanceInaya += a
+        ownerAdvanceShakira += b
+      }
+    } else if (typeof it.amount !== 'undefined') {
+      // legacy single-amount entry
+      const amt = safeNum(it.amount)
+      entryTotal = amt
+      if (ownerCount === 1) {
+        ownerAdvanceInaya += amt
+      } else {
+        const who = (typeof it.paidBy !== 'undefined') ? Number(it.paidBy) : 0
+        if (who === 1) ownerAdvanceShakira += amt
+        else ownerAdvanceInaya += amt
+      }
+    }
+
+    return s + entryTotal
+  }, 0)
+
+  // Net contractor share after deducting any advance payments already given
+  const contractorNetShareRaw = contractorShare - advancesTotal
+  const contractorNetShare = Math.max(0, contractorNetShareRaw)
+
   // owner_pool (Owners Group Amount)
   // If owners pay expenses: ownerPool = grandTotalReceived - contractorShare
   // If contractor pays expenses: ownerPool = (grandTotalReceived + totalLoan) * ownerShareFactor
   // If 50/50: ownerPool = (InitialPrice - contractorTotalSpent) / 2 (equals contractorShare)
   let ownerPool = 0
   if (expensePayment === 'owners') {
-    ownerPool = grandTotalReceived - contractorShare
+    ownerPool = grandTotalReceived - contractorNetShare
   } else if (expensePayment === 'contractor') {
     ownerPool = (grandTotalReceived + totalLoan) * ownerShareFactor
   } else if (is5050) {
@@ -136,6 +176,10 @@ export function computeAll(inputs, options = {}) {
   // Owner Final Share = (Owners Group Amount / 2) - Own Loan
   let finalInayaRaw = generalSharePerOwner - loanInaya
   let finalShakiraRaw = ownerCount === 2 ? (generalSharePerOwner - loanShakira) : 0
+
+  // Subtract any advance amounts that specific owners already paid to the contractor
+  finalInayaRaw -= ownerAdvanceInaya
+  if (ownerCount === 2) finalShakiraRaw -= ownerAdvanceShakira
 
   // Special handling for "Contractor Pays Expenses" only (not for 50/50 split)
   if (expensePayment === 'contractor' && !is5050) {
@@ -152,7 +196,7 @@ export function computeAll(inputs, options = {}) {
   // Validation: ensure sum of distributions equals available funds
   // For "Contractor Pays Expenses" (non-50/50): finalInaya + finalShakira + contractorShare should equal (grandTotalReceived + totalLoan)
   // For 50/50 or other modes: finalInaya + finalShakira + contractorShare should equal grandTotalReceived
-  const sumAll = finalInaya + (ownerCount === 2 ? finalShakira : 0) + contractorShare
+  const sumAll = finalInaya + (ownerCount === 2 ? finalShakira : 0) + contractorNetShare
   const expectedTotal = (expensePayment === 'contractor' && !is5050) ? (grandTotalReceived + totalLoan) : grandTotalReceived
   const totalDiff = expectedTotal - sumAll
 
@@ -205,6 +249,11 @@ export function computeAll(inputs, options = {}) {
     loanShakira: round2(loanShakira),
     contractorTotalSpent: round2(contractorTotalSpent),
     contractorShare: round2(contractorShare),
+    advancePayments,
+    advancesTotal: round2(advancesTotal),
+    ownerAdvanceInaya: round2(ownerAdvanceInaya),
+    ownerAdvanceShakira: round2(ownerAdvanceShakira),
+    contractorNetShare: round2(contractorNetShare),
     ownerCount,
     expensePayment,
     ownerPool: round2(ownerPool),

@@ -76,9 +76,12 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
                 )}
               </>
             )}
+            {results.advancesTotal > 0 && (
+              <StatRow label={t ? t('advancePaymentsGiven') : 'Contractor Advance Payment'} value={formatLKR(results.advancesTotal)} isNegative={false} />
+            )}
             <StatRow
-              label={(t ? t('contractorShare') : 'Contractor Share') + (results.expensePayment === 'owners' ? ` (${t ? t('contractorShareOwnersFormula') : 'InitialPrice/2 + Spent'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('contractorShareShared5050Formula') : '(InitialPrice - Spent)/2 + (Spent / 2)'})` : ` (${t ? t('contractorShareContractorFormula') : '(InitialPrice - Spent)/2'})`)}
-              value={formatLKR(results.contractorShare)}
+              label={(t ? t('contractorShare') : 'Contractor Share') + (results.expensePayment === 'owners' ? ` (${t ? t('contractorShareOwnersFormula') : 'InitialPrice/2 + Spent'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('contractorShareShared5050Formula') : '(InitialPrice - Spent)/2 + (Spent / 2)'})` : ` (${t ? t('contractorShareContractorFormula') : '(InitialPrice - Spent)/2'})`) }
+              value={formatLKR(results.contractorNetShare)}
               isNegative={false}
             />
             <div className="my-2 border-t border-slate-300"></div>
@@ -118,6 +121,11 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
                   <span className="text-[11px] font-bold bg-sky-200 text-sky-800 px-3 py-1 rounded-full">{t ? t('loan') : 'Loan'}: {formatLKR(results.loanInaya)}</span>
                 )}
               </div>
+              {results.ownerAdvanceInaya > 0 && (
+                <div className="mb-2">
+                  <span className="text-xs font-semibold text-slate-600">{t ? t('advancePaid') : 'Advance Paid'}: <strong className="font-mono">{formatLKR(results.ownerAdvanceInaya)}</strong></span>
+                </div>
+              )}
               <div className={`text-2xl font-mono font-bold ${results.highlights.finalInayaNegative ? 'text-rose-600' : 'text-sky-600'}`}>
                 {formatLKR(results.finalInaya)}
               </div>
@@ -136,6 +144,11 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
                     <span className="text-[11px] font-bold bg-emerald-200 text-emerald-800 px-3 py-1 rounded-full">{t ? t('loan') : 'Loan'}: {formatLKR(results.loanShakira)}</span>
                   )}
                 </div>
+                {results.ownerAdvanceShakira > 0 && (
+                  <div className="mb-2">
+                    <span className="text-xs font-semibold text-slate-600">{t ? t('advancePaid') : 'Advance Paid'}: <strong className="font-mono">{formatLKR(results.ownerAdvanceShakira)}</strong></span>
+                  </div>
+                )}
                 <div className={`text-2xl font-mono font-bold ${results.highlights.finalShakiraNegative ? 'text-rose-600' : 'text-emerald-600'}`}>
                   {formatLKR(results.finalShakira)}
                 </div>
