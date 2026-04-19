@@ -1,11 +1,20 @@
 # Salt Profit Share Calculator
 
-A small React + Vite web app to calculate profit share between two owners (Inaya and Shakira) for packed salt sales. It supports contractor expenses, extra expenses, loans, Zakat (5%), PDF export, basic report persistence, and a Supabase-powered member dashboard with popup authentication.
+A Progressive Web App (PWA) for calculating profit share between two owners (Inaya and Shakira) for packed salt sales. Designed for the Saltern Welfare Society's 400+ members with offline functionality and native app-like experience.
+
+## 🚀 PWA Features
+
+- **Installable**: Add to home screen on mobile devices
+- **Offline Support**: Works without internet connection
+- **Native Experience**: App-like interface and navigation
+- **Background Sync**: Saves data when back online
+- **Push Notifications**: Ready for future updates (framework in place)
+- **Responsive Design**: Optimized for all screen sizes
 
 ## Highlights
 
 - Real-time calculations as you type
-- Add multiple extra expenses
+- Add multiple extra expenses and labour costs
 - Optional per-owner loans and Zakat calculation
 - Printable PDF summary (jsPDF + html2canvas)
 - Save/load reports locally; Netlify/Supabase examples included for server persistence
@@ -19,6 +28,8 @@ A small React + Vite web app to calculate profit share between two owners (Inaya
 - React 18 + Vite
 - Tailwind CSS (utility styles)
 - jsPDF + html2canvas for PDF export
+- Service Worker for offline functionality
+- Web App Manifest for PWA features
 - Netlify Functions (examples) and Supabase REST examples
 
 ## Quick Start
@@ -34,20 +45,51 @@ npm install
 npm run dev
 ```
 
-Open the app at the URL shown by Vite (e.g. `http://localhost:5173` or another port Vite selects).
+Open the app at the URL shown by Vite (e.g. `http://localhost:5173`).
 
-Build and preview production bundle:
+## PWA Installation
+
+### For Users
+
+1. **On Mobile**: Open the app in your browser, tap "Add to Home Screen" when prompted
+2. **On Desktop**: Click the install icon in the address bar (Chrome) or use the install prompt
+3. **Manual Install**: Look for "Install App" or "Add to Home Screen" option in your browser menu
+
+### For Developers
+
+Build and preview production PWA:
 
 ```bash
 npm run build
 npm run preview -- --port 5174
 ```
 
+Generate PWA icons (requires canvas dependency):
+
+```bash
+npm install canvas --save-dev
+npm run generate-icons
+```
+
+**Note**: The app uses SVG icons by default, which work perfectly for PWA. PNG icon generation is optional for enhanced compatibility.
+
+## PWA Capabilities
+
+- **Offline Mode**: Core functionality works without internet
+- **Background Sync**: Data saves automatically when connection returns
+- **Install Prompt**: Smart prompts to install the app
+- **Update Management**: Automatic updates when new versions are available
+- **Responsive Design**: Adapts to any screen size
+- **Touch Optimized**: Mobile-first design with touch gestures
+
 ## Important Files
 
 - `src/App.jsx` — main app component
 - `src/components/InputSection.jsx` — form inputs and document details
 - `src/components/ResultSection.jsx` — results/summary UI
+- `public/manifest.json` — PWA manifest configuration
+- `public/sw.js` — Service worker for offline functionality
+- `public/icons/` — PWA icons in various sizes
 - `src/utils/calculations.jsx` — core calculation logic
 - `src/api/reports.js` — client API wrappers for save/get
 - `src/api/billing.js` — trial usage, paywall, and payment API wrappers

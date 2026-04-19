@@ -3,20 +3,310 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1f2937" />
+    <meta name="description" content="Profit sharing calculator for Saltern Welfare Society members" />
+    <meta name="keywords" content="salt, profit, share, calculator, welfare, society" />
+    <meta name="author" content="Saltern Welfare Society" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Salt Calculator" />
+    <meta name="msapplication-TileColor" content="#1f2937" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
     <title>Salt Profit Share Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @reference "tailwindcss";
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f8fafc;
+      }
       .card { @apply bg-white shadow rounded-lg p-4; }
       .red-value { @apply text-red-600 font-semibold; }
       .green-value { @apply text-green-600 font-semibold; }
       .container-max { max-width: 1200px; margin: 0 auto; }
+
+      /* PWA Splash Screen Styles */
+      .splash-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #e0f2fe 0%, #1f2937 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease-out;
+      }
+
+      .splash-screen.hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .splash-icon {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+      }
+
+      .splash-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .splash-subtitle {
+        font-size: 16px;
+        color: rgba(255,255,255,0.8);
+        text-align: center;
+        max-width: 280px;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+
+      /* Install Prompt Styles */
+      .install-prompt {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        z-index: 1000;
+        display: none;
+        border: 1px solid #e5e7eb;
+      }
+
+      .install-prompt.show {
+        display: block;
+      }
+
+      .install-prompt-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .install-btn {
+        flex: 1;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .install-btn.primary {
+        background: #1f2937;
+        color: white;
+      }
+
+      .install-btn.primary:hover {
+        background: #111827;
+      }
+
+      .install-btn.secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+      }
+
+      .install-btn.secondary:hover {
+        background: #e5e7eb;
+      }
     </style>
   </head>
   <body>
+    <!-- PWA Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+      <div class="splash-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="120" height="120">
+          <defs>
+            <linearGradient id="saltGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#e0f2fe;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#1f2937;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <circle cx="256" cy="256" r="240" fill="url(#saltGradient)" stroke="#1f2937" stroke-width="16"/>
+          <g fill="#ffffff" opacity="0.9">
+            <polygon points="256,120 280,160 232,160"/>
+            <polygon points="256,120 280,160 280,200"/>
+            <polygon points="256,120 232,160 232,200"/>
+            <polygon points="280,160 232,160 256,200"/>
+            <polygon points="180,200 200,220 160,220"/>
+            <polygon points="332,200 352,220 312,220"/>
+            <polygon points="180,312 200,332 160,332"/>
+            <polygon points="332,312 352,332 312,332"/>
+            <polygon points="120,256 140,276 100,276"/>
+            <polygon points="372,256 392,276 352,276"/>
+          </g>
+          <g fill="#1f2937">
+            <rect x="200" y="300" width="112" height="140" rx="8" fill="#ffffff" stroke="#1f2937" stroke-width="2"/>
+            <rect x="210" y="310" width="92" height="40" rx="4" fill="#e0f2fe" stroke="#1f2937" stroke-width="1"/>
+            <text x="256" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1f2937">SALT</text>
+            <circle cx="225" cy="365" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="256" cy="365" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="287" cy="365" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="225" cy="390" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="256" cy="390" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="287" cy="390" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="225" cy="415" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="256" cy="415" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+            <circle cx="287" cy="415" r="8" fill="#f3f4f6" stroke="#1f2937" stroke-width="1"/>
+          </g>
+          <g fill="#1f2937">
+            <rect x="248" y="240" width="16" height="4" rx="2"/>
+            <rect x="252" y="236" width="4" height="16" rx="2"/>
+          </g>
+        </svg>
+      </div>
+      <div class="splash-title">Salt Calculator</div>
+      <div class="splash-subtitle">Profit sharing calculator for Saltern Welfare Society</div>
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="install-prompt" class="install-prompt">
+      <div style="font-weight: 600; color: #111827; margin-bottom: 8px;">Install App</div>
+      <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">Add to your home screen for quick access</div>
+      <div class="install-prompt-buttons">
+        <button id="install-btn" class="install-btn primary">Install</button>
+        <button id="dismiss-btn" class="install-btn secondary">Later</button>
+      </div>
+    </div>
+
     <div id="root"></div>
+
+    <!-- PWA Service Worker Registration -->
     <script>
+      // PWA Install Prompt
+      let deferredPrompt;
+      const installPrompt = document.getElementById('install-prompt');
+      const installBtn = document.getElementById('install-btn');
+      const dismissBtn = document.getElementById('dismiss-btn');
+
+      // Hide splash screen after app loads
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if (splash) {
+            splash.classList.add('hide');
+            setTimeout(() => splash.remove(), 300);
+          }
+        }, 1000);
+      });
+
+      // Handle install prompt
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        deferredPrompt = e;
+
+        // Show install prompt after a delay
+        setTimeout(() => {
+          if (!localStorage.getItem('pwa-install-dismissed')) {
+            installPrompt.classList.add('show');
+          }
+        }, 3000);
+      });
+
+      // Handle install button click
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+
+        // Show the install prompt
+        deferredPrompt.prompt();
+
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+
+        // Reset the deferred prompt
+        deferredPrompt = null;
+
+        // Hide the install prompt
+        installPrompt.classList.remove('show');
+
+        // Track the outcome
+        if (outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+      });
+
+      // Handle dismiss button click
+      dismissBtn.addEventListener('click', () => {
+        installPrompt.classList.remove('show');
+        localStorage.setItem('pwa-install-dismissed', 'true');
+      });
+
+      // Handle successful installation
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+        installPrompt.classList.remove('show');
+        deferredPrompt = null;
+      });
+
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+
+              // Handle updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      // New content is available, show update prompt
+                      if (confirm('New version available! Reload to update?')) {
+                        window.location.reload();
+                      }
+                    }
+                  });
+                }
+              });
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+
+      // Handle online/offline status
+      window.addEventListener('online', () => {
+        console.log('App is online');
+        // You could show a toast or update UI here
+      });
+
+      window.addEventListener('offline', () => {
+        console.log('App is offline');
+        // You could show a toast or update UI here
+      });
+
       // Stub React Refresh runtime hooks to avoid preamble detection errors in dev
       window.$RefreshReg$ = window.$RefreshReg$ || function() {}
       window.$RefreshSig$ = window.$RefreshSig$ || function() { return function(type){ return type } }
