@@ -148,6 +148,9 @@ export default function InputSection({
   const addAdvancePayment = () => {
     const id = Date.now()
     const next = [...(inputs?.advancePayments || []), { id, date: '', amountInaya: '', amountShakira: '', reason: '' }]
+    if (typeof setInput === 'function') {
+      setInput(prev => ({ ...prev, advancePayments: next }))
+    }
   }
 
   const updateAdvancePayment = (id, field, value) => {
@@ -241,7 +244,7 @@ export default function InputSection({
       <AccordionCard 
         title={tr('documentDetails', 'REPORT METADATA')} 
         bgColor="#e0f2fe" 
-        defaultOpen={true}
+        defaultOpen={false}
         onReset={resetDocumentDetails}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-2">
@@ -313,7 +316,7 @@ export default function InputSection({
       <AccordionCard 
         title={tr('inputData', 'REVENUE & EXPENSES')} 
         bgColor="#fefce8" 
-        defaultOpen={!activeModule ? false : true}
+        defaultOpen={false}
         icon="📝"
         onReset={resetRevenueAndExpenses}
       >
@@ -549,7 +552,7 @@ export default function InputSection({
       <AccordionCard 
         title={tr('labour', 'LABOUR DETAILS')} 
         bgColor="#ffe4ff" 
-        defaultOpen={true}
+        defaultOpen={false}
         icon="👷"
         onReset={resetLabourCosts}
       >

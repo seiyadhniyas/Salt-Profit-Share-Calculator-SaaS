@@ -642,6 +642,7 @@ export default function App(){
       addExpenses: 'செலவுகளை சேர்க்க',
       costResponsibility: 'செலவு பொறுப்பு',
       addOperationalCost: 'செயல்பாட்டு செலவைச் சேர்க்கவும்',
+      addAdvancePayment: 'முன்கட்டணத்தை சேர்க்கவும்',
       noAdvancePayments: 'முன்கட்டணங்கள் பதிவாகவில்லை',
       advancePaymentsGiven: 'ஒப்பந்ததாரருக்கான முன்கட்டணம்',
       paidBy: 'இயற்றியவர்',
@@ -946,6 +947,7 @@ export default function App(){
       addExpenses: 'වියදම් එක් කරන්න',
       costResponsibility: 'වියදම් පිළිබඳ වගකීම',
       addOperationalCost: 'ක්‍රියාකාරක වියදමක් එක් කරන්න',
+      addAdvancePayment: 'පෙර ගෙවීමක් එක් කරන්න',
       noAdvancePayments: 'පෙර ගෙවීම් සටහන් වී නැත',
       advancePaymentsGiven: 'කොන්ත්‍රාත්කරුට දෙන පෙර ගෙවීම',
       paidBy: 'ගෙවන මිනිස්සු',
@@ -1845,7 +1847,7 @@ Message: ${contactFormData.message || 'N/A'}
 
       // Determine whether any issue should block closing the overlay
       // Only treat setup's missing location/date as blocking; all other pricing cards are non-blocking.
-      const blockingKeys = ['missing_location', 'missing_date']
+      const blockingKeys = [] // ['missing_location', 'missing_date'] - disabled blocking for now
       const hasBlocking = activeModule === 'setup' && issues.some(i => blockingKeys.includes(i.messageKey))
 
       // Log validation event (differentiate blocking vs non-blocking)
