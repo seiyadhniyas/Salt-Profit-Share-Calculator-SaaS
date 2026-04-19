@@ -3,14 +3,11 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient.js'
 export async function getBillingStatus(session) {
   if (!isSupabaseConfigured || !supabase || !session?.user?.id) {
     return {
-      ok: true,
-      billing: {
-        trial_limit: 3,
-        trial_uses: 0,
-        remaining: 3,
-        full_access_enabled: false,
-        payment_status: 'trial',
-      },
+      trial_limit: 3,
+      trial_uses: 0,
+      remaining: 3,
+      full_access_enabled: false,
+      payment_status: 'trial',
     }
   }
 
@@ -34,20 +31,14 @@ export async function getBillingStatus(session) {
     if (insertError) throw insertError
 
     return {
-      ok: true,
-      billing: {
-        ...inserted,
-        remaining: Math.max(0, (inserted.trial_limit || 3) - (inserted.trial_uses || 0)),
-      },
+      ...inserted,
+      remaining: Math.max(0, (inserted.trial_limit || 3) - (inserted.trial_uses || 0)),
     }
   }
 
   return {
-    ok: true,
-    billing: {
-      ...existing,
-      remaining: Math.max(0, (existing.trial_limit || 3) - (existing.trial_uses || 0)),
-    },
+    ...existing,
+    remaining: Math.max(0, (existing.trial_limit || 3) - (existing.trial_uses || 0)),
   }
 }
 

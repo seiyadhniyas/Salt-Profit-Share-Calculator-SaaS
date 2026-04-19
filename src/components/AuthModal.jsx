@@ -90,7 +90,7 @@ export default function AuthModal({ open, mode, onClose, onModeChange, onSuccess
           email: form.email,
           password: form.password,
           options: {
-            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+            emailRedirectTo: `${window.location.origin}/?dashboard=1`,
             data: {},
           },
         })

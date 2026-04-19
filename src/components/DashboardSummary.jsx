@@ -74,6 +74,22 @@ export default function DashboardSummary({
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || tr('guestMember', 'Guest member')
 
+  const reportCount = reports?.length || 0
+  const savedFileCount = savedFiles?.length || 0
+  const totalRevenue = reports?.reduce((sum, item) => sum + Number(item?.payload?.results?.initialPrice || 0), 0) || 0
+  const mostRecentReport = reports?.[0]
+  const mostRecentFile = savedFiles?.[0]
+  const paymentStatus = billingStatus?.payment_status || 'trial'
+  const fullAccessEnabled = Boolean(billingStatus?.full_access_enabled)
+  const trialUses = billingStatus?.trial_uses ?? 0
+  const trialRemaining = billingStatus?.remaining ?? Math.max(0, 3 - trialUses)
+  const paymentPending = paymentStatus === 'payment_pending_verification'
+  const paymentLabel = fullAccessEnabled
+    ? tr('premiumActive', 'PREMIUM ACTIVE')
+    : paymentPending
+      ? tr('pendingAdminApproval', 'PENDING ADMIN APPROVAL')
+      : `${tr('trialUses', 'TRIAL USES')}: ${trialUses}/3`
+
   // Handle contact form submission
   const handleContactFormSubmit = async (formData) => {
     try {
@@ -133,15 +149,22 @@ export default function DashboardSummary({
                   </div>
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div>
-                      <div className="text-base font-black text-slate-800 uppercase italic underline decoration-purple-300 decoration-2">{billingStatus?.full_access_enabled ? tr('premiumActive', 'PREMIUM ACTIVE') : `${tr('trialUses', 'TRIAL USES')}: ${billingStatus?.trial_uses || 0}/3`}</div>
-                      {!billingStatus?.full_access_enabled && (
+                      <div className="text-base font-black text-slate-800 uppercase italic underline decoration-purple-300 decoration-2">{paymentLabel}</div>
+                      {!fullAccessEnabled && (
                         <div className="text-xs text-slate-500 mt-2 font-medium leading-relaxed max-w-sm">
-                          {tr('lifetimeAccessPromo', 'PROMO: Full access for LKR 30,000 lifetime.')}
+                          {paymentPending
+                            ? tr('pendingAdminApprovalNote', 'Your payment is awaiting admin verification.')
+                            : tr('lifetimeAccessPromo', 'PROMO: Full access for LKR 30,000 lifetime.')}
                           <br/><span className="text-[10px]">{tr('cardSurchargeNote', '*Card payments include LKR 1,100 surcharge.')}</span>
                         </div>
                       )}
+                      {!fullAccessEnabled && !paymentPending && (
+                        <div className="mt-3 text-xs text-slate-500 font-medium uppercase tracking-[0.15em]">
+                          {tr('remainingTrial', 'Remaining trial uses')}: {trialRemaining}
+                        </div>
+                      )}
                     </div>
-                    {!billingStatus?.full_access_enabled && (
+                    {!fullAccessEnabled && (
                       <div className="flex gap-3">
                         <button onClick={() => onStartCardPayment?.()} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">{tr('payByCard', 'PAY BY CARD')}</button>
                         <button onClick={() => setShowContactForm(true)} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
@@ -150,7 +173,14 @@ export default function DashboardSummary({
                   </div>
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+              <StatCard title={tr('savedReports', 'Saved Reports')} value={`${reportCount}`} note={tr('cloudReportsNote', 'Secure P&L report history in the cloud')} accent="blue" />
+              <StatCard title={tr('downloadedFiles', 'Downloaded Files')} value={`${savedFileCount}`} note={savedFileCount > 0 ? tr('downloadedFilesNote', 'PDF/Excel exports saved to cloud storage') : tr('noDownloadsYet', 'No downloads yet')} accent="green" />
+              <StatCard title={tr('totalRevenue', 'Total Revenue')} value={formatLKR(totalRevenue)} note={tr('reportRevenueTotal', 'Aggregate from saved reports')} accent="purple" />
+              <StatCard title={tr('paymentStatus', 'Payment Status')} value={paymentLabel} note={paymentPending ? tr('pendingAdminApprovalNote', 'Awaiting admin approval') : fullAccessEnabled ? tr('premiumPaidNote', 'Full access granted') : `${tr('trialRemaining', 'Trial remaining')}: ${trialRemaining}`} accent={fullAccessEnabled ? 'green' : paymentPending ? 'amber' : 'amber'} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Locations Management */}
                   <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 flex items-center gap-2">
@@ -270,16 +300,22 @@ export default function DashboardSummary({
 
           {/* Saved Reports Table */}
           <section className="rounded-3xl border border-purple-200 bg-white p-6 shadow-xl overflow-hidden">
-             <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-black text-purple-900 uppercase tracking-widest">CLOUD DATA VAULT</h3>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-black uppercase tracking-wider">{reports.length} ENTRIES</span>
-                <button
-                  type="button"
-                  className="ml-4 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200 hover:bg-purple-100 transition"
-                  onClick={() => setShowVaultExpanded(v => !v)}
-                >
-                  {showVaultExpanded ? 'Collapse' : 'Expand'}
-                </button>
+             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <div>
+                  <h3 className="text-sm font-black text-purple-900 uppercase tracking-widest">CLOUD DATA VAULT</h3>
+                  <p className="text-xs text-slate-500 mt-1">{tr('vaultDescription', 'Saved sales records, P&L reports and download history.')}</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-black uppercase tracking-wider">{reportCount} {tr('entries', 'ENTRIES')}</span>
+                  <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[10px] font-bold uppercase tracking-wider">{savedFileCount} {tr('downloadedFiles', 'DOWNLOADS')}</span>
+                  <button
+                    type="button"
+                    className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200 hover:bg-purple-100 transition"
+                    onClick={() => setShowVaultExpanded(v => !v)}
+                  >
+                    {showVaultExpanded ? 'Collapse' : 'Expand'}
+                  </button>
+                </div>
              </div>
              <div className={`overflow-x-auto transition-all duration-300 ${showVaultExpanded ? '' : 'max-h-40 overflow-hidden'}`}>
                <table className="w-full text-left text-xs">
@@ -292,7 +328,7 @@ export default function DashboardSummary({
                  </thead>
                  <tbody className="divide-y divide-purple-50">
                    {/* TODO: Replace with full P&L aggregation logic for all time periods */}
-                   {reports.length > 0 ? reports.map(r => (
+                   {reportCount > 0 ? reports.map(r => (
                      <tr key={r.id} className="hover:bg-purple-50/50 transition-colors cursor-pointer">
                        <td className="px-5 py-4 font-black text-slate-800 uppercase">{r.payload?.inputs?.location || '-'}</td>
                        <td className="px-5 py-4 font-bold text-slate-500">{new Date(r.created_at).toLocaleDateString()}</td>
@@ -302,6 +338,49 @@ export default function DashboardSummary({
                  </tbody>
                </table>
              </div>
+          </section>
+
+          {/* Download History */}
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">{tr('downloadHistory', 'Download History')}</h3>
+                <p className="text-xs text-slate-500 mt-1">{tr('downloadHistoryDescription', 'Exported reports and downloadable files from your account.')}</p>
+              </div>
+              <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[10px] font-black uppercase tracking-wider">{savedFileCount} {tr('files', 'FILES')}</span>
+            </div>
+            {savedFileCount > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-900 uppercase font-black">
+                    <tr>
+                      <th className="px-5 py-4 first:rounded-l-2xl">FILE NAME</th>
+                      <th className="px-5 py-4">CREATED</th>
+                      <th className="px-5 py-4">ACTIONS</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {savedFiles.map(file => (
+                      <tr key={file.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-5 py-4 font-bold text-slate-800 break-words max-w-[220px]">{file.file_name || file.storage_url?.split('/').pop() || tr('unnamedFile', 'Unnamed File')}</td>
+                        <td className="px-5 py-4 text-slate-500">{new Date(file.created_at).toLocaleDateString()}</td>
+                        <td className="px-5 py-4">
+                          {file.storage_url ? (
+                            <a href={file.storage_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-2 text-[10px] font-bold uppercase text-slate-700 hover:bg-slate-200 transition">{tr('download', 'Download')}</a>
+                          ) : (
+                            <span className="text-[10px] uppercase font-bold text-slate-400">{tr('noLink', 'No link')}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="rounded-3xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500">
+                {tr('noDownloadHistory', 'No downloads have been created yet. Save a report or export a PDF to create a history entry.')}
+              </div>
+            )}
           </section>
 
           {/* Copyright Footer */}

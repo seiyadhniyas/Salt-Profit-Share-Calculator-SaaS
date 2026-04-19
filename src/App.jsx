@@ -150,6 +150,16 @@ export default function App(){
     }
   }, [session, tenantId])
 
+  useEffect(() => {
+    if (!session?.user?.id) return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('dashboard') === '1') {
+      setMenuOpen(true)
+      const cleanUrl = `${window.location.origin}${window.location.pathname}`
+      window.history.replaceState(null, '', cleanUrl)
+    }
+  }, [session])
+
   // Sync back to Supabase on changes
   useEffect(() => {
     const syncTimeout = setTimeout(async () => {
