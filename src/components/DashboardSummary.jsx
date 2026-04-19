@@ -74,6 +74,9 @@ export default function DashboardSummary({
   const signedIn = Boolean(session?.user)
   const displayName = session?.user?.email || tr('guestMember', 'Guest member')
 
+  // Get guest member trial uses from localStorage
+  const guestTrialUses = !signedIn ? parseInt(localStorage.getItem('guest_trial_uses') || '0', 10) : 0
+
   const reportCount = reports?.length || 0
   const savedFileCount = savedFiles?.length || 0
   const totalRevenue = reports?.reduce((sum, item) => sum + Number(item?.payload?.results?.initialPrice || 0), 0) || 0
@@ -81,8 +84,8 @@ export default function DashboardSummary({
   const mostRecentFile = savedFiles?.[0]
   const paymentStatus = billingStatus?.payment_status || 'trial'
   const fullAccessEnabled = Boolean(billingStatus?.full_access_enabled)
-  const trialUses = billingStatus?.trial_uses ?? 0
-  const trialRemaining = billingStatus?.remaining ?? Math.max(0, 3 - trialUses)
+  const trialUses = signedIn ? (billingStatus?.trial_uses ?? 0) : guestTrialUses
+  const trialRemaining = signedIn ? (billingStatus?.remaining ?? Math.max(0, 3 - (billingStatus?.trial_uses ?? 0))) : Math.max(0, 3 - guestTrialUses)
   const paymentPending = paymentStatus === 'payment_pending_verification'
   const paymentLabel = fullAccessEnabled
     ? tr('premiumActive', 'PREMIUM ACTIVE')

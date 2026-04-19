@@ -370,7 +370,7 @@ export default function InputSection({
             </div>
 
             <div className="flex items-center gap-2 mb-2 p-3 bg-blue-50 rounded-2xl border-2 border-blue-100">
-              <span className="text-xl">📦</span>
+              <span className="text-xl">💵</span>
               <div className="text-base font-semibold text-blue-900 tracking-tight">{tr('totalCurrentSaltSale')}</div>
             </div>
             

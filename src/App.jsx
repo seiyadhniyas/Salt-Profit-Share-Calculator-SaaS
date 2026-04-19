@@ -367,7 +367,7 @@ export default function App(){
       cloudReportsNote: 'Secure P&L report history in the cloud',
       entries: 'ENTRIES',
       files: 'FILES',
-      trialRemaining: 'Trial remaining',
+      trialRemaining: 'Remaining Trial',
       pendingAdminApprovalNote: 'Awaiting admin approval',
       premiumPaidNote: 'Full access granted',
       vaultDescription: 'Saved sales records, P&L reports and download history.',
@@ -670,7 +670,7 @@ export default function App(){
       cloudReportsNote: 'மேகத்தில் பாதுகாப்பான P&L அறிக்கை வரலாறு',
       entries: 'நூல்கள்',
       files: 'கோப்புகள்',
-      trialRemaining: 'சோதனை மீதமுள்ளது',
+      trialRemaining: 'மீதமுள்ள சோதனை',
       pendingAdminApprovalNote: 'உங்கள் கட்டணம் நிர்வாகி அனுமதிக்கப்படுவதற்காக காத்திருக்கிறது',
       premiumPaidNote: 'முழு அணுகல் வழங்கப்பட்டது',
       vaultDescription: 'சேமிக்கப்பட்ட விற்பனை பதிவுகள், P&L அறிக்கைகள் மற்றும் பதிவிறக்கம் வரலாறு.',
@@ -977,7 +977,7 @@ export default function App(){
       cloudReportsNote: 'මේඝයේ ආරක්ෂිත P&L වාර්තාවේ ඉතිහාසය',
       entries: 'එන්ට්‍රිස්',
       files: 'ගොනු',
-      trialRemaining: 'ප්‍රයෝගික ඉතිරිවීම',
+      trialRemaining: 'ඉතිරි ප්‍රයෝගිකය',
       pendingAdminApprovalNote: 'සංග්‍රහණය අදාළ පරිපාලක අනුමැතිය සඳහා බලමින් පවතී',
       premiumPaidNote: 'සම්පූර්ණ ප්‍රවේශය ලබා දී ඇත',
       vaultDescription: 'සුරැකුණු විකිණීම් වාර්තා, P&L වාර්තා සහ බාගැනීමේ ඉතිහාසය.',
@@ -1415,10 +1415,28 @@ export default function App(){
   }
 
   const ensurePremiumAccess = async () => {
+    // Guest member (not signed in) - limit to 3 uses via localStorage
     if (!session?.user?.id) {
-      alert(t('premiumAuthRequired'))
-      handleOpenAuth('signin')
-      return false
+      const guestUsesKey = 'guest_trial_uses'
+      const guestUses = parseInt(localStorage.getItem(guestUsesKey) || '0', 10)
+      
+      if (guestUses >= 3) {
+        const confirmPay = window.confirm(
+          `You have used your 3 guest trial uses.\n\n` +
+          `To continue saving reports:\n` +
+          `✓ Sign in to use trial credits\n` +
+          `✓ Pay for lifetime access (LKR 30,000)\n\n` +
+          `Would you like to sign in or explore payment options?`
+        )
+        if (confirmPay) {
+          handleOpenAuth('signin')
+        }
+        return false
+      }
+      
+      // Increment guest use counter
+      localStorage.setItem(guestUsesKey, String(guestUses + 1))
+      return true
     }
 
     if (billingStatus?.full_access_enabled) {
@@ -2041,8 +2059,8 @@ Message: ${contactFormData.message || 'N/A'}
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-8 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
-        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-20 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-3">
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-3 pt-2 sm:px-0">
+        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-6 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-2">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-3 pt-0 sm:px-0">
             <div className="flex items-center">
               <select 
                 value={lang} 
@@ -2161,7 +2179,7 @@ Message: ${contactFormData.message || 'N/A'}
                   id: 'revenue', 
                   title: t('revenue'), 
                   sub: t('bagsPriceSource'), 
-                  icon: '📦', 
+                  icon: '💵', 
                   color: 'bg-[#ffe4c4]', 
                   num: '2',
                   filled: Boolean(inputs.packedBags > 0 || inputs.pricePerBag > 0)
@@ -2188,7 +2206,7 @@ Message: ${contactFormData.message || 'N/A'}
                   id: 'inventory', 
                   title: t('inventory'), 
                   sub: t('stockReservedSub'), 
-                  icon: '💾', 
+                  icon: '📦', 
                   color: 'bg-[#ecffb1]', 
                   num: '2a',
                   filled: Boolean(stockReserved.stockLevel > 0)
@@ -2240,7 +2258,7 @@ Message: ${contactFormData.message || 'N/A'}
                   <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200 bg-white">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-xl">
-                        {activeModule === 'setup' ? '📋' : activeModule === 'revenue' ? '📦' : activeModule === 'costs' ? '🏭' : activeModule === 'labour' ? '👷' : activeModule === 'inventory' ? '💾' : '🌊'}
+                        {activeModule === 'setup' ? '📋' : activeModule === 'revenue' ? '💵' : activeModule === 'costs' ? '🏭' : activeModule === 'labour' ? '👷' : activeModule === 'inventory' ? '📦' : '🌊'}
                       </div>
                       <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight">{t(activeModule + 'Data')}</h2>
                     </div>
@@ -2445,7 +2463,7 @@ Message: ${contactFormData.message || 'N/A'}
             </div>
 
             <div className="section">
-              <h2>📦 SALT SALE SUMMARY</h2>
+              <h2>💵 SALT SALE SUMMARY</h2>
               <div className="row"><div className="label">{t('totalSaltPackedBags')}</div><div className="value">{inputs.packedBags || 0}</div></div>
               <div className="row"><div className="label">{t('deductedBags')}</div><div className="value">{inputs.deductedBags || 0}</div></div>
               <div className="row"><div className="label">{t('netBags')}</div><div className="value">{results.netBags}</div></div>
