@@ -8,10 +8,17 @@ export default function AccordionCard({ title, children, defaultOpen = false, bg
 
   return (
     <div className={`android-card overflow-hidden mb-6 shadow-xl border border-slate-300`} style={{ backgroundColor: bgColor }}>
-      <button
-        type="button"
+            <div
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none transition-colors hover:bg-black/5 active:bg-black/10"
+        className="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none transition-colors hover:bg-black/5 active:bg-black/10 cursor-pointer"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
       >
         <div className="flex items-center gap-3">
           {icon && <span className="text-2xl opacity-80">{icon}</span>}
@@ -38,7 +45,7 @@ export default function AccordionCard({ title, children, defaultOpen = false, bg
             </svg>
           </div>
         </div>
-      </button>
+      </div>
       
       {isOpen && (
         <div className="px-6 pb-6 pt-1 animate-fadeIn border-t border-black/5">

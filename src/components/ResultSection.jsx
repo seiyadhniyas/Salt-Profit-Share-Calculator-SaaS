@@ -49,12 +49,12 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
             <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (' + (t ? t('netTimesPricePerBag') : 'Net × Price/Bag') + ')'} value={formatLKR(results.initialPrice)} isNegative={false} />
             <div className="my-2 border-t border-slate-300"></div>
             <StatRow label={(t ? t('contractorSpent') : 'Contractor Total Spent') + ' (' + (t ? t('contractorSpentFormula') : 'Packing Wage × TotalPackedBags + Bag Cost × PackedBags + Other Expenses + Labour Costs') + ')'} value={formatLKR(results.contractorTotalSpent)} isNegative={false} />
-            {results.extraExpensesTotal > 0 && (
-              <StatRow label="Extra Expenses" value={formatLKR(results.extraExpensesTotal)} isNegative={false} />
+                        {results.extraExpensesTotal > 0 && (
+              <StatRow label={t ? t('extraExpenses') : "Extra Expenses"} value={formatLKR(results.extraExpensesTotal)} isNegative={false} />
             )}
             {results.labourCostsTotal > 0 && (
               <>
-                <StatRow label="Labour Costs (Total)" value={formatLKR(results.labourCostsTotal)} isNegative={false} />
+                <StatRow label={t ? t('labourCostsTotal') : "Labour Costs (Total)"} value={formatLKR(results.labourCostsTotal)} isNegative={false} />
                 {results.labourCosts && results.labourCosts.length > 0 && (
                   <>
                     {/* Arrow moved upward, height unchanged */}
