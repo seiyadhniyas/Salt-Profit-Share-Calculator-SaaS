@@ -2041,41 +2041,48 @@ Message: ${contactFormData.message || 'N/A'}
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-8 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
-        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-20 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-12">
-          <div className="absolute left-3 top-3 sm:left-5 sm:top-4" style={{paddingLeft: '10px'}}>
-            <select 
-              value={lang} 
-              onChange={(e) => setLang(e.target.value)} 
-              className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ backgroundColor: '#fce4ec' }}
-            >
-              <option value="en">ENG</option>
-              <option value="ta">தமிழ்</option>
-              <option value="si">සිංහල</option>
-            </select>
-          </div>
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-5 sm:top-4"
-            aria-label={t('openDashboardMenu')}
-            style={{paddingRight: '10px'}}
-          >
-            <span className="text-lg leading-none">☰</span>
-            <span className="hidden sm:inline">{t('dashboard')}</span>
-          </button>
+        <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-20 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-3">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-3 pt-2 sm:px-0">
+            <div className="flex items-center">
+              <select 
+                value={lang} 
+                onChange={(e) => setLang(e.target.value)} 
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ backgroundColor: '#fce4ec' }}
+              >
+                <option value="en">ENG</option>
+                <option value="ta">தமிழ்</option>
+                <option value="si">සිංහල</option>
+              </select>
+            </div>
 
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={() => setAiEventsOpen(true)}
-              className="absolute right-16 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:right-20 sm:top-4"
-              aria-label="AI Events"
-            >
-              <span className="text-lg leading-none">🧾</span>
-              <span className="hidden sm:inline">Events</span>
-            </button>
-          )}
+            <div className="flex justify-center items-center">
+            </div>
+
+            <div className="flex items-center justify-end gap-2">
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => setAiEventsOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50"
+                  aria-label="AI Events"
+                >
+                  <span className="text-lg leading-none">🧾</span>
+                  <span className="hidden sm:inline">Events</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50"
+                aria-label={t('openDashboardMenu')}
+              >
+                <span className="text-lg leading-none">☰</span>
+                <span className="hidden sm:inline">{t('dashboard')}</span>
+              </button>
+            </div>
+          </div>
 
           <div className="mx-auto max-w-3xl text-center">
             <h1 className={`font-bold leading-tight text-gray-800 ${lang === 'ta' ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
