@@ -8,7 +8,7 @@ export default function AccordionCard({ title, children, defaultOpen = false, bg
 
   return (
     <div className={`android-card overflow-hidden mb-6 shadow-xl border border-slate-300`} style={{ backgroundColor: bgColor }}>
-            <div
+      <div
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none transition-colors hover:bg-black/5 active:bg-black/10 cursor-pointer"
         role="button"
