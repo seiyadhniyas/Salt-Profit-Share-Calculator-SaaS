@@ -176,14 +176,7 @@ export default function DashboardSummary({
                   </div>
                </div>
 
-               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
-              <StatCard title={tr('savedReports', 'Saved Reports')} value={`${reportCount}`} note={tr('cloudReportsNote', 'Secure P&L report history in the cloud')} accent="blue" />
-              <StatCard title={tr('downloadedFiles', 'Downloaded Files')} value={`${savedFileCount}`} note={savedFileCount > 0 ? tr('downloadedFilesNote', 'PDF/Excel exports saved to cloud storage') : tr('noDownloadsYet', 'No downloads yet')} accent="green" />
-              <StatCard title={tr('totalRevenue', 'Total Revenue')} value={formatLKR(totalRevenue)} note={tr('reportRevenueTotal', 'Aggregate from saved reports')} accent="purple" />
-              <StatCard title={tr('paymentStatus', 'Payment Status')} value={paymentLabel} note={paymentPending ? tr('pendingAdminApprovalNote', 'Awaiting admin approval') : fullAccessEnabled ? tr('premiumPaidNote', 'Full access granted') : `${tr('trialRemaining', 'Trial remaining')}: ${trialRemaining}`} accent={fullAccessEnabled ? 'green' : paymentPending ? 'amber' : 'amber'} />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Locations Management */}
                   <div className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight mb-4 flex items-center gap-2">
@@ -259,47 +252,54 @@ export default function DashboardSummary({
                       </div>
                     </div>
                   </div>
-
-                  {/* Profit Share Slider */}
-                  <div className="md:col-span-2 rounded-2xl border border-slate-300 p-4 sm:p-6 bg-white shadow-xl">
-                    <div className="flex justify-between items-center mb-4 sm:mb-6">
-                      <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight">PROFIT SHARE RATIO</div>
-                      {session?.user ? (
-                        <div className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-tighter border border-emerald-100 animate-pulse">
-                          Cloud Synced
-                        </div>
-                      ) : (
-                        <div className="text-[9px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full uppercase tracking-tighter border border-amber-100">
-                          Local Cache Only
-                        </div>
-                      )}
-                    </div>
-                    <input
-                      type="range" min="0" max="100" step="5"
-                      value={contractorSharePercentage}
-                      onChange={e => onContractorSharePercentageChange?.(Number(e.target.value))}
-                      className="w-full h-3 rounded-lg bg-purple-100 accent-purple-600 mb-4 sm:mb-8 cursor-pointer shadow-inner"
-                    />
-                    <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                      <div 
-                        className="p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600"
-                        style={{ background: 'linear-gradient(to bottom right, #1e293b, #334155)' }}
-                      >
-                        <div className="text-[9px] sm:text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1 sm:mb-2">CONTRACTOR SHARE</div>
-                        <div className="text-2xl sm:text-4xl font-black text-white">{contractorSharePercentage}%</div>
-                      </div>
-                      <div 
-                        className="p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400"
-                        style={{ background: 'linear-gradient(to bottom right, #6b21a8, #4f46e5)' }}
-                      >
-                        <div className="text-[9px] sm:text-[10px] font-black text-purple-200 uppercase tracking-widest mb-1 sm:mb-2">OWNERS SHARE</div>
-                        <div className="text-2xl sm:text-4xl font-black text-white">{100 - contractorSharePercentage}%</div>
-                      </div>
-                    </div>
-                  </div>
                </div>
+
+               {/* Profit Share Slider */}
+               <div className="rounded-2xl border border-slate-300 p-4 sm:p-6 bg-white shadow-xl">
+                 <div className="flex justify-between items-center mb-4 sm:mb-6">
+                   <div className="text-[10px] font-semibold uppercase text-slate-500 tracking-tight">PROFIT SHARE RATIO</div>
+                   {session?.user ? (
+                     <div className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-tighter border border-emerald-100 animate-pulse">
+                       Cloud Synced
+                     </div>
+                   ) : (
+                     <div className="text-[9px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full uppercase tracking-tighter border border-amber-100">
+                       Local Cache Only
+                     </div>
+                   )}
+                 </div>
+                 <input
+                   type="range" min="0" max="100" step="5"
+                   value={contractorSharePercentage}
+                   onChange={e => onContractorSharePercentageChange?.(Number(e.target.value))}
+                   className="w-full h-3 rounded-lg bg-purple-100 accent-purple-600 mb-4 sm:mb-8 cursor-pointer shadow-inner"
+                 />
+                 <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                   <div 
+                     className="p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-slate-600"
+                     style={{ background: 'linear-gradient(to bottom right, #1e293b, #334155)' }}
+                   >
+                     <div className="text-[9px] sm:text-[10px] font-semibold text-slate-500 uppercase tracking-tight mb-1 sm:mb-2">CONTRACTOR SHARE</div>
+                     <div className="text-2xl sm:text-4xl font-black text-white">{contractorSharePercentage}%</div>
+                   </div>
+                   <div 
+                     className="p-3 sm:p-6 rounded-2xl text-center shadow-lg border-2 border-indigo-400"
+                     style={{ background: 'linear-gradient(to bottom right, #6b21a8, #4f46e5)' }}
+                   >
+                     <div className="text-[9px] sm:text-[10px] font-black text-purple-200 uppercase tracking-widest mb-1 sm:mb-2">OWNERS SHARE</div>
+                     <div className="text-2xl sm:text-4xl font-black text-white">{100 - contractorSharePercentage}%</div>
+                   </div>
+                 </div>
+               </div>
+
+               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+              <StatCard title={tr('savedReports', 'Saved Reports')} value={`${reportCount}`} note={tr('cloudReportsNote', 'Secure P&L report history in the cloud')} accent="blue" />
+              <StatCard title={tr('downloadedFiles', 'Downloaded Files')} value={`${savedFileCount}`} note={savedFileCount > 0 ? tr('downloadedFilesNote', 'PDF/Excel exports saved to cloud storage') : tr('noDownloadsYet', 'No downloads yet')} accent="green" />
+              <StatCard title={tr('totalRevenue', 'Total Revenue')} value={formatLKR(totalRevenue)} note={tr('reportRevenueTotal', 'Aggregate from saved reports')} accent="purple" />
+              <StatCard title={tr('paymentStatus', 'Payment Status')} value={paymentLabel} note={paymentPending ? tr('pendingAdminApprovalNote', 'Awaiting admin approval') : fullAccessEnabled ? tr('premiumPaidNote', 'Full access granted') : `${tr('trialRemaining', 'Trial remaining')}: ${trialRemaining}`} accent={fullAccessEnabled ? 'green' : paymentPending ? 'amber' : 'amber'} />
             </div>
-          </section>
+          </div>
+        </section>
 
           {/* Saved Reports Table */}
           <section className="rounded-3xl border border-purple-200 bg-white p-6 shadow-xl overflow-hidden">
