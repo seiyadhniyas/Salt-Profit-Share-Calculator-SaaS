@@ -23,7 +23,7 @@ function StatRow({label, value, isNegative}){
   )
 }
 
-export default function ResultSection({results, t, ownerNames = ['', ''], ownerCount = 2}){
+export default function ResultSection({results, t, ownerNames = ['', ''], ownerCount = 2, inputs = {}}){
   if(!results) return null
   
   const owner1Name = (ownerNames && ownerNames[0]) || `${t ? t('owner') : 'Owner'} 1`
@@ -45,6 +45,16 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
             </span>
           </div>
           <div className="space-y-1">
+            {(inputs.location || inputs.date) && (
+              <div className="py-3 px-5 rounded-[28px] bg-blue-50 border border-blue-200 mb-3 text-sm">
+                {inputs.location && (
+                  <div className="text-slate-700"><span className="font-bold">{t ? t('locationDay') : 'Location'}:</span> {inputs.location}</div>
+                )}
+                {inputs.date && (
+                  <div className="text-slate-700 mt-1"><span className="font-bold">{t ? t('date') : 'Date'}:</span> {inputs.date}</div>
+                )}
+              </div>
+            )}
             <StatRow label={t ? t('netBags') + ' (' + t('packedMinusDeducted') + ')' : 'Net Bags (Packed - Deducted)'} value={results.netBags} isNegative={false} />
             <StatRow label={(t ? t('initialPrice') : 'Initial Price') + ' (' + (t ? t('netTimesPricePerBag') : 'Net × Price/Bag') + ')'} value={formatLKR(results.initialPrice)} isNegative={false} />
             <div className="my-2 border-t border-slate-300"></div>

@@ -2434,7 +2434,7 @@ Message: ${contactFormData.message || 'N/A'}
         </div>
 
 
-        {results && <div className="mb-20 sm:mb-24 lg:mb-32"><ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} /></div>}
+        {results && <div className="mb-20 sm:mb-24 lg:mb-32"><ResultSection results={results} t={t} ownerNames={activeOwnerNames} ownerCount={ownerCount} inputs={inputs} /></div>}
 
         {/* Hidden/off-screen printable area */}
         {results && (
