@@ -230,6 +230,10 @@ export function computeAll(inputs, options = {}) {
   // Helper to round decimal values to 2 places (currency)
   const round2 = (v) => Math.round(v * 100) / 100
 
+  // Society Service Charge calculations
+  const societyServiceCharge = netBags * 100
+  const societyServiceReserved30 = societyServiceCharge * 0.30
+
   return {
     packedBags,
     deductedBags,
@@ -264,6 +268,8 @@ export function computeAll(inputs, options = {}) {
     zakatShakira: round2(zakatShakira),
     finalInayaAfterZakat: round2(finalInayaAfterZakat),
     finalShakiraAfterZakat: round2(finalShakiraAfterZakat),
+    societyServiceCharge: round2(societyServiceCharge),
+    societyServiceReserved30: round2(societyServiceReserved30),
     highlights,
     stockSource,
     reservedStockDeducted: Math.round(reservedStockDeducted),
