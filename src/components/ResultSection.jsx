@@ -32,7 +32,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
 
   return (
     <div className="mt-2 text-left">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 lg:gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-9">
         {/* Detailed Breakdown */}
         <div className="android-card p-2 lg:p-6 relative group overflow-hidden" style={{ backgroundColor: "#fff0f0" }}>
           <div className="flex items-center justify-between mb-4 ml-[10px] relative z-20">
