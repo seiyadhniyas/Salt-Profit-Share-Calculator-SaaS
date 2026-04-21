@@ -29,23 +29,23 @@ import { getLocalSuggestions } from './utils/aiAssistClient.js'
 const STORAGE_KEY = 'salt_profit_share_last'
 
 export default function App(){
-  // if (!isSupabaseConfigured || !supabase) {
-  //   return (
-  //     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', color: '#1e293b' }}>
-  //       <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>Supabase Not Configured</h1>
-  //       <p style={{ fontSize: 18, maxWidth: 480, textAlign: 'center' }}>
-  //         Please set your Supabase credentials in a <code>.env</code> file at the project root.<br />
-  //         Example:<br />
-  //         <code>VITE_SUPABASE_URL=...</code><br />
-  //         <code>VITE_SUPABASE_ANON_KEY=...</code>
-  //       </p>
-  //       <p style={{ marginTop: 32, color: '#ef4444', fontWeight: 600 }}>
-  //         The app cannot function without these values.<br />
-  //         See <a href="https://supabase.com/docs/guides/getting-started" target="_blank" rel="noopener noreferrer">Supabase Docs</a> for help.
-  //       </p>
-  //     </div>
-  //   )
-  // }
+  if (!isSupabaseConfigured || !supabase) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', color: '#1e293b' }}>
+        <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>Supabase Not Configured</h1>
+        <p style={{ fontSize: 18, maxWidth: 480, textAlign: 'center' }}>
+          Please set your Supabase credentials in a <code>.env</code> file at the project root.<br />
+          Example:<br />
+          <code>VITE_SUPABASE_URL=...</code><br />
+          <code>VITE_SUPABASE_ANON_KEY=...</code>
+        </p>
+        <p style={{ marginTop: 32, color: '#ef4444', fontWeight: 600 }}>
+          The app cannot function without these values.<br />
+          See <a href="https://supabase.com/docs/guides/getting-started" target="_blank" rel="noopener noreferrer">Supabase Docs</a> for help.
+        </p>
+      </div>
+    )
+  }
   const defaultInputs = {
     packedBags: 0,
     deductedBags: 0,
