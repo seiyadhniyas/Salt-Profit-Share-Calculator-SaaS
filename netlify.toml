@@ -9,7 +9,17 @@
   status = 200
 
 [context.production.environment]
-# Set server-side values in the Netlify UI instead of committing secrets.
-# Browser auth/dashboard variables should live in .env.local as VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY.
-  SUPABASE_URL = "https://your-project.supabase.co"
-  SUPABASE_KEY = "<YOUR_SUPABASE_SERVICE_ROLE_OR_API_KEY>"
+# Browser env vars injected into build by Vite (set these in Netlify UI)
+  VITE_SUPABASE_URL = "https://ktcsdocrzgeqplmiphfa.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0Y3Nkb2NyemdlcXBsbWlwaGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTI5NDAsImV4cCI6MjA5MDcyODk0MH0.tuY6a_6u9kE9jhJHF9leE12JiLlIyWPozQLxuC9NMoc"
+  VITE_STRIPE_LKR_FEE_PERCENT = "3.4"
+  VITE_STRIPE_LKR_FEE_FIXED = "90"
+  VITE_ADMIN_SECRET = "AdminSecret123"
+
+# Server-side secrets (set these in Netlify UI, never commit)
+  SUPABASE_URL = "https://ktcsdocrzgeqplmiphfa.supabase.co"
+  SUPABASE_SERVICE_ROLE_KEY = "your_service_role_key"
+  STRIPE_SECRET_KEY = "sk_live_or_test_key"
+  STRIPE_WEBHOOK_SECRET = "whsec_from_stripe_webhook"
+  ADMIN_VERIFICATION_KEY = "set_a_long_random_secret"
+  ADMIN_NOTIFICATION_WEBHOOK_URL = "https://your-admin-webhook-endpoint.example.com"
