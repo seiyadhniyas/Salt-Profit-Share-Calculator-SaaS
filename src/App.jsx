@@ -325,6 +325,7 @@ export default function App(){
       deductedBags: 'Deducted Bags',
       pricePerBag: 'Salt Price per Bag (LKR)',
       cashReceived: 'Cash Received (LKR)',
+      cashAutoHint: 'This fills automatically, you may override it.',
       chequeReceived: 'Cheque Received (LKR)',
       contractorExpenses: 'Contractor Expenses',
       packingFeePerBag: 'pack wage per bag (LKR)',
@@ -628,6 +629,7 @@ export default function App(){
       deductedBags: 'கழிக்கப்பட்ட மூட்டைகள்',
       pricePerBag: 'மூட்டை ஒன்றின் விலை (LKR)',
       cashReceived: 'ரொக்கப் பணம் (LKR)',
+      cashAutoHint: 'இது தானாக நிரம்பும், நீங்கள் அதை மாற்றலாம்.',
       chequeReceived: 'காசோலை பணம் (LKR)',
       contractorExpenses: 'ஒப்பந்ததாரர் செலவுகள்',
       packingFeePerBag: 'மூட்டை கட்டும் கூலி (LKR)',
@@ -930,6 +932,7 @@ export default function App(){
       deductedBags: 'අඩු කළ මලු ප්‍රමාණය',
       pricePerBag: 'මල්ලක මිල (LKR)',
       cashReceived: 'අතේ ඇති මුදල් (LKR)',
+      cashAutoHint: 'මෙය ස්වයංක්‍රීයව පිරෙයි, ඔබ එය වෙනස් කළ හැක.',
       chequeReceived: 'චෙක්පත් මුදල් (LKR)',
       contractorExpenses: 'කොන්ත්‍රාත්කරුගේ වියදම්',
       packingFeePerBag: 'ඇසිරීමේ කුලිය (LKR)',
@@ -2624,11 +2627,20 @@ Message: ${contactFormData.message || 'N/A'}
           }, 100);
         }}
         onPL={() => {
-          // Scroll to results section if available
-          const resultsSection = document.querySelector('.android-shadow.rounded-[32px]');
-          if (resultsSection) {
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
+          // Open dashboard/reports view to display P&L reports
+          setMenuOpen(true);
+          setTimeout(() => {
+            // Focus on the reports section of the dashboard
+            const filesTab = document.querySelector('[data-tab="files"]');
+            if (filesTab) {
+              filesTab.click();
+              // Scroll to P&L table
+              const plTable = document.querySelector('table');
+              if (plTable) {
+                plTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }
+          }, 150);
         }}
         onDashboard={() => setMenuOpen(true)}
       />

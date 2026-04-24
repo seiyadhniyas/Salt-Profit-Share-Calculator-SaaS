@@ -79,7 +79,14 @@ export default function DashboardSummary({
 
   const reportCount = reports?.length || 0
   const savedFileCount = savedFiles?.length || 0
+  
+  // Enhanced P&L calculations
   const totalRevenue = reports?.reduce((sum, item) => sum + Number(item?.payload?.results?.initialPrice || 0), 0) || 0
+  const totalCosts = reports?.reduce((sum, item) => sum + 
+    (Number(item?.payload?.results?.contractorTotalSpent || 0) + 
+     Number(item?.payload?.results?.extraExpensesTotal || 0) + 
+     Number(item?.payload?.results?.labourCostsTotal || 0)), 0) || 0
+  const totalNetProfit = totalRevenue - totalCosts
   const mostRecentReport = reports?.[0]
   const mostRecentFile = savedFiles?.[0]
   const paymentStatus = billingStatus?.payment_status || 'trial'
@@ -296,6 +303,8 @@ export default function DashboardSummary({
               <StatCard title={tr('savedReports', 'Saved Reports')} value={`${reportCount}`} note={tr('cloudReportsNote', 'Secure P&L report history in the cloud')} accent="blue" />
               <StatCard title={tr('downloadedFiles', 'Downloaded Files')} value={`${savedFileCount}`} note={savedFileCount > 0 ? tr('downloadedFilesNote', 'PDF/Excel exports saved to cloud storage') : tr('noDownloadsYet', 'No downloads yet')} accent="green" />
               <StatCard title={tr('totalRevenue', 'Total Revenue')} value={formatLKR(totalRevenue)} note={tr('reportRevenueTotal', 'Aggregate from saved reports')} accent="purple" />
+              <StatCard title="Total Costs" value={formatLKR(totalCosts)} note="Operational & labour costs" accent="amber" />
+              <StatCard title="Net Profit" value={formatLKR(totalNetProfit)} note={totalNetProfit >= 0 ? 'Overall profitability' : 'Operating at loss'} accent={totalNetProfit >= 0 ? 'green' : 'slate'} />
               <StatCard title={tr('paymentStatus', 'Payment Status')} value={paymentLabel} note={paymentPending ? tr('pendingAdminApprovalNote', 'Awaiting admin approval') : fullAccessEnabled ? tr('premiumPaidNote', 'Full access granted') : `${tr('trialRemaining', 'Trial remaining')}: ${trialRemaining}`} accent={fullAccessEnabled ? 'green' : paymentPending ? 'amber' : 'amber'} />
             </div>
           </div>
@@ -325,19 +334,28 @@ export default function DashboardSummary({
                  <thead className="bg-purple-50 text-purple-900 uppercase font-black">
                    <tr>
                      <th className="px-5 py-4 first:rounded-l-2xl">LOCATION</th>
-                     <th className="px-5 py-4">SECURE DATE</th>
-                     <th className="px-5 py-4 last:rounded-r-2xl">REVENUE (LKR)</th>
+                     <th className="px-5 py-4">DATE</th>
+                     <th className="px-5 py-4">REVENUE (LKR)</th>
+                     <th className="px-5 py-4">COSTS (LKR)</th>
+                     <th className="px-5 py-4 last:rounded-r-2xl">NET PROFIT (LKR)</th>
                    </tr>
                  </thead>
                  <tbody className="divide-y divide-purple-50">
-                   {/* TODO: Replace with full P&L aggregation logic for all time periods */}
-                   {reportCount > 0 ? reports.map(r => (
-                     <tr key={r.id} className="hover:bg-purple-50/50 transition-colors cursor-pointer">
-                       <td className="px-5 py-4 font-black text-slate-800 uppercase">{r.payload?.inputs?.location || '-'}</td>
-                       <td className="px-5 py-4 font-bold text-slate-500">{new Date(r.created_at).toLocaleDateString()}</td>
-                       <td className="px-5 py-4 text-emerald-600 font-black">{formatLKR(r.payload?.results?.initialPrice || 0)}</td>
-                     </tr>
-                   )) : <tr><td colSpan="3" className="text-center py-10 font-bold text-slate-300 uppercase tracking-widest italic">NO SECURE RECORDS FOUND</td></tr>}
+                   {/* Full P&L aggregation logic for all time periods */}
+                   {reportCount > 0 ? reports.map(r => {
+                     const revenue = r.payload?.results?.initialPrice || 0;
+                     const costs = (r.payload?.results?.contractorTotalSpent || 0) + (r.payload?.results?.extraExpensesTotal || 0) + (r.payload?.results?.labourCostsTotal || 0);
+                     const netProfit = revenue - costs;
+                     return (
+                       <tr key={r.id} className="hover:bg-purple-50/50 transition-colors cursor-pointer">
+                         <td className="px-5 py-4 font-black text-slate-800 uppercase">{r.payload?.inputs?.location || '-'}</td>
+                         <td className="px-5 py-4 font-bold text-slate-500">{new Date(r.created_at).toLocaleDateString()}</td>
+                         <td className="px-5 py-4 text-emerald-600 font-black">{formatLKR(revenue)}</td>
+                         <td className="px-5 py-4 text-orange-600 font-black">{formatLKR(costs)}</td>
+                         <td className={`px-5 py-4 font-black ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{formatLKR(netProfit)}</td>
+                       </tr>
+                     );
+                   }) : <tr><td colSpan="5" className="text-center py-10 font-bold text-slate-300 uppercase tracking-widest italic">NO SECURE RECORDS FOUND</td></tr>}
                  </tbody>
                </table>
              </div>
