@@ -9,6 +9,7 @@ import AdminAuthModal from './components/AdminAuthModal.jsx'
 import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import * as XLSX from 'xlsx'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFilesFromSupabase, savePdfFileToSupabase } from './api/reports.js'
 import { saveStockReservedToSupabase, getStockReservedRecords } from './api/stockReserved.js'
 import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment, getAdminPendingPayments, activatePaymentRequestAsAdmin } from './api/billing.js'
@@ -767,7 +768,7 @@ export default function App(){
       noLocationsAvailable: 'இடங்கள் கிடைக்கவில்லை. டாஷ்போர்டில் இடங்களைச் சேர்க்கவும்.',
       fromDate: 'தொடக்க தேதி',
       toDate: 'முடிவு தேதி',
-      packingCostBreakdown: 'பதிவு செலவு உடைப்பு',
+      packingCostBreakdown: 'பொதி கட்டும் செலவு விவரங்கள் (தொழிலாளர் செலவுப் பிரிவிலிருந்து)',
       fromLabourCard: 'தொழிலாளர் செலவு கார்டிலிருந்து',
       labourCost: 'தொழிலாளர் செலவு',
       totalPackingCost: 'மொத்த பதிவு செலவு',
@@ -1598,141 +1599,136 @@ Message: ${contactFormData.message || 'N/A'}
 
     if (!results) return alert(t('noResultsToSave'))
     try {
-      const csvData = []
+      const excelData = []
       
       // Title
-      csvData.push([t('title')])
-      csvData.push(['Generated on', new Date().toLocaleDateString()])
-      csvData.push([''])
+      excelData.push([t('title')])
+      excelData.push(['Generated on', new Date().toLocaleDateString()])
+      excelData.push([''])
 
       // Document Details Section
-      csvData.push(['DOCUMENT DETAILS'])
-      csvData.push(['Location', inputs.location || '-'])
-      csvData.push(['Date', inputs.date || '-'])
-      csvData.push(['Buyer Name', inputs.buyerName || '-'])
-      csvData.push(['Bill Number', inputs.billNumber || '-'])
-      csvData.push([''])
+      excelData.push(['DOCUMENT DETAILS'])
+      excelData.push(['Location', inputs.location || '-'])
+      excelData.push(['Date', inputs.date || '-'])
+      excelData.push(['Buyer Name', inputs.buyerName || '-'])
+      excelData.push(['Bill Number', inputs.billNumber || '-'])
+      excelData.push([''])
 
       // Revenue & Expenses Summary
-      csvData.push(['SALT SALE SUMMARY'])
-      csvData.push(['Packed Bags', inputs.packedBags || 0])
-      csvData.push(['Deducted Bags', inputs.deductedBags || 0])
-      csvData.push(['Net Bags', results.netBags || 0])
-      csvData.push(['Price Per Bag (LKR)', inputs.pricePerBag || 0])
-      csvData.push(['Initial Price (LKR)', results.initialPrice || 0])
-      csvData.push([''])
+      excelData.push(['SALT SALE SUMMARY'])
+      excelData.push(['Packed Bags', inputs.packedBags || 0])
+      excelData.push(['Deducted Bags', inputs.deductedBags || 0])
+      excelData.push(['Net Bags', results.netBags || 0])
+      excelData.push(['Price Per Bag (LKR)', inputs.pricePerBag || 0])
+      excelData.push(['Initial Price (LKR)', results.initialPrice || 0])
+      excelData.push([''])
 
       // Operational Costs Section
-      csvData.push(['OPERATIONAL COSTS'])
-      csvData.push(['Packing Fee Per Bag (LKR)', inputs.packingFeePerBag || 0])
-      csvData.push(['Plastic Bag Cost (LKR)', inputs.bagCostPerUnit || 0])
-      csvData.push(['Fixed Overheads (LKR)', inputs.otherExpenses || 0])
+      excelData.push(['OPERATIONAL COSTS'])
+      excelData.push(['Packing Fee Per Bag (LKR)', inputs.packingFeePerBag || 0])
+      excelData.push(['Plastic Bag Cost (LKR)', inputs.bagCostPerUnit || 0])
+      excelData.push(['Fixed Overheads (LKR)', inputs.otherExpenses || 0])
       
       if (results.extraExpensesTotal > 0) {
-        csvData.push(['Extra Expenses (LKR)', results.extraExpensesTotal])
+        excelData.push(['Extra Expenses (LKR)', results.extraExpensesTotal])
       }
       
       if (results.labourCostsTotal > 0) {
-        csvData.push(['Labour Costs Total (LKR)', results.labourCostsTotal])
+        excelData.push(['Labour Costs Total (LKR)', results.labourCostsTotal])
       }
       
-      csvData.push(['Total Contractor Spent (LKR)', results.contractorTotalSpent || 0])
-      csvData.push([''])
+      excelData.push(['Total Contractor Spent (LKR)', results.contractorTotalSpent || 0])
+      excelData.push([''])
 
       // Settlement
-      csvData.push(['NET SETTLEMENT'])
-      csvData.push(['Physical Cash (LKR)', inputs.cashReceived || 0])
-      csvData.push(['Bank Cheques (LKR)', inputs.chequeReceived || 0])
-      csvData.push([''])
+      excelData.push(['NET SETTLEMENT'])
+      excelData.push(['Physical Cash (LKR)', inputs.cashReceived || 0])
+      excelData.push(['Bank Cheques (LKR)', inputs.chequeReceived || 0])
+      excelData.push([''])
 
       // Profit Share Calculations
-      csvData.push(['PROFIT SHARE CALCULATIONS'])
-      csvData.push(['Contractor Share %', contractorSharePercentage || 0])
-      csvData.push(['Expense Payment Mode', inputs.expensePayment === 'owners' ? 'Owners Responsibility' : inputs.expensePayment === 'contractor' ? 'Contractor Responsibility' : '50/50 Shared'])
-      csvData.push([''])
+      excelData.push(['PROFIT SHARE CALCULATIONS'])
+      excelData.push(['Contractor Share %', contractorSharePercentage || 0])
+      excelData.push(['Expense Payment Mode', inputs.expensePayment === 'owners' ? 'Owners Responsibility' : inputs.expensePayment === 'contractor' ? 'Contractor Responsibility' : '50/50 Shared'])
+      excelData.push([''])
 
-      csvData.push(['GRAND TOTALS'])
-      csvData.push(['Grand Total Received (LKR)', results.grandTotalReceived || 0])
-      csvData.push(['Contractor Share (Gross) (LKR)', results.contractorShare || 0])
-      csvData.push(['Contractor Advance Payment (LKR)', results.advancesTotal || 0])
-      csvData.push(['Contractor Share (Net after Advances) (LKR)', results.contractorNetShare || 0])
-      csvData.push(['Owners Group Amount (LKR)', results.ownerPool || 0])
-      csvData.push(['Per Owner Share (LKR)', results.generalSharePerOwner || 0])
-      csvData.push([''])
+      excelData.push(['GRAND TOTALS'])
+      excelData.push(['Grand Total Received (LKR)', results.grandTotalReceived || 0])
+      excelData.push(['Contractor Share (Gross) (LKR)', results.contractorShare || 0])
+      excelData.push(['Contractor Advance Payment (LKR)', results.advancesTotal || 0])
+      excelData.push(['Contractor Share (Net after Advances) (LKR)', results.contractorNetShare || 0])
+      excelData.push(['Owners Group Amount (LKR)', results.ownerPool || 0])
+      excelData.push(['Per Owner Share (LKR)', results.generalSharePerOwner || 0])
+      excelData.push([''])
 
       // Owner Distribution
       if (ownerCount === 1) {
-        csvData.push(['SINGLE OWNER DISTRIBUTION'])
-        csvData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
-        csvData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        excelData.push(['SINGLE OWNER DISTRIBUTION'])
+        excelData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
+        excelData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
         if (inputs.bothOwnersHaveLoans) {
-          csvData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
-          csvData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
+          excelData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
+          excelData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
         }
       } else {
-        csvData.push(['TWO OWNERS DISTRIBUTION'])
-        csvData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
-        csvData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        excelData.push(['TWO OWNERS DISTRIBUTION'])
+        excelData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
+        excelData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
         if (inputs.bothOwnersHaveLoans) {
-          csvData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
+          excelData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
         }
-        csvData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
+        excelData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
         
-        csvData.push([''])
-        csvData.push(['Owner 2 Name', ownerNames[1] || 'Owner 2'])
-        csvData.push(['Owner 2 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        excelData.push([''])
+        excelData.push(['Owner 2 Name', ownerNames[1] || 'Owner 2'])
+        excelData.push(['Owner 2 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
         if (inputs.bothOwnersHaveLoans) {
-          csvData.push(['Owner 2 Loan (LKR)', inputs.loanShakira || 0])
+          excelData.push(['Owner 2 Loan (LKR)', inputs.loanShakira || 0])
         }
-        csvData.push(['Owner 2 Final Share (LKR)', results.finalShakira || 0])
+        excelData.push(['Owner 2 Final Share (LKR)', results.finalShakira || 0])
       }
-      csvData.push([''])
+      excelData.push([''])
 
       // Zakat Information (if applicable)
       if (results.zakatInaya > 0 || results.zakatShakira > 0) {
-        csvData.push(['ZAKAT CALCULATIONS'])
+        excelData.push(['ZAKAT CALCULATIONS'])
         if (ownerCount === 1) {
-          csvData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
-          csvData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
+          excelData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
+          excelData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
         } else {
-          csvData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
-          csvData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
-          csvData.push(['Owner 2 Zakat (LKR)', results.zakatShakira || 0])
-          csvData.push(['Owner 2 After Zakat (LKR)', results.finalShakiraAfterZakat || 0])
+          excelData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
+          excelData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
+          excelData.push(['Owner 2 Zakat (LKR)', results.zakatShakira || 0])
+          excelData.push(['Owner 2 After Zakat (LKR)', results.finalShakiraAfterZakat || 0])
         }
-        csvData.push([''])
+        excelData.push([''])
       }
 
       // Society Service Charge (if applicable)
       if (results.societyServiceCharge > 0) {
-        csvData.push(['SOCIETY SERVICE CHARGES'])
-        csvData.push(['Service Charge Amount (LKR)', results.societyServiceCharge || 0])
-        csvData.push(['Reserved 30% (LKR)', (results.societyServiceCharge * 0.30) || 0])
-        csvData.push([''])
+        excelData.push(['SOCIETY SERVICE CHARGES'])
+        excelData.push(['Service Charge Amount (LKR)', results.societyServiceCharge || 0])
+        excelData.push(['Reserved 30% (LKR)', (results.societyServiceCharge * 0.30) || 0])
+        excelData.push([''])
       }
 
-      // Convert to CSV string
-      const csvContent = csvData.map(row => 
-        row.map(cell => {
-          const cellStr = String(cell || '')
-          // Quote cells that contain commas
-          return cellStr.includes(',') ? `"${cellStr}"` : cellStr
-        }).join(',')
-      ).join('\n')
+      // Create workbook and worksheet
+      const ws = XLSX.utils.aoa_to_sheet(excelData)
+      
+      // Set column widths (in characters)
+      ws['!cols'] = [
+        { wch: 35 },  // Column A: wide for labels
+        { wch: 20 }   // Column B: wide for values
+      ]
 
-      // Create blob and download
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-      const link = document.createElement('a')
-      const url = URL.createObjectURL(blob)
-      const fileName = `Report-${(inputs.location || 'Report').replace(/\s+/g, '-')}-${inputs.date || new Date().toISOString().split('T')[0]}.csv`
-      
-      link.setAttribute('href', url)
-      link.setAttribute('download', fileName)
-      link.style.visibility = 'hidden'
-      
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      // Add autofilter and freeze panes if supported
+      ws['!autofilter'] = { ref: 'A1:B1' }
+
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Report')
+
+      const fileName = `Report-${(inputs.location || 'Report').replace(/\s+/g, '-')}-${inputs.date || new Date().toISOString().split('T')[0]}.xlsx`
+      XLSX.writeFile(wb, fileName)
     } catch (err) {
       console.error(err)
       alert(t('couldNotCreatePdf'))

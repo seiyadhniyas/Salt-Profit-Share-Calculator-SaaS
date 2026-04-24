@@ -1,19 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // This is a web mockup of a bottom access menu for demonstration only.
 // For React Native, use @react-navigation/bottom-tabs and react-native-vector-icons.
 
 export default function BottomAccessMenu({ onDownloadPDF, onDownloadExcel, onSave, onCloud, onPL, onDashboard }) {
   const [downloadOption, setDownloadOption] = useState('pdf');
+  const [pendingDownload, setPendingDownload] = useState(null);
+
+  // Execute pending download when it changes
+  useEffect(() => {
+    if (pendingDownload === 'pdf' && typeof onDownloadPDF === 'function') {
+      onDownloadPDF();
+      setPendingDownload(null);
+    } else if (pendingDownload === 'excel' && typeof onDownloadExcel === 'function') {
+      onDownloadExcel();
+      setPendingDownload(null);
+    }
+  }, [pendingDownload, onDownloadPDF, onDownloadExcel]);
 
   const handleDownloadChange = (event) => {
     const value = event.target.value;
     setDownloadOption(value);
-    if (value === 'pdf' && typeof onDownloadPDF === 'function') {
-      onDownloadPDF();
-    } else if (value === 'excel' && typeof onDownloadExcel === 'function') {
-      onDownloadExcel();
-    }
+    // Queue the download for the next effect cycle
+    setPendingDownload(value);
   };
 
   return (

@@ -499,7 +499,7 @@ export default function InputSection({
                <span className="text-xl">💰</span>
                <div className="text-sm font-semibold text-emerald-900 uppercase tracking-tight">{tr('income', 'NET SETTLEMENT')}</div>
             </div>
-            <NumberInput label={tr('cashReceived', 'PHYSICAL CASH (LKR)')} name="cashReceived" value={inputs?.cashReceived} onChange={onChange} decimals={2} tooltip={tr('cashAutoHint', 'Automatically displayed, you may override the amount')} />
+            <NumberInput label={tr('cashReceived', 'PHYSICAL CASH (LKR)')} name="cashReceived" value={inputs?.cashReceived} onChange={onChange} decimals={2} tooltip={tr('cashAutoHint', 'This fills automatically, you may override it.')} />
             <NumberInput label={tr('chequeReceived', 'BANK CHEQUES (LKR)')} name="chequeReceived" value={inputs?.chequeReceived} onChange={onChange} decimals={2} />
             
             <div className={`mt-12 bg-indigo-50/50 rounded-[28px] border-2 border-indigo-100 transition-all duration-300 ${(inputs?.bothOwnersHaveLoans) ? 'p-6' : 'p-0 flex items-center min-h-[64px]'}`}>

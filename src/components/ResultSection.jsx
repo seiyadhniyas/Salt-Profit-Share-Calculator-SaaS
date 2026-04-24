@@ -35,7 +35,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-9">
         {/* Detailed Breakdown */}
         <div className="android-card p-2 lg:p-6 relative group overflow-hidden" style={{ backgroundColor: "#fff0f0" }}>
-          <div className="flex items-center justify-between mb-4 ml-[10px] relative z-20">
+          <div className="flex items-center justify-between mb-6 ml-[10px] relative z-20 pb-3 border-b-2 border-transparent">
             <div className="flex items-center gap-2">
               <span className="text-lg">📊</span>
               <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight">{t ? t('calculationBreakdown') : 'Calculation Breakdown'}</h3>
@@ -44,7 +44,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               6
             </span>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1 pt-2">
             {(inputs.location || inputs.date) && (
               <div className="py-3 px-5 rounded-[28px] bg-blue-50 border border-blue-200 mb-3 text-sm">
                 {inputs.location && (
@@ -94,7 +94,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               value={formatLKR(results.contractorNetShare)}
               isNegative={false}
             />
-            <div className="my-2 border-t border-slate-300"></div>
+            <div className="my-4 py-2 border-t border-slate-300"></div>
             <StatRow
               label={(t ? t('grandTotalReceived') : 'Grand Total Received') + (results.expensePayment === 'owners' ? ` (${t ? t('grandTotalOwnersFormula') : 'InitialPrice - TotalLoan'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('grandTotalShared5050Formula') : 'InitialPrice - Spent/2 - TotalLoan'})` : ` (${t ? t('grandTotalContractorFormula') : 'InitialPrice - Spent - TotalLoan'})`)}
               value={formatLKR(results.grandTotalReceived)}
@@ -105,7 +105,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               value={formatLKR(results.ownerPool)}
               isNegative={results.highlights.ownerPoolNegative}
             />
-            <div className="my-2 border-t"></div>
+            <div className="my-4 py-2 border-t"></div>
             <StatRow label={t ? `${t('societyServiceCharge')} (${t('netBags')} × 100)` : 'Society Service Charge (Net Bags × 100)'} value={formatLKR(results.netBags * 100)} isNegative={false} />
             <StatRow label={t ? t('societyServiceReserved30') : 'Society Service Reserved 30%'} value={formatLKR((results.netBags * 100) * 0.30)} isNegative={false} />
           </div>
@@ -113,7 +113,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
 
         {/* Final Results */}
         <div className="android-card p-2 lg:p-6 relative group overflow-hidden" style={{ backgroundColor: "#f0fdf4" }}>
-          <div className="flex items-center justify-between mb-4 ml-[10px] relative z-20">
+          <div className="flex items-center justify-between mb-6 ml-[10px] relative z-20 pb-3 border-b-2 border-transparent">
             <div className="flex items-center gap-2">
               <span className="text-lg">🥇</span>
               <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight">{t ? t('finalResults') : 'Final Results'}</h3>
@@ -122,7 +122,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               7
             </span>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 pt-2">
             <div className="android-card p-6 bg-sky-50 border border-sky-100">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm font-bold text-slate-700">{owner1Name} - {t ? t('finalShare') : 'Final Share'}</span>
