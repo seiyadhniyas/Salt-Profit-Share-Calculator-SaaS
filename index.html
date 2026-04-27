@@ -8,6 +8,12 @@
     <meta name="keywords" content="salt, profit, share, calculator, welfare, society" />
     <meta name="author" content="Saltern Welfare Society" />
 
+    <script>
+      // Ensure React Refresh hooks exist before vite/react runtime runs
+      window.$RefreshReg$ = window.$RefreshReg$ || function() {}
+      window.$RefreshSig$ = window.$RefreshSig$ || function() { return function(typed){ return typed } }
+    </script>
+
     <!-- PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -199,14 +205,6 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
-      // Dev-only: ensure React Fast Refresh preamble functions exist
-      try {
-        if (location && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
-          if (!window.$RefreshReg$) window.$RefreshReg$ = function() {}
-          if (!window.$RefreshSig$) window.$RefreshSig$ = function() { return function(type) { return type } }
-        }
-      } catch (e) {}
-
       // PWA Install Prompt
       let deferredPrompt;
       const installPrompt = document.getElementById('install-prompt');
@@ -276,8 +274,8 @@
         deferredPrompt = null;
       });
 
-      // Service Worker Registration (disabled in localhost/dev to avoid cache issues)
-      if ('serviceWorker' in navigator && location && !(location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
@@ -315,7 +313,9 @@
         // You could show a toast or update UI here
       });
 
-      
+      // Stub React Refresh runtime hooks to avoid preamble detection errors in dev
+      window.$RefreshReg$ = window.$RefreshReg$ || function() {}
+      window.$RefreshSig$ = window.$RefreshSig$ || function() { return function(type){ return type } }
     </script>
     <script type="module" src="/src/index.jsx"></script>
   </body>
