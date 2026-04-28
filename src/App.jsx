@@ -596,7 +596,7 @@ export default function App(){
       done: 'Done',
     },
     ta: {
-      title: 'உப்பு விற்பதை தளம்',
+      title: 'உப்பு விற்பனை தளம்',
       subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்தக்காரர்களுக்கான நிதி கணக்கீடு',
       documentDetails: "ஆவண விவரங்கள்",
       locationDay: 'இடம்',
