@@ -292,7 +292,7 @@ export default function App(){
 
   const translations = {
     en: {
-      title: 'Salt Profit Share Calculator',
+      title: 'Salt Trade Calculator',
       subtitle: 'Financial calculator for owners and contractors',
       documentDetails: "Document Details",
       locationDay: 'Location',
@@ -595,7 +595,7 @@ export default function App(){
       done: 'Done',
     },
     ta: {
-      title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
+      title: 'உப்பு வர்த்தக கணக்கீடு',
       subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்தக்காரர்களுக்கான நிதி கணக்கீடு',
       documentDetails: "ஆவண விவரங்கள்",
       locationDay: 'இடம்',
@@ -897,7 +897,7 @@ export default function App(){
       done: 'முடிந்தது',
     },
     si: {
-      title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
+      title: 'ලුණු වෙළඳ ගණක යන්ත්‍රය',
       subtitle: 'අයිතිකරුවන් සහ කොන්ත්‍රාත්කරුවන් සඳහා මූල්‍ය ගණක යන්ත්‍රය',
       documentDetails: "ලේඛන විස්තර",
       locationDay: 'ස්ථානය',
