@@ -127,42 +127,6 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
-          return response || fetch(request);
-        })
-    );
-    return;
-  }
-
-  // Try cache first, then network
-  event.respondWith(
-    caches.match(request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        return fetch(request)
-          .then((networkResponse) => {
-            // Cache successful responses
-            if (networkResponse.status === 200) {
-              const responseClone = networkResponse.clone();
-              caches.open(DYNAMIC_CACHE)
-                .then((cache) => {
-                  cache.put(request, responseClone);
-                });
-            }
-            return networkResponse;
-          })
-          .catch(() => {
-            // Return offline fallback for failed requests
-            if (request.destination === 'document') {
-              return caches.match('/index.html');
-            }
-            return new Response('Offline', { status: 503 });
-          });
-      })
-  );
-});
 
 // Background sync for saving reports when back online
 self.addEventListener('sync', (event) => {
