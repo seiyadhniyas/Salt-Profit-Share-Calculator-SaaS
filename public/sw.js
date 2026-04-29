@@ -1,23 +1,18 @@
-const CACHE_NAME = 'salt-calculator-v1.0.0';
-const STATIC_CACHE = 'salt-calculator-static-v1.0.0';
-const DYNAMIC_CACHE = 'salt-calculator-dynamic-v1.0.0';
-
-// Files to cache immediately
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/Calculator-icon.png'
-];
-
-// Install event - cache static assets
+// Service worker disabled - to prevent caching issues with broken deploys
+// Users should clear browser cache manually if needed
+console.log('[SW] Service worker is disabled')
 self.addEventListener('install', (event) => {
-  console.log('[SW] Install event');
+  self.skipWaiting()
+})
+self.addEventListener('activate', (event) => {
+  // Clear all caches
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('[SW] Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
+    caches.keys().then((cacheNames) => {
+      return Promise.all(cacheNames.map((name) => caches.delete(name)))
+    })
+  )
+  self.clients.claim()
+})
       })
       .catch((error) => {
         console.error('[SW] Error caching static assets:', error);
