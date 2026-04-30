@@ -32,14 +32,31 @@ self.addEventListener('fetch', (event) => {
   const request = event.request
   if (request.method !== 'GET') return
 
-  // Navigation requests (HTML) - network first
+  let url
+  try {
+    url = new URL(request.url)
+  } catch (e) {
+    // If URL parsing fails, fall back to network
+    event.respondWith(fetch(request))
+    return
+  }
+
+  // Skip unsupported protocols (chrome-extension:, data:, about:, etc.)
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    event.respondWith(fetch(request).catch(() => new Response('Network error', { status: 503 })))
+    return
+  }
+
+  // Navigation requests (HTML) - network first with cached fallback
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((response) => {
           if (response && response.status === 200) {
             const copy = response.clone()
-            caches.open(RUNTIME_CACHE).then((c) => c.put(request, copy))
+            caches.open(RUNTIME_CACHE).then((c) => {
+              try { c.put(request, copy) } catch (e) {}
+            }).catch(() => {})
           }
           return response
         })
@@ -48,15 +65,17 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Cache first for other assets
+  // Cache-first for other assets (only cache http(s) successful responses)
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached
       return fetch(request)
         .then((response) => {
-          if (response && response.status === 200) {
+          if (response && response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
             const clone = response.clone()
-            caches.open(RUNTIME_CACHE).then((c) => c.put(request, clone))
+            caches.open(RUNTIME_CACHE).then((c) => {
+              try { c.put(request, clone) } catch (e) {}
+            }).catch(() => {})
           }
           return response
         })
