@@ -92,6 +92,9 @@ export default function App(){
   const [tenantId, setTenantId] = useState(null)
   const [userRole, setUserRole] = useState(null)
 
+  // Promo information for first-100 discount
+  const [promoInfo, setPromoInfo] = useState({ count: 0, remaining: 0, basePrice: 30000, discountPercent: 30, discountedPrice: Math.round(30000 * 0.7) })
+
 
   // Auth & Profile Sync
   useEffect(() => {
@@ -104,6 +107,31 @@ export default function App(){
     })
 
     return () => subscription.unsubscribe()
+  }, [])
+
+  // Load promo info (first 100 users discount)
+  useEffect(() => {
+    let mounted = true
+    async function loadPromo() {
+      try {
+        const res = await fetch('/.netlify/functions/getPromoStatus')
+        const data = await res.json().catch(() => ({}))
+        if (!mounted) return
+        if (data?.ok) {
+          setPromoInfo({
+            count: data.count || 0,
+            remaining: data.remaining || 0,
+            basePrice: data.basePrice || 30000,
+            discountPercent: data.discountPercent || 30,
+            discountedPrice: data.discountedPrice || Math.round((data.basePrice || 30000) * 0.7),
+          })
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    loadPromo()
+    return () => { mounted = false }
   }, [])
 
   // Load profile settings from Supabase
@@ -1476,12 +1504,16 @@ export default function App(){
 
     try {
       setPaymentBusy(true)
+      // pick discounted price when promo available
+      const amountToUse = (promoInfo?.remaining || 0) > 0 ? (promoInfo.discountedPrice || ONE_OFF_PRICE_LKR) : (promoInfo.basePrice || ONE_OFF_PRICE_LKR)
       const resp = await createStripeCheckoutSession({
         session,
         origin: `${window.location.origin}${window.location.pathname}`,
+        amountLkr: amountToUse,
       })
-      if (resp?.url) {
-        window.location.href = resp.url
+      const redirectUrl = resp?.checkoutUrl || resp?.url || resp?.checkout_url
+      if (redirectUrl) {
+        window.location.href = redirectUrl
       } else {
         alert('Stripe initialization failed.')
       }
@@ -2593,6 +2625,7 @@ Message: ${contactFormData.message || 'N/A'}
         t={t}
         billingStatus={billingStatus}
         onStartCardPayment={handleStartCardPayment}
+        promoInfo={promoInfo}
         onRequestCashPayment={handleRequestCashPayment}
         stripeFeePreview={stripeFeePreview}
         paymentBusy={paymentBusy}

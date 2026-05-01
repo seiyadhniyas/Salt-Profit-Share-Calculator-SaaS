@@ -41,6 +41,7 @@ export default function DashboardSummary({
   contractorSharePercentage = 50,
   onContractorSharePercentageChange,
   t,
+  promoInfo = {},
   billingStatus,
   onStartCardPayment,
   onRequestCashPayment,
@@ -166,6 +167,14 @@ export default function DashboardSummary({
                             ? tr('pendingAdminApprovalNote', 'Your payment is awaiting admin verification.')
                             : tr('lifetimeAccessPromo', 'PROMO: Full access for LKR 30,000 lifetime.')}
                           <br/><span className="text-[10px]">{tr('cardSurchargeNote', '*Card payments include LKR 1,100 surcharge.')}</span>
+                        </div>
+                      )}
+                      {/* Promo countdown banner */}
+                      {!fullAccessEnabled && promoInfo?.remaining > 0 && (
+                        <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-100 text-amber-900 text-sm font-bold">
+                          <div className="text-xs uppercase tracking-wide">Limited launch offer</div>
+                          <div className="mt-1 text-base font-black">{promoInfo.discountPercent}% off — {formatLKR(promoInfo.discountedPrice)}</div>
+                          <div className="text-[12px] mt-0.5">Only {promoInfo.remaining} spots left</div>
                         </div>
                       )}
                       {!fullAccessEnabled && !paymentPending && (
