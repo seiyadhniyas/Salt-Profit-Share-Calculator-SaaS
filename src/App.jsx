@@ -114,6 +114,12 @@ export default function App(){
   useEffect(() => {
     let mounted = true
     let timerId = null
+    const isLocal = (typeof window !== 'undefined') && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '::1'
+    )
+
     async function loadPromo() {
       try {
         const res = await fetch('/.netlify/functions/getPromoStatus', { cache: 'no-store' })
@@ -127,9 +133,28 @@ export default function App(){
             discountPercent: Number(data.discountPercent || 30),
             discountedPrice: Number(data.discountedPrice || Math.round((data.basePrice || 30000) * 0.7)),
           })
+        } else if (isLocal) {
+          // Show promo locally for testing when functions are not available
+          setPromoInfo({
+            count: 0,
+            remaining: 100,
+            basePrice: 30000,
+            discountPercent: 30,
+            discountedPrice: Math.round(30000 * 0.7),
+          })
         }
       } catch (e) {
-        // ignore
+        // If running on localhost and the functions endpoint isn't available,
+        // show a local demo promo so developers can preview the UI without deploying.
+        if (isLocal && mounted) {
+          setPromoInfo({
+            count: 0,
+            remaining: 100,
+            basePrice: 30000,
+            discountPercent: 30,
+            discountedPrice: Math.round(30000 * 0.7),
+          })
+        }
       }
     }
 
@@ -2096,7 +2121,7 @@ Message: ${contactFormData.message || 'N/A'}
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-8 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
         <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-6 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-2">
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-3 pt-0 sm:px-0">
+          <div className="flex items-center justify-center sm:justify-between gap-2 px-3 pt-0 sm:px-0">
             <div className="flex items-center">
               <select 
                 value={lang} 
@@ -2113,7 +2138,7 @@ Message: ${contactFormData.message || 'N/A'}
             <div className="flex justify-center items-center">
             </div>
 
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex items-center gap-2">
               {/* Promo badge: shows remaining promo spots and discounted price; opens Dashboard on click */}
               {promoInfo?.remaining > 0 && (
                 <PromoBadge promoInfo={promoInfo} onClick={() => setMenuOpen(true)} />
