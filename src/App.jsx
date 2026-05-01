@@ -78,6 +78,7 @@ export default function App(){
       return Array.isArray(saved) && saved.length === 2 ? saved : ['', '']
     } catch { return ['', ''] }
   })
+  const [session, setSession] = useState(null)
   const [contractorSharePercentage, setContractorSharePercentage] = useState(() => {
     try {
       return Number(localStorage.getItem('contractorSharePercentage')) || 50
@@ -91,7 +92,6 @@ export default function App(){
   const [tenantId, setTenantId] = useState(null)
   const [userRole, setUserRole] = useState(null)
 
-  const [session, setSession] = useState(null)
 
   // Auth & Profile Sync
   useEffect(() => {
