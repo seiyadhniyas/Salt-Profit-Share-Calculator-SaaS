@@ -3,16 +3,30 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   root: './',
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Dev-only: provide a simple middleware to stub Netlify function routes so the app
+    // can run without a local functions runtime. This returns a JSON stub for
+    // requests under /.netlify/functions/* during development.
+    {
+      name: 'netlify-functions-dev-stub',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && req.url.startsWith('/.netlify/functions/')) {
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 200
+            res.end(JSON.stringify({ ok: false, error: 'dev-stub: no functions runtime' }))
+            return
+          }
+          next()
+        })
+      }
+    }
+  ],
   server: {
     port: 3000,
-    open: false,
-    host: '0.0.0.0',
-    hmr: {
-      protocol: 'ws',
-      host: '127.0.0.1',
-      port: 3000
-    }
+    open: true,
+    hmr: false,
   },
   build: {
     rollupOptions: {
