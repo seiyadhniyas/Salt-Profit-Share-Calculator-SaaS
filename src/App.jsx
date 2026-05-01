@@ -19,6 +19,7 @@ import { createTenant, listTenantsForUser } from './api/tenants.js'
 import { getUserRole, canEdit } from './api/roles.js'
 import RedesignedHeader from './components/RedesignedHeader.jsx'
 import BottomAccessMenu from './components/BottomAccessMenu.jsx'
+import PromoBadge from './components/PromoBadge.jsx'
 import AccordionCard from './components/AccordionCard.jsx'
 import validateModule from './utils/validator.js'
 import Toaster from './components/Toaster.jsx'
@@ -109,29 +110,37 @@ export default function App(){
     return () => subscription.unsubscribe()
   }, [])
 
-  // Load promo info (first 100 users discount)
+  // Load promo info (first 100 users discount) and poll periodically
   useEffect(() => {
     let mounted = true
+    let timerId = null
     async function loadPromo() {
       try {
-        const res = await fetch('/.netlify/functions/getPromoStatus')
+        const res = await fetch('/.netlify/functions/getPromoStatus', { cache: 'no-store' })
         const data = await res.json().catch(() => ({}))
         if (!mounted) return
         if (data?.ok) {
           setPromoInfo({
-            count: data.count || 0,
-            remaining: data.remaining || 0,
-            basePrice: data.basePrice || 30000,
-            discountPercent: data.discountPercent || 30,
-            discountedPrice: data.discountedPrice || Math.round((data.basePrice || 30000) * 0.7),
+            count: Number(data.count || 0),
+            remaining: Number(data.remaining || 0),
+            basePrice: Number(data.basePrice || 30000),
+            discountPercent: Number(data.discountPercent || 30),
+            discountedPrice: Number(data.discountedPrice || Math.round((data.basePrice || 30000) * 0.7)),
           })
         }
       } catch (e) {
         // ignore
       }
     }
+
+    // initial load + poll every 15s
     loadPromo()
-    return () => { mounted = false }
+    timerId = setInterval(loadPromo, 15000)
+
+    return () => {
+      mounted = false
+      if (timerId) clearInterval(timerId)
+    }
   }, [])
 
   // Load profile settings from Supabase
@@ -2105,6 +2114,10 @@ Message: ${contactFormData.message || 'N/A'}
             </div>
 
             <div className="flex items-center justify-end gap-2">
+              {/* Promo badge: shows remaining promo spots and discounted price; opens Dashboard on click */}
+              {promoInfo?.remaining > 0 && (
+                <PromoBadge promoInfo={promoInfo} onClick={() => setMenuOpen(true)} />
+              )}
               {isAdmin && (
                 <button
                   type="button"
