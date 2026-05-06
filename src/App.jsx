@@ -2121,8 +2121,8 @@ Message: ${contactFormData.message || 'N/A'}
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-8 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
         <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-6 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-2">
-          <div className="flex items-center justify-center sm:justify-between gap-2 px-3 pt-0 sm:px-0">
-            <div className="flex items-center">
+          <div className="flex items-center px-3 pt-0 sm:px-0">
+            <div className="flex-1 flex items-center justify-start">
               <select 
                 value={lang} 
                 onChange={(e) => setLang(e.target.value)} 
@@ -2135,14 +2135,14 @@ Message: ${contactFormData.message || 'N/A'}
               </select>
             </div>
 
-            <div className="flex justify-center items-center">
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Promo badge: shows remaining promo spots and discounted price; opens Dashboard on click */}
+            <div className="flex-1 flex items-center justify-center">
+              {/* Center: Promo badge */}
               {promoInfo?.remaining > 0 && (
                 <PromoBadge promoInfo={promoInfo} onClick={() => setMenuOpen(true)} />
               )}
+            </div>
+
+            <div className="flex-1 flex items-center justify-end gap-2">
               {isAdmin && (
                 <button
                   type="button"
