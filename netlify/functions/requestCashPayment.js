@@ -19,6 +19,7 @@ exports.handler = async function (event) {
     const userId = body.userId
     const userEmail = body.userEmail || null
     const amountLkr = Number(body.amountLkr) || 30000
+    const buyerNote = body.buyerNote || ''
 
     if (!userId) {
       return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'userId is required' }) }
@@ -32,7 +33,7 @@ exports.handler = async function (event) {
       currency: 'lkr',
       payment_method: 'cash',
       status: 'pending',
-      metadata: { source: 'cash_request' },
+      metadata: { source: 'cash_request', buyerNote },
       admin_notified: false,
     }
 

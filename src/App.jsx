@@ -1549,17 +1549,20 @@ export default function App(){
       if (redirectUrl) {
         window.location.href = redirectUrl
       } else {
-        alert('Stripe initialization failed.')
+        showToast('Stripe initialization failed.', 'error')
       }
     } catch (error) {
-      alert(error.message)
+      showToast(error.message || 'Payment initialization failed', 'error')
     } finally {
       setPaymentBusy(false)
     }
   }
 
   const handleRequestCashPayment = async (contactFormData) => {
-    if (!session?.user?.id) return
+    if (!session?.user?.id) {
+      showToast('Please sign in first', 'error')
+      return
+    }
     try {
       setPaymentBusy(true)
       
@@ -1572,15 +1575,17 @@ export default function App(){
         buyerNote = `
 Name: ${contactFormData.fullName}
 Phone: ${contactFormData.phoneNumber}
+Email: ${contactFormData.email || session.user.email || 'N/A'}
 Company: ${contactFormData.company || 'N/A'}
 Preferred Contact: ${contactFormData.preferredContactMethod}
 Message: ${contactFormData.message || 'N/A'}
         `.trim()
       }
       
-      await requestCashPayment({ session, amount: ONE_OFF_PRICE_LKR, buyerNote })
-      // Success notification is shown in the ContactFormModal
+      await requestCashPayment({ session, amountLkr: ONE_OFF_PRICE_LKR, buyerNote })
+      showToast('Payment request submitted successfully! Admin will contact you within 24 hours.', 'success', 8000)
     } catch (error) {
+      showToast(error.message || 'Failed to submit payment request', 'error')
       throw error
     } finally {
       setPaymentBusy(false)

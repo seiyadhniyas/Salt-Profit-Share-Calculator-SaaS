@@ -78,7 +78,7 @@ export async function createStripeCheckoutSession({ session, origin, amountLkr =
   return body
 }
 
-export async function requestCashPayment({ session, amountLkr = 30000 }) {
+export async function requestCashPayment({ session, amountLkr = 30000, buyerNote = '' }) {
   if (!session?.user?.id) {
     throw new Error('Please sign in first')
   }
@@ -90,6 +90,7 @@ export async function requestCashPayment({ session, amountLkr = 30000 }) {
       userId: session.user.id,
       userEmail: session.user.email || null,
       amountLkr,
+      buyerNote,
     }),
   })
 
