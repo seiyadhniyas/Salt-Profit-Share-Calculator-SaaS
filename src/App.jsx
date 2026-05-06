@@ -1560,8 +1560,7 @@ export default function App(){
 
   const handleRequestCashPayment = async (contactFormData) => {
     if (!session?.user?.id) {
-      showToast('Please sign in first', 'error')
-      return
+      throw new Error('Please sign in first')
     }
     try {
       setPaymentBusy(true)
@@ -1583,9 +1582,9 @@ Message: ${contactFormData.message || 'N/A'}
       }
       
       await requestCashPayment({ session, amountLkr: ONE_OFF_PRICE_LKR, buyerNote })
-      showToast('Payment request submitted successfully! Admin will contact you within 24 hours.', 'success', 8000)
+      // Success! ContactFormModal will handle the success screen
     } catch (error) {
-      showToast(error.message || 'Failed to submit payment request', 'error')
+      // Re-throw so ContactFormModal can handle the error with alert
       throw error
     } finally {
       setPaymentBusy(false)
