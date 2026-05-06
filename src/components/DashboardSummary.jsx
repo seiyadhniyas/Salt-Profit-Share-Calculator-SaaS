@@ -185,8 +185,8 @@ export default function DashboardSummary({
                     </div>
                     {!fullAccessEnabled && (
                       <div className="flex gap-3">
-                        <button onClick={() => onStartCardPayment?.()} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">{tr('payByCard', 'PAY BY CARD')}</button>
-                        <button onClick={() => setShowContactForm(true)} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
+                        <button onClick={(e) => { e.stopPropagation(); onStartCardPayment?.(); }} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">{tr('payByCard', 'PAY BY CARD')}</button>
+                        <button onClick={(e) => { e.stopPropagation(); setShowContactForm(true); }} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
                       </div>
                     )}
                   </div>

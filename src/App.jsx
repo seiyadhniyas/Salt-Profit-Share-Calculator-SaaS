@@ -1652,7 +1652,7 @@ Message: ${contactFormData.message || 'N/A'}
       // Auto-save to Supabase if session exists
       if (session?.user?.id) {
         const pdfBlob = pdf.output('blob')
-        await savePdfFileToSupabase(pdfBlob, fileName, session)
+        await savePdfFileToSupabase({ blob: pdfBlob, session, payload: { inputs, results }, fileName })
         loadSavedFiles(session)
       }
     } catch (err) {
@@ -1780,14 +1780,17 @@ Message: ${contactFormData.message || 'N/A'}
         csvData.push([''])
       }
 
-      // Convert to CSV string
-      const csvContent = csvData.map(row => 
-        row.map(cell => {
-          const cellStr = String(cell || '')
-          // Quote cells that contain commas
-          return cellStr.includes(',') ? `"${cellStr}"` : cellStr
-        }).join(',')
-      ).join('\n')
+      // Convert to CSV string with colons and alignment
+      const csvContent = csvData.map((row, idx) => {
+        // If row has 2 items (label, value), format as "Label: Value"
+        if (row.length === 2) {
+          const label = String(row[0] || '').padEnd(40, ' ')
+          const value = String(row[1] || '')
+          return `${label} : ${value}`
+        }
+        // For other rows, use colon-separated format
+        return row.map(cell => String(cell || '')).join(' : ')
+      }).join('\n')
 
       // Create blob and download
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
