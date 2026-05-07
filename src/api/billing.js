@@ -70,9 +70,17 @@ export async function createStripeCheckoutSession({ session, origin, amountLkr =
     }),
   })
 
-  const body = await res.json().catch(() => ({}))
+  const text = await res.text().catch(() => '')
+  let body = {}
+  try {
+    body = text ? JSON.parse(text) : {}
+  } catch (e) {
+    body = { _raw: text }
+  }
+
   if (!res.ok || !body?.ok) {
-    throw new Error(body?.error || 'Unable to start Stripe checkout')
+    const serverMessage = body?.error || body?._raw || text || res.statusText || `status ${res.status}`
+    throw new Error(`Unable to start Stripe checkout (${serverMessage})`)
   }
 
   return body
@@ -94,9 +102,17 @@ export async function requestCashPayment({ session, amountLkr = 30000, buyerNote
     }),
   })
 
-  const body = await res.json().catch(() => ({}))
+  const text = await res.text().catch(() => '')
+  let body = {}
+  try {
+    body = text ? JSON.parse(text) : {}
+  } catch (e) {
+    body = { _raw: text }
+  }
+
   if (!res.ok || !body?.ok) {
-    throw new Error(body?.error || 'Unable to submit cash payment request')
+    const serverMessage = body?.error || body?._raw || text || res.statusText || `status ${res.status}`
+    throw new Error(`Unable to submit cash payment request (${serverMessage})`)
   }
 
   return body

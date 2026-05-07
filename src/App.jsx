@@ -1549,7 +1549,8 @@ export default function App(){
       if (redirectUrl) {
         window.location.href = redirectUrl
       } else {
-        showToast('Stripe initialization failed.', 'error')
+        const serverMsg = resp?.error || resp?.message || resp?._raw || null
+        showToast(serverMsg ? `Stripe init error: ${serverMsg}` : 'Stripe returned no checkout URL. Ensure serverless functions are running (netlify dev) or site is deployed.', 'error')
       }
     } catch (error) {
       showToast(error.message || 'Payment initialization failed', 'error')
