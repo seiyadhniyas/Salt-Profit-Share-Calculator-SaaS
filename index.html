@@ -275,19 +275,33 @@
       });
 
       // Service Worker Registration
+      // Disable stale SWs on localhost/dev so the browser does not keep serving an older cached UI.
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
+          try {
+            const regs = await navigator.serviceWorker.getRegistrations()
+            for (const reg of regs) {
+              await reg.unregister()
+            }
+          } catch (e) {
+            console.warn('SW cleanup failed:', e)
+          }
+
+          const isLocalhost = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) || window.location.hostname.startsWith('192.168.')
+          if (isLocalhost) {
+            console.log('Local dev detected; skipping service worker registration to avoid stale app cache.')
+            return
+          }
+
           navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
               console.log('SW registered: ', registration);
 
-              // Handle updates
               registration.addEventListener('updatefound', () => {
                 const newWorker = registration.installing;
                 if (newWorker) {
                   newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                      // New content is available, show update prompt
                       if (confirm('New version available! Reload to update?')) {
                         window.location.reload();
                       }

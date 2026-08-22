@@ -36,9 +36,9 @@ function showEnvError(message, details = {}) {
   `
 }
 
-// If deployed (not localdev), attempt to unregister service workers and clear related caches.
-// This helps when a previous service worker served stale/broken app shell.
-if (typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname) && !window.location.hostname.startsWith('192.168.')) {
+// For local dev, always clear any stale service worker registrations so the browser
+// does not keep serving an older cached app shell.
+if (typeof window !== 'undefined') {
   (async () => {
     try {
       if ('serviceWorker' in navigator) {
@@ -48,16 +48,18 @@ if (typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window
         }
       }
     } catch (e) {}
-    try {
-      if (window.caches && window.caches.keys) {
+
+    const isLocalhost = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) || window.location.hostname.startsWith('192.168.')
+    if (!isLocalhost && window.caches && window.caches.keys) {
+      try {
         const keys = await caches.keys()
         for (const k of keys) {
           try {
             if (k && k.includes('salt-calculator')) await caches.delete(k)
           } catch(e) {}
         }
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
   })()
 }
 

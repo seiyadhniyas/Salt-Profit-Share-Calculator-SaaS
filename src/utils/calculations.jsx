@@ -6,6 +6,40 @@ const safeNum = (v) => {
   return Number.isFinite(n) ? n : 0
 }
 
+export function deriveOwnerNetBags(packedBags, deductedBags, owner1NetBags, owner2NetBags, ownerCount = 2) {
+  const netBags = Math.max(0, safeNum(packedBags) - safeNum(deductedBags))
+
+  if (ownerCount !== 2) {
+    const resolvedOwner1 = owner1NetBags !== '' && owner1NetBags !== null && typeof owner1NetBags !== 'undefined'
+      ? Math.max(0, Math.min(safeNum(owner1NetBags), netBags))
+      : netBags
+    return { netBags, owner1NetBags: resolvedOwner1, owner2NetBags: 0 }
+  }
+
+  const hasOwner1Value = owner1NetBags !== '' && owner1NetBags !== null && typeof owner1NetBags !== 'undefined'
+  const hasOwner2Value = owner2NetBags !== '' && owner2NetBags !== null && typeof owner2NetBags !== 'undefined'
+
+  let nextOwner1 = hasOwner1Value ? Math.max(0, Math.min(safeNum(owner1NetBags), netBags)) : 0
+  let nextOwner2 = hasOwner2Value ? Math.max(0, Math.min(safeNum(owner2NetBags), netBags)) : 0
+
+  if (hasOwner1Value && !hasOwner2Value) {
+    nextOwner2 = Math.max(0, netBags - nextOwner1)
+  } else if (!hasOwner1Value && hasOwner2Value) {
+    nextOwner1 = Math.max(0, netBags - nextOwner2)
+  } else if (!hasOwner1Value && !hasOwner2Value) {
+    nextOwner1 = netBags / 2
+    nextOwner2 = netBags / 2
+  } else if (nextOwner1 + nextOwner2 > netBags) {
+    nextOwner2 = Math.max(0, netBags - nextOwner1)
+  }
+
+  return {
+    netBags,
+    owner1NetBags: Math.max(0, nextOwner1),
+    owner2NetBags: Math.max(0, nextOwner2),
+  }
+}
+
 // Primary compute function. Takes an inputs object and options, returns an object
 // with all intermediate and final values. Keeps raw values for
 // highlighting and applies validation rules described in spec.
@@ -64,8 +98,13 @@ export function computeAll(inputs, options = {}) {
   const loanShakira = (ownerCount === 2 && inputs.bothOwnersHaveLoans) ? safeNum(inputs.loanShakira) : 0
 
   // net bags
-  const netBagsRaw = packedBags - deductedBags
-  const netBags = Math.max(0, netBagsRaw)
+  const { netBags, owner1NetBags, owner2NetBags } = deriveOwnerNetBags(
+    packedBags,
+    deductedBags,
+    inputs.owner1NetBags,
+    inputs.owner2NetBags,
+    ownerCount,
+  )
 
   // initial price = net_bags * price_per_bag
   const initialPrice = netBags * pricePerBag
@@ -203,14 +242,22 @@ export function computeAll(inputs, options = {}) {
   // Helper to round decimal values to 2 places (currency)
   const round2 = (v) => Math.round(v * 100) / 100
 
-  // Society Service Charge calculations
-  const societyServiceCharge = netBags * 100
-  const societyServiceReserved30 = societyServiceCharge * 0.30
+  // Society Service Charge calculations based on each owner's net bags
+  const owner1ServiceNetBags = ownerCount === 1 ? netBags : owner1NetBags
+  const owner2ServiceNetBags = ownerCount === 2 ? owner2NetBags : 0
+  const societyServiceChargeOwner1 = owner1ServiceNetBags * 100
+  const societyServiceChargeOwner2 = owner2ServiceNetBags * 100
+  const societyServiceCharge = societyServiceChargeOwner1 + societyServiceChargeOwner2
+  const societyServiceReserved30Owner1 = societyServiceChargeOwner1 * 0.30
+  const societyServiceReserved30Owner2 = societyServiceChargeOwner2 * 0.30
+  const societyServiceReserved30 = societyServiceReserved30Owner1 + societyServiceReserved30Owner2
 
   return {
     packedBags,
     deductedBags,
     netBags,
+    owner1NetBags: round2(owner1NetBags),
+    owner2NetBags: round2(owner2NetBags),
     initialPrice: round2(initialPrice),
     cashReceived: round2(cashReceived),
     chequeReceived: round2(chequeReceived),
@@ -243,6 +290,10 @@ export function computeAll(inputs, options = {}) {
     finalShakiraAfterZakat: round2(finalShakiraAfterZakat),
     societyServiceCharge: round2(societyServiceCharge),
     societyServiceReserved30: round2(societyServiceReserved30),
+    societyServiceChargeOwner1: round2(societyServiceChargeOwner1),
+    societyServiceChargeOwner2: round2(societyServiceChargeOwner2),
+    societyServiceReserved30Owner1: round2(societyServiceReserved30Owner1),
+    societyServiceReserved30Owner2: round2(societyServiceReserved30Owner2),
     highlights,
     stockSource,
     reservedStockDeducted: Math.round(reservedStockDeducted),

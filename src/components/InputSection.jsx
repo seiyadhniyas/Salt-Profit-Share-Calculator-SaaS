@@ -2,6 +2,7 @@
 import AccordionCard from './AccordionCard'
 import StockReservedCard from './StockReservedCard'
 import DisasterRecoveryCard from './DisasterRecoveryCard'
+import { deriveOwnerNetBags } from '../utils/calculations.jsx'
 
 function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip, disabled = false }) {
   const displayValue = value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
@@ -75,6 +76,27 @@ export default function InputSection({
     if (contractorSectionDisabled && ['packingFeePerBag', 'bagCostPerUnit', 'otherExpenses', 'expensePayment'].includes(name)) {
       return
     }
+
+    if (name === 'owner1NetBags' || name === 'owner2NetBags') {
+      const nextValues = deriveOwnerNetBags(
+        inputs?.packedBags ?? 0,
+        inputs?.deductedBags ?? 0,
+        name === 'owner1NetBags' ? val : inputs?.owner1NetBags ?? 0,
+        name === 'owner2NetBags' ? val : inputs?.owner2NetBags ?? 0,
+        ownerCount,
+      )
+
+      if (typeof setInput === 'function') {
+        setInput(prev => ({
+          ...prev,
+          owner1NetBags: nextValues.owner1NetBags,
+          owner2NetBags: nextValues.owner2NetBags,
+          [name]: val,
+        }))
+      }
+      return
+    }
+
     if (typeof setInput === 'function') {
       setInput(prev => ({ ...prev, [name]: val }))
     }
@@ -82,6 +104,29 @@ export default function InputSection({
       setCashReceivedManuallySet(true)
     }
   }
+
+  useEffect(() => {
+    if (ownerCount !== 2 || typeof setInput !== 'function') return
+
+    const nextValues = deriveOwnerNetBags(
+      inputs?.packedBags ?? 0,
+      inputs?.deductedBags ?? 0,
+      inputs?.owner1NetBags ?? 0,
+      inputs?.owner2NetBags ?? 0,
+      ownerCount,
+    )
+
+    const owner1Changed = Number(inputs?.owner1NetBags ?? 0) !== nextValues.owner1NetBags
+    const owner2Changed = Number(inputs?.owner2NetBags ?? 0) !== nextValues.owner2NetBags
+
+    if (owner1Changed || owner2Changed) {
+      setInput(prev => ({
+        ...prev,
+        owner1NetBags: nextValues.owner1NetBags,
+        owner2NetBags: nextValues.owner2NetBags,
+      }))
+    }
+  }, [inputs?.packedBags, inputs?.deductedBags, inputs?.owner1NetBags, inputs?.owner2NetBags, ownerCount, setInput])
 
   useEffect(() => {
     if (!cashReceivedManuallySet && typeof setInput === 'function') {
@@ -173,6 +218,8 @@ export default function InputSection({
         ...prev,
         packedBags: 0,
         deductedBags: 0,
+        owner1NetBags: 0,
+        owner2NetBags: 0,
         pricePerBag: 0,
         packingFeePerBag: 0,
         bagCostPerUnit: 0,
@@ -396,6 +443,16 @@ export default function InputSection({
             )}
 
             <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs?.deductedBags} onChange={onChange} decimals={null} />
+
+            {ownerCount === 1 ? (
+              <NumberInput label={`${ownerNames?.[0] || tr('owner', 'OWNER') + ' 1'} ${tr('netBags', 'NET BAGS')}`} name="owner1NetBags" value={inputs?.owner1NetBags} onChange={onChange} decimals={null} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <NumberInput label={`${ownerNames?.[0] || tr('owner', 'OWNER') + ' 1'} ${tr('netBags', 'NET BAGS')}`} name="owner1NetBags" value={inputs?.owner1NetBags} onChange={onChange} decimals={null} />
+                <NumberInput label={`${ownerNames?.[1] || tr('owner', 'OWNER') + ' 2'} ${tr('netBags', 'NET BAGS')}`} name="owner2NetBags" value={inputs?.owner2NetBags} onChange={onChange} decimals={null} />
+              </div>
+            )}
+
             <NumberInput label={tr('pricePerBag', 'PRICE PER BAG (LKR)')} name="pricePerBag" value={inputs?.pricePerBag} onChange={onChange} decimals={2} />
           </div>
           )}

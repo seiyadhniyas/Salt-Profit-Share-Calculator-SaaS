@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeAll } from './calculations.jsx'
+import { computeAll, deriveOwnerNetBags } from './calculations.jsx'
 
 describe('computeAll basic scenarios (no formula changes)', () => {
   it('owners pay, simple 50/50 split', () => {
@@ -94,6 +94,36 @@ describe('computeAll basic scenarios (no formula changes)', () => {
     expect(res.generalSharePerOwner).toBeCloseTo(17500)
     expect(res.finalInaya).toBeCloseTo(14500)
     expect(res.finalShakira).toBeCloseTo(10500)
+  })
+
+  it('calculates society service from each owner net bag reading', () => {
+    const inputs = {
+      packedBags: 100,
+      deductedBags: 20,
+      pricePerBag: 1000,
+      owner1NetBags: 50,
+      owner2NetBags: 30,
+    }
+
+    const res = computeAll(inputs, { contractorSharePercentage: 50, ownerCount: 2 })
+
+    expect(res.netBags).toBe(80)
+    expect(res.owner1NetBags).toBe(50)
+    expect(res.owner2NetBags).toBe(30)
+    expect(res.societyServiceCharge).toBe(8000)
+    expect(res.societyServiceReserved30).toBe(2400)
+    expect(res.societyServiceChargeOwner1).toBe(5000)
+    expect(res.societyServiceChargeOwner2).toBe(3000)
+    expect(res.societyServiceReserved30Owner1).toBe(1500)
+    expect(res.societyServiceReserved30Owner2).toBe(900)
+  })
+
+  it('fills the remaining owner net bags from the total after deductions', () => {
+    const next = deriveOwnerNetBags(100, 20, 50, null, 2)
+
+    expect(next.netBags).toBe(80)
+    expect(next.owner1NetBags).toBe(50)
+    expect(next.owner2NetBags).toBe(30)
   })
 
   it('reserved stock deduction (kg -> bags conversion)', () => {
