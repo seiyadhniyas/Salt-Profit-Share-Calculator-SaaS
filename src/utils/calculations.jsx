@@ -6,12 +6,15 @@ const safeNum = (v) => {
   return Number.isFinite(n) ? n : 0
 }
 
+// Round to 2 decimal places (currency precision)
+const round2 = (v) => Math.round((Number(v) || 0) * 100) / 100
+
 export function deriveOwnerNetBags(packedBags, deductedBags, owner1NetBags, owner2NetBags, ownerCount = 2) {
-  const netBags = Math.max(0, safeNum(packedBags) - safeNum(deductedBags))
+  const netBags = Math.max(0, Math.floor(safeNum(packedBags) - safeNum(deductedBags)))
 
   if (ownerCount !== 2) {
     const resolvedOwner1 = owner1NetBags !== '' && owner1NetBags !== null && typeof owner1NetBags !== 'undefined'
-      ? Math.max(0, Math.min(safeNum(owner1NetBags), netBags))
+      ? Math.max(0, Math.min(Math.floor(safeNum(owner1NetBags)), netBags))
       : netBags
     return { netBags, owner1NetBags: resolvedOwner1, owner2NetBags: 0 }
   }
@@ -19,8 +22,8 @@ export function deriveOwnerNetBags(packedBags, deductedBags, owner1NetBags, owne
   const hasOwner1Value = owner1NetBags !== '' && owner1NetBags !== null && typeof owner1NetBags !== 'undefined'
   const hasOwner2Value = owner2NetBags !== '' && owner2NetBags !== null && typeof owner2NetBags !== 'undefined'
 
-  let nextOwner1 = hasOwner1Value ? Math.max(0, Math.min(safeNum(owner1NetBags), netBags)) : 0
-  let nextOwner2 = hasOwner2Value ? Math.max(0, Math.min(safeNum(owner2NetBags), netBags)) : 0
+  let nextOwner1 = hasOwner1Value ? Math.max(0, Math.min(Math.floor(safeNum(owner1NetBags)), netBags)) : 0
+  let nextOwner2 = hasOwner2Value ? Math.max(0, Math.min(Math.floor(safeNum(owner2NetBags)), netBags)) : 0
 
   if (hasOwner1Value && !hasOwner2Value) {
     nextOwner2 = Math.max(0, netBags - nextOwner1)
@@ -35,8 +38,8 @@ export function deriveOwnerNetBags(packedBags, deductedBags, owner1NetBags, owne
 
   return {
     netBags,
-    owner1NetBags: Math.max(0, nextOwner1),
-    owner2NetBags: Math.max(0, nextOwner2),
+    owner1NetBags: Math.max(0, Math.floor(nextOwner1)),
+    owner2NetBags: Math.max(0, Math.floor(nextOwner2)),
   }
 }
 
@@ -240,7 +243,7 @@ export function computeAll(inputs, options = {}) {
   }
 
   // Helper to round decimal values to 2 places (currency)
-  const round2 = (v) => Math.round(v * 100) / 100
+  // (use file-level round2)
 
   // Society Service Charge calculations based on each owner's net bags
   const owner1ServiceNetBags = ownerCount === 1 ? netBags : owner1NetBags
@@ -253,11 +256,11 @@ export function computeAll(inputs, options = {}) {
   const societyServiceReserved30 = societyServiceReserved30Owner1 + societyServiceReserved30Owner2
 
   return {
-    packedBags,
-    deductedBags,
-    netBags,
-    owner1NetBags: round2(owner1NetBags),
-    owner2NetBags: round2(owner2NetBags),
+    packedBags: Math.floor(packedBags),
+    deductedBags: Math.floor(deductedBags),
+    netBags: netBags,
+    owner1NetBags: Math.floor(owner1NetBags),
+    owner2NetBags: Math.floor(owner2NetBags),
     initialPrice: round2(initialPrice),
     cashReceived: round2(cashReceived),
     chequeReceived: round2(chequeReceived),

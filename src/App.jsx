@@ -50,8 +50,8 @@ export default function App(){
   const defaultInputs = {
     packedBags: 0,
     deductedBags: 0,
-    owner1NetBags: 0,
-    owner2NetBags: 0,
+    owner1NetBags: '',
+    owner2NetBags: '',
     pricePerBag: 0,
     cashReceived: 0,
     chequeReceived: 0,

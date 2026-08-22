@@ -4,8 +4,8 @@ import StockReservedCard from './StockReservedCard'
 import DisasterRecoveryCard from './DisasterRecoveryCard'
 import { deriveOwnerNetBags } from '../utils/calculations.jsx'
 
-function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip, disabled = false }) {
-  const displayValue = value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
+function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip, disabled = false, onBlur }) {
+  const displayValue = value === '' || value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
   
   return (
     <label className="block mb-3">
@@ -27,6 +27,7 @@ function NumberInput({ label, value, onChange, min = 0, step = 'any', name, deci
         min={min}
         value={displayValue}
         onChange={(e) => onChange(name, e.target.value)}
+        onBlur={(e) => { if (typeof onBlur === 'function') onBlur(name) }}
         disabled={disabled}
         className={`w-full rounded-[28px] px-6 py-4 text-slate-900 placeholder-slate-400 focus:ring-0 transition-all outline-none font-bold text-sm uppercase border-2 ${disabled ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' : 'bg-slate-50 border-slate-400 focus:border-slate-900'}`}
       />
@@ -82,17 +83,18 @@ export default function InputSection({
         inputs?.packedBags ?? 0,
         inputs?.deductedBags ?? 0,
         name === 'owner1NetBags' ? val : inputs?.owner1NetBags ?? 0,
-        name === 'owner2NetBags' ? val : inputs?.owner2NetBags ?? 0,
+        name === 'owner1NetBags' ? val : inputs?.owner2NetBags ?? 0,
         ownerCount,
       )
 
+      try { console.debug('[deriveOwnerNetBags:onChange]', { name, val, packedBags: inputs?.packedBags, deductedBags: inputs?.deductedBags, nextValues }) } catch (e) {}
+
       if (typeof setInput === 'function') {
-        setInput(prev => ({
-          ...prev,
-          owner1NetBags: nextValues.owner1NetBags,
-          owner2NetBags: nextValues.owner2NetBags,
-          [name]: val,
-        }))
+        if (name === 'owner1NetBags') {
+          setInput(prev => ({ ...prev, owner1NetBags: val, owner2NetBags: nextValues.owner2NetBags }))
+        } else {
+          setInput(prev => ({ ...prev, owner2NetBags: val, owner1NetBags: nextValues.owner1NetBags }))
+        }
       }
       return
     }
@@ -116,6 +118,10 @@ export default function InputSection({
       ownerCount,
     )
 
+    try {
+      console.debug('[deriveOwnerNetBags:effect]', { packedBags: inputs?.packedBags, deductedBags: inputs?.deductedBags, owner1: inputs?.owner1NetBags, owner2: inputs?.owner2NetBags, nextValues })
+    } catch (e) {}
+
     const owner1Changed = Number(inputs?.owner1NetBags ?? 0) !== nextValues.owner1NetBags
     const owner2Changed = Number(inputs?.owner2NetBags ?? 0) !== nextValues.owner2NetBags
 
@@ -127,6 +133,21 @@ export default function InputSection({
       }))
     }
   }, [inputs?.packedBags, inputs?.deductedBags, inputs?.owner1NetBags, inputs?.owner2NetBags, ownerCount, setInput])
+
+  // Normalize owner net bag values on blur (convert typed string to rounded number and recompute)
+  const onOwnerBlur = (name) => {
+    if (ownerCount !== 2 || typeof setInput !== 'function') return
+    const raw = inputs?.[name]
+    const parsed = Number(raw)
+    const nextValues = deriveOwnerNetBags(
+      inputs?.packedBags ?? 0,
+      inputs?.deductedBags ?? 0,
+      name === 'owner1NetBags' ? parsed : inputs?.owner1NetBags ?? 0,
+      name === 'owner2NetBags' ? parsed : inputs?.owner2NetBags ?? 0,
+      ownerCount,
+    )
+    setInput(prev => ({ ...prev, owner1NetBags: nextValues.owner1NetBags, owner2NetBags: nextValues.owner2NetBags }))
+  }
 
   useEffect(() => {
     if (!cashReceivedManuallySet && typeof setInput === 'function') {
@@ -218,8 +239,8 @@ export default function InputSection({
         ...prev,
         packedBags: 0,
         deductedBags: 0,
-        owner1NetBags: 0,
-        owner2NetBags: 0,
+        owner1NetBags: '',
+        owner2NetBags: '',
         pricePerBag: 0,
         packingFeePerBag: 0,
         bagCostPerUnit: 0,
@@ -445,11 +466,11 @@ export default function InputSection({
             <NumberInput label={tr('deductedBags', 'DEDUCTED BAGS')} name="deductedBags" value={inputs?.deductedBags} onChange={onChange} decimals={null} />
 
             {ownerCount === 1 ? (
-              <NumberInput label={`${ownerNames?.[0] || tr('owner', 'OWNER') + ' 1'} ${tr('netBags', 'NET BAGS')}`} name="owner1NetBags" value={inputs?.owner1NetBags} onChange={onChange} decimals={null} />
+              <NumberInput label={`${ownerNames?.[0] || tr('owner', 'OWNER') + ' 1'} ${tr('netBags', 'NET BAGS')}`} name="owner1NetBags" value={inputs?.owner1NetBags} onChange={onChange} onBlur={onOwnerBlur} decimals={null} />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <NumberInput label={`${ownerNames?.[0] || tr('owner', 'OWNER') + ' 1'} ${tr('netBags', 'NET BAGS')}`} name="owner1NetBags" value={inputs?.owner1NetBags} onChange={onChange} decimals={null} />
-                <NumberInput label={`${ownerNames?.[1] || tr('owner', 'OWNER') + ' 2'} ${tr('netBags', 'NET BAGS')}`} name="owner2NetBags" value={inputs?.owner2NetBags} onChange={onChange} decimals={null} />
+                <NumberInput label={`${ownerNames?.[0] || tr('owner', 'OWNER') + ' 1'} ${tr('netBags', 'NET BAGS')}`} name="owner1NetBags" value={inputs?.owner1NetBags} onChange={onChange} onBlur={onOwnerBlur} decimals={null} />
+                <NumberInput label={`${ownerNames?.[1] || tr('owner', 'OWNER') + ' 2'} ${tr('netBags', 'NET BAGS')}`} name="owner2NetBags" value={inputs?.owner2NetBags} onChange={onChange} decimals={null} disabled={true} />
               </div>
             )}
 

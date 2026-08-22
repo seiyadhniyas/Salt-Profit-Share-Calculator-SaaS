@@ -106,22 +106,70 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               isNegative={results.highlights.ownerPoolNegative}
             />
             <div className="my-4 py-2 border-t"></div>
-            <StatRow label={t ? `${t('societyServiceCharge')} (${t('netBags')} × 100)` : 'Society Service Charge (Net Bags × 100)'} value={formatLKR(results.societyServiceCharge || 0)} isNegative={false} />
+            <div className="py-3 px-5 rounded-[28px] bg-[#fff3b8] border border-[#e7d36d] mb-3 last:mb-0">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                <div>
+                  <div className="text-sm text-slate-700 font-bold">{t ? `${t('societyServiceCharge')} (${t('netBags')} × 100)` : 'Society Service Charge (Net Bags × 100)'}</div>
+                </div>
+                <div className="text-base font-mono font-bold text-slate-900">{formatLKR(results.societyServiceCharge || 0)}</div>
+              </div>
+            </div>
             {ownerCount === 1 ? (
-              <StatRow label={t ? `${t('societyServiceCharge')} - ${owner1Name}` : `Society Service Charge - ${owner1Name}`} value={formatLKR(results.societyServiceChargeOwner1 || 0)} isNegative={false} />
+              <div className="py-3 px-5 rounded-[28px] bg-[#fff7cc] border border-[#e7d36d] mb-3 last:mb-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <div>
+                    <div className="text-sm text-slate-700 font-bold">{t ? `${t('societyServiceCharge')} - ${owner1Name}` : `Society Service Charge - ${owner1Name}`}</div>
+                  </div>
+                  <div className="text-base font-mono font-bold text-slate-900">{formatLKR(results.societyServiceChargeOwner1 || 0)}</div>
+                </div>
+              </div>
             ) : (
               <>
-                <StatRow label={t ? `${t('societyServiceCharge')} - ${owner1Name}` : `Society Service Charge - ${owner1Name}`} value={formatLKR(results.societyServiceChargeOwner1 || 0)} isNegative={false} />
-                <StatRow label={t ? `${t('societyServiceCharge')} - ${owner2Name}` : `Society Service Charge - ${owner2Name}`} value={formatLKR(results.societyServiceChargeOwner2 || 0)} isNegative={false} />
+                <div className="py-3 px-5 rounded-[28px] bg-[#fff8c7] border border-[#f2d45a] mb-3 last:mb-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                    <div>
+                      <div className="text-sm text-slate-700 font-bold">{t ? `${t('societyServiceCharge')} - ${owner1Name}` : `Society Service Charge - ${owner1Name}`}</div>
+                    </div>
+                    <div className="text-base font-mono font-bold text-slate-900">{formatLKR(results.societyServiceChargeOwner1 || 0)}</div>
+                  </div>
+                </div>
+                <div className="py-3 px-5 rounded-[28px] bg-[#fff0a8] border border-[#e9c85f] mb-3 last:mb-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                    <div>
+                      <div className="text-sm text-slate-700 font-bold">{t ? `${t('societyServiceCharge')} - ${owner2Name}` : `Society Service Charge - ${owner2Name}`}</div>
+                    </div>
+                    <div className="text-base font-mono font-bold text-slate-900">{formatLKR(results.societyServiceChargeOwner2 || 0)}</div>
+                  </div>
+                </div>
               </>
             )}
-            <StatRow label={t ? t('societyServiceReserved30') : 'Society Service Reserved 30%'} value={formatLKR(results.societyServiceReserved30 || 0)} isNegative={false} />
             {ownerCount === 1 ? (
-              <StatRow label={t ? `${t('societyServiceReserved30')} - ${owner1Name}` : `Society Service Reserved 30% - ${owner1Name}`} value={formatLKR(results.societyServiceReserved30Owner1 || 0)} isNegative={false} />
+              <div className="py-3 px-5 rounded-[28px] bg-[#fff7cc] border border-[#e7d36d] mb-3 last:mb-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <div>
+                    <div className="text-sm text-slate-700 font-bold">{t ? `${t('societyServiceReserved30')} - ${owner1Name}` : `Society Service Reserved 30% - ${owner1Name}`}</div>
+                  </div>
+                  <div className="text-base font-mono font-bold text-slate-900">{formatLKR(results.societyServiceReserved30Owner1 || 0)}</div>
+                </div>
+              </div>
             ) : (
               <>
-                <StatRow label={t ? `${t('societyServiceReserved30')} - ${owner1Name}` : `Society Service Reserved 30% - ${owner1Name}`} value={formatLKR(results.societyServiceReserved30Owner1 || 0)} isNegative={false} />
-                <StatRow label={t ? `${t('societyServiceReserved30')} - ${owner2Name}` : `Society Service Reserved 30% - ${owner2Name}`} value={formatLKR(results.societyServiceReserved30Owner2 || 0)} isNegative={false} />
+                <div className="py-3 px-5 rounded-[28px] bg-[#fff8c7] border border-[#f2d45a] mb-3 last:mb-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                    <div>
+                      <div className="text-sm text-slate-700 font-bold">{t ? `${t('societyServiceReserved30')} - ${owner1Name}` : `Society Service Reserved 30% - ${owner1Name}`}</div>
+                    </div>
+                    <div className="text-base font-mono font-bold text-slate-900">{formatLKR(results.societyServiceReserved30Owner1 || 0)}</div>
+                  </div>
+                </div>
+                <div className="py-3 px-5 rounded-[28px] bg-[#fff0a8] border border-[#e9c85f] mb-3 last:mb-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                    <div>
+                      <div className="text-sm text-slate-700 font-bold">{t ? `${t('societyServiceReserved30')} - ${owner2Name}` : `Society Service Reserved 30% - ${owner2Name}`}</div>
+                    </div>
+                    <div className="text-base font-mono font-bold text-slate-900">{formatLKR(results.societyServiceReserved30Owner2 || 0)}</div>
+                  </div>
+                </div>
               </>
             )}
           </div>
