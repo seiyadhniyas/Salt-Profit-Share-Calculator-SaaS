@@ -75,6 +75,27 @@ describe('computeAll basic scenarios (no formula changes)', () => {
     expect(res.finalShakira).toBeCloseTo(17250)
   })
 
+  it('deducts each owner loan from their share in the owners-pay mode', () => {
+    const inputs = {
+      packedBags: 100,
+      deductedBags: 0,
+      pricePerBag: 1000,
+      packingFeePerBag: 20,
+      bagCostPerUnit: 10,
+      otherExpenses: 2000,
+      expensePayment: 'owners',
+      loanInaya: 3000,
+      loanShakira: 7000,
+      bothOwnersHaveLoans: true,
+    }
+
+    const res = computeAll(inputs, { contractorSharePercentage: 50, ownerCount: 2 })
+
+    expect(res.generalSharePerOwner).toBeCloseTo(17500)
+    expect(res.finalInaya).toBeCloseTo(14500)
+    expect(res.finalShakira).toBeCloseTo(10500)
+  })
+
   it('reserved stock deduction (kg -> bags conversion)', () => {
     const inputs = { packedBags: 20, deductedBags: 0, pricePerBag: 500, reservedAmount: 0 }
     const stockReserved = { stockLevel: 100, stockUnit: 'kg' } // 100 kg -> 2 bags (50kg per bag)

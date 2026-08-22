@@ -173,7 +173,9 @@ export function computeAll(inputs, options = {}) {
   const generalSharePerOwner = ownerPool / ownerCount
 
   // raw final shares
-  // Owner Final Share = (Owners Group Amount / 2) - Own Loan
+  // The owners-pay mode still uses an equal split between owners, but each owner's
+  // own loan amount should reduce their final share. Advances already paid to the
+  // contractor are deducted from the matching owner's share as well.
   let finalInayaRaw = generalSharePerOwner - loanInaya
   let finalShakiraRaw = ownerCount === 2 ? (generalSharePerOwner - loanShakira) : 0
 
@@ -181,9 +183,6 @@ export function computeAll(inputs, options = {}) {
   finalInayaRaw -= ownerAdvanceInaya
   if (ownerCount === 2) finalShakiraRaw -= ownerAdvanceShakira
 
-  // Each owner keeps their own loan balance and share. Any remaining balance is
-  // already captured in the owners' pool calculation, so reassigning the entire
-  // leftover amount to a single owner creates skewed zeros and distorts the split.
   // Prevent negative values: if result < 0 -> show 0 (we'll clamp)
   let finalInaya = Math.max(0, finalInayaRaw)
   let finalShakira = ownerCount === 2 ? Math.max(0, finalShakiraRaw) : 0
