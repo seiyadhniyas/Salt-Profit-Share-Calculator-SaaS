@@ -36,6 +36,45 @@ describe('computeAll basic scenarios (no formula changes)', () => {
     expect(res.finalInayaAfterZakat).toBeCloseTo(5657.25)
   })
 
+  it('keeps both final owner shares positive across expense responsibility modes', () => {
+    const baseInputs = {
+      packedBags: 100,
+      deductedBags: 0,
+      pricePerBag: 1000,
+      packingFeePerBag: 20,
+      bagCostPerUnit: 10,
+      otherExpenses: 2000,
+      bothOwnersHaveLoans: false,
+    }
+
+    for (const expensePayment of ['owners', 'contractor', 'shared5050']) {
+      const res = computeAll({ ...baseInputs, expensePayment }, { contractorSharePercentage: 50, ownerCount: 2 })
+      expect(res.finalInaya).toBeGreaterThan(0)
+      expect(res.finalShakira).toBeGreaterThan(0)
+      expect(res.finalInaya).toBeCloseTo(res.finalShakira)
+    }
+  })
+
+  it('applies each owner loan to their own final share without swapping values between owners', () => {
+    const inputs = {
+      packedBags: 100,
+      deductedBags: 0,
+      pricePerBag: 1000,
+      packingFeePerBag: 20,
+      bagCostPerUnit: 10,
+      otherExpenses: 2000,
+      expensePayment: 'contractor',
+      loanInaya: 3000,
+      loanShakira: 7000,
+      bothOwnersHaveLoans: true,
+    }
+
+    const res = computeAll(inputs, { contractorSharePercentage: 50, ownerCount: 2 })
+
+    expect(res.finalInaya).toBeCloseTo(21250)
+    expect(res.finalShakira).toBeCloseTo(17250)
+  })
+
   it('reserved stock deduction (kg -> bags conversion)', () => {
     const inputs = { packedBags: 20, deductedBags: 0, pricePerBag: 500, reservedAmount: 0 }
     const stockReserved = { stockLevel: 100, stockUnit: 'kg' } // 100 kg -> 2 bags (50kg per bag)

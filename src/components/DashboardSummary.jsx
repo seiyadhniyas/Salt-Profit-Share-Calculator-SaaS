@@ -41,7 +41,6 @@ export default function DashboardSummary({
   contractorSharePercentage = 50,
   onContractorSharePercentageChange,
   t,
-  promoInfo = {},
   billingStatus,
   onStartCardPayment,
   onRequestCashPayment,
@@ -169,14 +168,6 @@ export default function DashboardSummary({
                           <br/><span className="text-[10px]">{tr('cardSurchargeNote', '*Card payments include LKR 1,100 surcharge.')}</span>
                         </div>
                       )}
-                      {/* Promo countdown banner */}
-                      {!fullAccessEnabled && promoInfo?.remaining > 0 && (
-                        <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-100 text-amber-900 text-sm font-bold">
-                          <div className="text-xs uppercase tracking-wide">Limited launch offer</div>
-                          <div className="mt-1 text-base font-black">{promoInfo.discountPercent}% off — {formatLKR(promoInfo.discountedPrice)}</div>
-                          <div className="text-[12px] mt-0.5">Only {promoInfo.remaining} spots left</div>
-                        </div>
-                      )}
                       {!fullAccessEnabled && !paymentPending && (
                         <div className="mt-3 text-xs text-slate-500 font-medium uppercase tracking-[0.15em]">
                           {tr('remainingTrial', 'Remaining trial uses')}: {trialRemaining}
@@ -185,8 +176,8 @@ export default function DashboardSummary({
                     </div>
                     {!fullAccessEnabled && (
                       <div className="flex gap-3">
-                        <button onClick={(e) => { e.stopPropagation(); onStartCardPayment?.(); }} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">{tr('payByCard', 'PAY BY CARD')}</button>
-                        <button onClick={(e) => { e.stopPropagation(); setShowContactForm(true); }} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
+                        <button onClick={() => onStartCardPayment?.()} className="rounded-xl bg-purple-600 px-5 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all uppercase shadow-lg shadow-purple-200">{tr('payByCard', 'PAY BY CARD')}</button>
+                        <button onClick={() => setShowContactForm(true)} className="rounded-xl border-2 border-purple-200 bg-white px-5 py-3 text-xs font-black text-purple-600 hover:bg-purple-50 transition-all uppercase">{tr('cashOrBank', 'CASH / BANK')}</button>
                       </div>
                     )}
                   </div>

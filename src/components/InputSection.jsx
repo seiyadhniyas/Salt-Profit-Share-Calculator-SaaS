@@ -244,7 +244,7 @@ export default function InputSection({
       <AccordionCard 
         title={tr('documentDetails', 'REPORT METADATA')} 
         bgColor="#e0f2fe" 
-        defaultOpen={false}
+        defaultOpen={activeModule === 'setup'}
         onReset={resetDocumentDetails}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-2">
@@ -316,7 +316,7 @@ export default function InputSection({
       <AccordionCard 
         title={tr('inputData', 'REVENUE & EXPENSES')} 
         bgColor="#fefce8" 
-        defaultOpen={false}
+        defaultOpen={activeModule === 'revenue' || activeModule === 'costs'}
         icon="📝"
         onReset={resetRevenueAndExpenses}
       >
@@ -543,6 +543,7 @@ export default function InputSection({
             labourCostsTotal={results?.labourCostsTotal || 0}
             bagCostPerUnit={bagCostPerUnit}
             onReset={resetStockReserved}
+            defaultOpen={activeModule === 'inventory'}
           />
         </div>
       </div>
@@ -552,7 +553,7 @@ export default function InputSection({
       <AccordionCard 
         title={tr('labour', 'LABOUR DETAILS')} 
         bgColor="#ffe4ff" 
-        defaultOpen={false}
+        defaultOpen={activeModule === 'labour'}
         icon="👷"
         onReset={resetLabourCosts}
       >
@@ -639,7 +640,7 @@ export default function InputSection({
       <AccordionCard 
         title={tr('disasterRecovery', 'Disaster Recovery')} 
         bgColor="#fce4ec" 
-        defaultOpen={false}
+        defaultOpen={activeModule === 'disaster'}
         icon="🏘️"
         onReset={() => {
           const empty = {

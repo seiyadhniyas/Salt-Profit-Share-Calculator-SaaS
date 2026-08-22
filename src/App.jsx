@@ -9,6 +9,7 @@ import AdminAuthModal from './components/AdminAuthModal.jsx'
 import { computeAll, formatLKR, formatKg } from './utils/calculations.jsx'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import * as XLSX from 'xlsx'
 import { saveReport, saveReportToSupabase, getReportsFromSupabase, getSavedFilesFromSupabase, savePdfFileToSupabase } from './api/reports.js'
 import { saveStockReservedToSupabase, getStockReservedRecords } from './api/stockReserved.js'
 import { getBillingStatus, consumeTrialUse, createStripeCheckoutSession, requestCashPayment, getAdminPendingPayments, activatePaymentRequestAsAdmin } from './api/billing.js'
@@ -19,7 +20,6 @@ import { createTenant, listTenantsForUser } from './api/tenants.js'
 import { getUserRole, canEdit } from './api/roles.js'
 import RedesignedHeader from './components/RedesignedHeader.jsx'
 import BottomAccessMenu from './components/BottomAccessMenu.jsx'
-import PromoBadge from './components/PromoBadge.jsx'
 import AccordionCard from './components/AccordionCard.jsx'
 import validateModule from './utils/validator.js'
 import Toaster from './components/Toaster.jsx'
@@ -30,23 +30,23 @@ import { getLocalSuggestions } from './utils/aiAssistClient.js'
 const STORAGE_KEY = 'salt_profit_share_last'
 
 export default function App(){
-  // if (!isSupabaseConfigured || !supabase) {
-  //   return (
-  //     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', color: '#1e293b' }}>
-  //       <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>Supabase Not Configured</h1>
-  //       <p style={{ fontSize: 18, maxWidth: 480, textAlign: 'center' }}>
-  //         Please set your Supabase credentials in a <code>.env</code> file at the project root.<br />
-  //         Example:<br />
-  //         <code>VITE_SUPABASE_URL=...</code><br />
-  //         <code>VITE_SUPABASE_ANON_KEY=...</code>
-  //       </p>
-  //       <p style={{ marginTop: 32, color: '#ef4444', fontWeight: 600 }}>
-  //         The app cannot function without these values.<br />
-  //         See <a href="https://supabase.com/docs/guides/getting-started" target="_blank" rel="noopener noreferrer">Supabase Docs</a> for help.
-  //       </p>
-  //     </div>
-  //   )
-  // }
+  if (!isSupabaseConfigured || !supabase) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', color: '#1e293b' }}>
+        <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 16 }}>Supabase Not Configured</h1>
+        <p style={{ fontSize: 18, maxWidth: 480, textAlign: 'center' }}>
+          Please set your Supabase credentials in a <code>.env</code> file at the project root.<br />
+          Example:<br />
+          <code>VITE_SUPABASE_URL=...</code><br />
+          <code>VITE_SUPABASE_ANON_KEY=...</code>
+        </p>
+        <p style={{ marginTop: 32, color: '#ef4444', fontWeight: 600 }}>
+          The app cannot function without these values.<br />
+          See <a href="https://supabase.com/docs/guides/getting-started" target="_blank" rel="noopener noreferrer">Supabase Docs</a> for help.
+        </p>
+      </div>
+    )
+  }
   const defaultInputs = {
     packedBags: 0,
     deductedBags: 0,
@@ -79,7 +79,6 @@ export default function App(){
       return Array.isArray(saved) && saved.length === 2 ? saved : ['', '']
     } catch { return ['', ''] }
   })
-  const [session, setSession] = useState(null)
   const [contractorSharePercentage, setContractorSharePercentage] = useState(() => {
     try {
       return Number(localStorage.getItem('contractorSharePercentage')) || 50
@@ -93,9 +92,7 @@ export default function App(){
   const [tenantId, setTenantId] = useState(null)
   const [userRole, setUserRole] = useState(null)
 
-  // Promo information for first-100 discount
-  const [promoInfo, setPromoInfo] = useState({ count: 0, remaining: 0, basePrice: 30000, discountPercent: 30, discountedPrice: Math.round(30000 * 0.7) })
-
+  const [session, setSession] = useState(null)
 
   // Auth & Profile Sync
   useEffect(() => {
@@ -108,64 +105,6 @@ export default function App(){
     })
 
     return () => subscription.unsubscribe()
-  }, [])
-
-  // Load promo info (first 100 users discount) and poll periodically
-  useEffect(() => {
-    let mounted = true
-    let timerId = null
-    const isLocal = (typeof window !== 'undefined') && (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.hostname === '::1'
-    )
-
-    async function loadPromo() {
-      try {
-        const res = await fetch('/.netlify/functions/getPromoStatus', { cache: 'no-store' })
-        const data = await res.json().catch(() => ({}))
-        if (!mounted) return
-        if (data?.ok) {
-          setPromoInfo({
-            count: Number(data.count || 0),
-            remaining: Number(data.remaining || 0),
-            basePrice: Number(data.basePrice || 30000),
-            discountPercent: Number(data.discountPercent || 30),
-            discountedPrice: Number(data.discountedPrice || Math.round((data.basePrice || 30000) * 0.7)),
-          })
-        } else if (isLocal) {
-          // Show promo locally for testing when functions are not available
-          setPromoInfo({
-            count: 0,
-            remaining: 100,
-            basePrice: 30000,
-            discountPercent: 30,
-            discountedPrice: Math.round(30000 * 0.7),
-          })
-        }
-      } catch (e) {
-        // If running on localhost and the functions endpoint isn't available,
-        // show a local demo promo so developers can preview the UI without deploying.
-        if (isLocal && mounted) {
-          setPromoInfo({
-            count: 0,
-            remaining: 100,
-            basePrice: 30000,
-            discountPercent: 30,
-            discountedPrice: Math.round(30000 * 0.7),
-          })
-        }
-      }
-    }
-
-    // initial load + poll every 15s
-    loadPromo()
-    timerId = setInterval(loadPromo, 15000)
-
-    return () => {
-      mounted = false
-      if (timerId) clearInterval(timerId)
-    }
   }, [])
 
   // Load profile settings from Supabase
@@ -354,7 +293,7 @@ export default function App(){
 
   const translations = {
     en: {
-      title: 'Salt Sale Site',
+      title: 'Salt Profit Share Calculator',
       subtitle: 'Financial calculator for owners and contractors',
       documentDetails: "Document Details",
       locationDay: 'Location',
@@ -658,7 +597,7 @@ export default function App(){
       done: 'Done',
     },
     ta: {
-      title: 'உப்பு விற்பனை தளம்',
+      title: 'உப்பு இலாபப் பங்கு கணக்கீடு',
       subtitle: 'உரிமையாளர்கள் மற்றும் ஒப்பந்தக்காரர்களுக்கான நிதி கணக்கீடு',
       documentDetails: "ஆவண விவரங்கள்",
       locationDay: 'இடம்',
@@ -690,7 +629,7 @@ export default function App(){
       deductedBags: 'கழிக்கப்பட்ட மூட்டைகள்',
       pricePerBag: 'மூட்டை ஒன்றின் விலை (LKR)',
       cashReceived: 'ரொக்கப் பணம் (LKR)',
-      cashAutoHint: 'இது தானாக நிரப்பப்படும், நீங்கள் மாற்றலாம்.',
+      cashAutoHint: 'இது தானாக நிரம்பும், நீங்கள் அதை மாற்றலாம்.',
       chequeReceived: 'காசோலை பணம் (LKR)',
       contractorExpenses: 'ஒப்பந்ததாரர் செலவுகள்',
       packingFeePerBag: 'மூட்டை கட்டும் கூலி (LKR)',
@@ -831,8 +770,8 @@ export default function App(){
       noLocationsAvailable: 'இடங்கள் கிடைக்கவில்லை. டாஷ்போர்டில் இடங்களைச் சேர்க்கவும்.',
       fromDate: 'தொடக்க தேதி',
       toDate: 'முடிவு தேதி',
-      packingCostBreakdown: 'பொதி கட்டும் செலவு விவரங்கள்',
-      fromLabourCard: 'தொழிலாளர் செலவுப் பிரிவிலிருந்து',
+      packingCostBreakdown: 'பொதி கட்டும் செலவு விவரங்கள் (தொழிலாளர் செலவுப் பிரிவிலிருந்து)',
+      fromLabourCard: 'தொழிலாளர் செலவு கார்டிலிருந்து',
       labourCost: 'தொழிலாளர் செலவு',
       totalPackingCost: 'மொத்த பதிவு செலவு',
       stockSummary: 'உப்பு சுருக்கம்',
@@ -961,7 +900,7 @@ export default function App(){
       done: 'முடிந்தது',
     },
     si: {
-      title: 'ලුණු විකුණන අඩවිය',
+      title: 'ලුණු ලාභ බෙදාගැනීමේ ගණක යන්ත්‍රය',
       subtitle: 'අයිතිකරුවන් සහ කොන්ත්‍රාත්කරුවන් සඳහා මූල්‍ය ගණක යන්ත්‍රය',
       documentDetails: "ලේඛන විස්තර",
       locationDay: 'ස්ථානය',
@@ -1296,6 +1235,15 @@ export default function App(){
   const [adminActionBusy, setAdminActionBusy] = useState(false)
   const [activeModule, setActiveModule] = useState(null)
   const [aiEventsOpen, setAiEventsOpen] = useState(false)
+
+  const openModule = (moduleId) => {
+    setActiveModule(null)
+    window.setTimeout(() => {
+      setActiveModule(moduleId)
+    }, 0)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const isProdSupabase = isSupabaseConfigured && Boolean(supabase)
   const ONE_OFF_PRICE_LKR = 30000
   const STRIPE_FEE_PERCENT = Number(import.meta.env.VITE_STRIPE_LKR_FEE_PERCENT || 3.4)
@@ -1538,31 +1486,24 @@ export default function App(){
 
     try {
       setPaymentBusy(true)
-      // pick discounted price when promo available
-      const amountToUse = (promoInfo?.remaining || 0) > 0 ? (promoInfo.discountedPrice || ONE_OFF_PRICE_LKR) : (promoInfo.basePrice || ONE_OFF_PRICE_LKR)
       const resp = await createStripeCheckoutSession({
         session,
         origin: `${window.location.origin}${window.location.pathname}`,
-        amountLkr: amountToUse,
       })
-      const redirectUrl = resp?.checkoutUrl || resp?.url || resp?.checkout_url
-      if (redirectUrl) {
-        window.location.href = redirectUrl
+      if (resp?.url) {
+        window.location.href = resp.url
       } else {
-        const serverMsg = resp?.error || resp?.message || resp?._raw || null
-        showToast(serverMsg ? `Stripe init error: ${serverMsg}` : 'Stripe returned no checkout URL. Ensure serverless functions are running (netlify dev) or site is deployed.', 'error')
+        alert('Stripe initialization failed.')
       }
     } catch (error) {
-      showToast(error.message || 'Payment initialization failed', 'error')
+      alert(error.message)
     } finally {
       setPaymentBusy(false)
     }
   }
 
   const handleRequestCashPayment = async (contactFormData) => {
-    if (!session?.user?.id) {
-      throw new Error('Please sign in first')
-    }
+    if (!session?.user?.id) return
     try {
       setPaymentBusy(true)
       
@@ -1575,17 +1516,15 @@ export default function App(){
         buyerNote = `
 Name: ${contactFormData.fullName}
 Phone: ${contactFormData.phoneNumber}
-Email: ${contactFormData.email || session.user.email || 'N/A'}
 Company: ${contactFormData.company || 'N/A'}
 Preferred Contact: ${contactFormData.preferredContactMethod}
 Message: ${contactFormData.message || 'N/A'}
         `.trim()
       }
       
-      await requestCashPayment({ session, amountLkr: ONE_OFF_PRICE_LKR, buyerNote })
-      // Success! ContactFormModal will handle the success screen
+      await requestCashPayment({ session, amount: ONE_OFF_PRICE_LKR, buyerNote })
+      // Success notification is shown in the ContactFormModal
     } catch (error) {
-      // Re-throw so ContactFormModal can handle the error with alert
       throw error
     } finally {
       setPaymentBusy(false)
@@ -1657,7 +1596,7 @@ Message: ${contactFormData.message || 'N/A'}
       // Auto-save to Supabase if session exists
       if (session?.user?.id) {
         const pdfBlob = pdf.output('blob')
-        await savePdfFileToSupabase({ blob: pdfBlob, session, payload: { inputs, results }, fileName })
+        await savePdfFileToSupabase(pdfBlob, fileName, session)
         loadSavedFiles(session)
       }
     } catch (err) {
@@ -1672,144 +1611,136 @@ Message: ${contactFormData.message || 'N/A'}
 
     if (!results) return alert(t('noResultsToSave'))
     try {
-      const csvData = []
+      const excelData = []
       
       // Title
-      csvData.push([t('title')])
-      csvData.push(['Generated on', new Date().toLocaleDateString()])
-      csvData.push([''])
+      excelData.push([t('title')])
+      excelData.push(['Generated on', new Date().toLocaleDateString()])
+      excelData.push([''])
 
       // Document Details Section
-      csvData.push(['DOCUMENT DETAILS'])
-      csvData.push(['Location', inputs.location || '-'])
-      csvData.push(['Date', inputs.date || '-'])
-      csvData.push(['Buyer Name', inputs.buyerName || '-'])
-      csvData.push(['Bill Number', inputs.billNumber || '-'])
-      csvData.push([''])
+      excelData.push(['DOCUMENT DETAILS'])
+      excelData.push(['Location', inputs.location || '-'])
+      excelData.push(['Date', inputs.date || '-'])
+      excelData.push(['Buyer Name', inputs.buyerName || '-'])
+      excelData.push(['Bill Number', inputs.billNumber || '-'])
+      excelData.push([''])
 
       // Revenue & Expenses Summary
-      csvData.push(['SALT SALE SUMMARY'])
-      csvData.push(['Packed Bags', inputs.packedBags || 0])
-      csvData.push(['Deducted Bags', inputs.deductedBags || 0])
-      csvData.push(['Net Bags', results.netBags || 0])
-      csvData.push(['Price Per Bag (LKR)', inputs.pricePerBag || 0])
-      csvData.push(['Initial Price (LKR)', results.initialPrice || 0])
-      csvData.push([''])
+      excelData.push(['SALT SALE SUMMARY'])
+      excelData.push(['Packed Bags', inputs.packedBags || 0])
+      excelData.push(['Deducted Bags', inputs.deductedBags || 0])
+      excelData.push(['Net Bags', results.netBags || 0])
+      excelData.push(['Price Per Bag (LKR)', inputs.pricePerBag || 0])
+      excelData.push(['Initial Price (LKR)', results.initialPrice || 0])
+      excelData.push([''])
 
       // Operational Costs Section
-      csvData.push(['OPERATIONAL COSTS'])
-      csvData.push(['Packing Fee Per Bag (LKR)', inputs.packingFeePerBag || 0])
-      csvData.push(['Plastic Bag Cost (LKR)', inputs.bagCostPerUnit || 0])
-      csvData.push(['Fixed Overheads (LKR)', inputs.otherExpenses || 0])
+      excelData.push(['OPERATIONAL COSTS'])
+      excelData.push(['Packing Fee Per Bag (LKR)', inputs.packingFeePerBag || 0])
+      excelData.push(['Plastic Bag Cost (LKR)', inputs.bagCostPerUnit || 0])
+      excelData.push(['Fixed Overheads (LKR)', inputs.otherExpenses || 0])
       
       if (results.extraExpensesTotal > 0) {
-        csvData.push(['Extra Expenses (LKR)', results.extraExpensesTotal])
+        excelData.push(['Extra Expenses (LKR)', results.extraExpensesTotal])
       }
       
       if (results.labourCostsTotal > 0) {
-        csvData.push(['Labour Costs Total (LKR)', results.labourCostsTotal])
+        excelData.push(['Labour Costs Total (LKR)', results.labourCostsTotal])
       }
       
-      csvData.push(['Total Contractor Spent (LKR)', results.contractorTotalSpent || 0])
-      csvData.push([''])
+      excelData.push(['Total Contractor Spent (LKR)', results.contractorTotalSpent || 0])
+      excelData.push([''])
 
       // Settlement
-      csvData.push(['NET SETTLEMENT'])
-      csvData.push(['Physical Cash (LKR)', inputs.cashReceived || 0])
-      csvData.push(['Bank Cheques (LKR)', inputs.chequeReceived || 0])
-      csvData.push([''])
+      excelData.push(['NET SETTLEMENT'])
+      excelData.push(['Physical Cash (LKR)', inputs.cashReceived || 0])
+      excelData.push(['Bank Cheques (LKR)', inputs.chequeReceived || 0])
+      excelData.push([''])
 
       // Profit Share Calculations
-      csvData.push(['PROFIT SHARE CALCULATIONS'])
-      csvData.push(['Contractor Share %', contractorSharePercentage || 0])
-      csvData.push(['Expense Payment Mode', inputs.expensePayment === 'owners' ? 'Owners Responsibility' : inputs.expensePayment === 'contractor' ? 'Contractor Responsibility' : '50/50 Shared'])
-      csvData.push([''])
+      excelData.push(['PROFIT SHARE CALCULATIONS'])
+      excelData.push(['Contractor Share %', contractorSharePercentage || 0])
+      excelData.push(['Expense Payment Mode', inputs.expensePayment === 'owners' ? 'Owners Responsibility' : inputs.expensePayment === 'contractor' ? 'Contractor Responsibility' : '50/50 Shared'])
+      excelData.push([''])
 
-      csvData.push(['GRAND TOTALS'])
-      csvData.push(['Grand Total Received (LKR)', results.grandTotalReceived || 0])
-      csvData.push(['Contractor Share (Gross) (LKR)', results.contractorShare || 0])
-      csvData.push(['Contractor Advance Payment (LKR)', results.advancesTotal || 0])
-      csvData.push(['Contractor Share (Net after Advances) (LKR)', results.contractorNetShare || 0])
-      csvData.push(['Owners Group Amount (LKR)', results.ownerPool || 0])
-      csvData.push(['Per Owner Share (LKR)', results.generalSharePerOwner || 0])
-      csvData.push([''])
+      excelData.push(['GRAND TOTALS'])
+      excelData.push(['Grand Total Received (LKR)', results.grandTotalReceived || 0])
+      excelData.push(['Contractor Share (Gross) (LKR)', results.contractorShare || 0])
+      excelData.push(['Contractor Advance Payment (LKR)', results.advancesTotal || 0])
+      excelData.push(['Contractor Share (Net after Advances) (LKR)', results.contractorNetShare || 0])
+      excelData.push(['Owners Group Amount (LKR)', results.ownerPool || 0])
+      excelData.push(['Per Owner Share (LKR)', results.generalSharePerOwner || 0])
+      excelData.push([''])
 
       // Owner Distribution
       if (ownerCount === 1) {
-        csvData.push(['SINGLE OWNER DISTRIBUTION'])
-        csvData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
-        csvData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        excelData.push(['SINGLE OWNER DISTRIBUTION'])
+        excelData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
+        excelData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
         if (inputs.bothOwnersHaveLoans) {
-          csvData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
-          csvData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
+          excelData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
+          excelData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
         }
       } else {
-        csvData.push(['TWO OWNERS DISTRIBUTION'])
-        csvData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
-        csvData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        excelData.push(['TWO OWNERS DISTRIBUTION'])
+        excelData.push(['Owner 1 Name', ownerNames[0] || 'Owner 1'])
+        excelData.push(['Owner 1 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
         if (inputs.bothOwnersHaveLoans) {
-          csvData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
+          excelData.push(['Owner 1 Loan (LKR)', inputs.loanInaya || 0])
         }
-        csvData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
+        excelData.push(['Owner 1 Final Share (LKR)', results.finalInaya || 0])
         
-        csvData.push([''])
-        csvData.push(['Owner 2 Name', ownerNames[1] || 'Owner 2'])
-        csvData.push(['Owner 2 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
+        excelData.push([''])
+        excelData.push(['Owner 2 Name', ownerNames[1] || 'Owner 2'])
+        excelData.push(['Owner 2 Share Before Loan (LKR)', results.generalSharePerOwner || 0])
         if (inputs.bothOwnersHaveLoans) {
-          csvData.push(['Owner 2 Loan (LKR)', inputs.loanShakira || 0])
+          excelData.push(['Owner 2 Loan (LKR)', inputs.loanShakira || 0])
         }
-        csvData.push(['Owner 2 Final Share (LKR)', results.finalShakira || 0])
+        excelData.push(['Owner 2 Final Share (LKR)', results.finalShakira || 0])
       }
-      csvData.push([''])
+      excelData.push([''])
 
       // Zakat Information (if applicable)
       if (results.zakatInaya > 0 || results.zakatShakira > 0) {
-        csvData.push(['ZAKAT CALCULATIONS'])
+        excelData.push(['ZAKAT CALCULATIONS'])
         if (ownerCount === 1) {
-          csvData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
-          csvData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
+          excelData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
+          excelData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
         } else {
-          csvData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
-          csvData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
-          csvData.push(['Owner 2 Zakat (LKR)', results.zakatShakira || 0])
-          csvData.push(['Owner 2 After Zakat (LKR)', results.finalShakiraAfterZakat || 0])
+          excelData.push(['Owner 1 Zakat (LKR)', results.zakatInaya || 0])
+          excelData.push(['Owner 1 After Zakat (LKR)', results.finalInayaAfterZakat || 0])
+          excelData.push(['Owner 2 Zakat (LKR)', results.zakatShakira || 0])
+          excelData.push(['Owner 2 After Zakat (LKR)', results.finalShakiraAfterZakat || 0])
         }
-        csvData.push([''])
+        excelData.push([''])
       }
 
       // Society Service Charge (if applicable)
       if (results.societyServiceCharge > 0) {
-        csvData.push(['SOCIETY SERVICE CHARGES'])
-        csvData.push(['Service Charge Amount (LKR)', results.societyServiceCharge || 0])
-        csvData.push(['Reserved 30% (LKR)', (results.societyServiceCharge * 0.30) || 0])
-        csvData.push([''])
+        excelData.push(['SOCIETY SERVICE CHARGES'])
+        excelData.push(['Service Charge Amount (LKR)', results.societyServiceCharge || 0])
+        excelData.push(['Reserved 30% (LKR)', (results.societyServiceCharge * 0.30) || 0])
+        excelData.push([''])
       }
 
-      // Convert to CSV string with colons and alignment
-      const csvContent = csvData.map((row, idx) => {
-        // If row has 2 items (label, value), format as "Label: Value"
-        if (row.length === 2) {
-          const label = String(row[0] || '').padEnd(40, ' ')
-          const value = String(row[1] || '')
-          return `${label} : ${value}`
-        }
-        // For other rows, use colon-separated format
-        return row.map(cell => String(cell || '')).join(' : ')
-      }).join('\n')
+      // Create workbook and worksheet
+      const ws = XLSX.utils.aoa_to_sheet(excelData)
+      
+      // Set column widths (in characters)
+      ws['!cols'] = [
+        { wch: 35 },  // Column A: wide for labels
+        { wch: 20 }   // Column B: wide for values
+      ]
 
-      // Create blob and download
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-      const link = document.createElement('a')
-      const url = URL.createObjectURL(blob)
-      const fileName = `Report-${(inputs.location || 'Report').replace(/\s+/g, '-')}-${inputs.date || new Date().toISOString().split('T')[0]}.csv`
-      
-      link.setAttribute('href', url)
-      link.setAttribute('download', fileName)
-      link.style.visibility = 'hidden'
-      
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      // Add autofilter and freeze panes if supported
+      ws['!autofilter'] = { ref: 'A1:B1' }
+
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Report')
+
+      const fileName = `Report-${(inputs.location || 'Report').replace(/\s+/g, '-')}-${inputs.date || new Date().toISOString().split('T')[0]}.xlsx`
+      XLSX.writeFile(wb, fileName)
     } catch (err) {
       console.error(err)
       alert(t('couldNotCreatePdf'))
@@ -2129,8 +2060,8 @@ Message: ${contactFormData.message || 'N/A'}
     <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-1 sm:p-4 pb-8 ${lang === 'ta' ? 'text-xs lg:text-sm' : 'text-sm lg:text-base'}`}>
       <div ref={rootRef} className="container-max">
         <header className="relative mb-6 rounded-3xl border border-white/70 bg-[#fff9ff] px-1 sm:px-6 pb-5 pt-6 shadow-sm backdrop-blur-sm sm:pb-6 sm:pt-2">
-          <div className="flex items-center px-3 pt-0 sm:px-0">
-            <div className="flex-1 flex items-center justify-start">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-3 pt-0 sm:px-0">
+            <div className="flex items-center">
               <select 
                 value={lang} 
                 onChange={(e) => setLang(e.target.value)} 
@@ -2143,14 +2074,10 @@ Message: ${contactFormData.message || 'N/A'}
               </select>
             </div>
 
-            <div className="flex-1 flex items-center justify-center">
-              {/* Center: Promo badge */}
-              {promoInfo?.remaining > 0 && (
-                <PromoBadge promoInfo={promoInfo} onClick={() => setMenuOpen(true)} />
-              )}
+            <div className="flex justify-center items-center">
             </div>
 
-            <div className="flex-1 flex items-center justify-end gap-2">
+            <div className="flex items-center justify-end gap-2">
               {isAdmin && (
                 <button
                   type="button"
@@ -2296,7 +2223,7 @@ Message: ${contactFormData.message || 'N/A'}
               ].map(module => (
                 <button
                   key={module.id}
-                  onClick={() => setActiveModule(module.id)}
+                  onClick={() => openModule(module.id)}
                   className={`relative p-3 rounded-[32px] ${module.color} border-none android-shadow flex flex-col items-start text-left active:scale-95 transition-all group overflow-hidden h-[140px]`}
                 >
                   <div className="absolute top-4 right-5 z-20">
@@ -2671,7 +2598,6 @@ Message: ${contactFormData.message || 'N/A'}
         t={t}
         billingStatus={billingStatus}
         onStartCardPayment={handleStartCardPayment}
-        promoInfo={promoInfo}
         onRequestCashPayment={handleRequestCashPayment}
         stripeFeePreview={stripeFeePreview}
         paymentBusy={paymentBusy}
@@ -2710,11 +2636,20 @@ Message: ${contactFormData.message || 'N/A'}
           }, 100);
         }}
         onPL={() => {
-          // Scroll to results section if available
-          const resultsSection = document.querySelector('.android-shadow.rounded-[32px]');
-          if (resultsSection) {
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
+          // Open dashboard/reports view to display P&L reports
+          setMenuOpen(true);
+          setTimeout(() => {
+            // Focus on the reports section of the dashboard
+            const filesTab = document.querySelector('[data-tab="files"]');
+            if (filesTab) {
+              filesTab.click();
+              // Scroll to P&L table
+              const plTable = document.querySelector('table');
+              if (plTable) {
+                plTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }
+          }, 150);
         }}
         onDashboard={() => setMenuOpen(true)}
       />

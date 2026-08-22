@@ -14,12 +14,13 @@
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0Y3Nkb2NyemdlcXBsbWlwaGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTI5NDAsImV4cCI6MjA5MDcyODk0MH0.tuY6a_6u9kE9jhJHF9leE12JiLlIyWPozQLxuC9NMoc"
   VITE_STRIPE_LKR_FEE_PERCENT = "3.4"
   VITE_STRIPE_LKR_FEE_FIXED = "90"
-  VITE_ADMIN_SECRET = "AdminSecret123"
+  VITE_ADMIN_SECRET = "Admin_Secret_1976"
 
 # Server-side secrets (set these in Netlify UI, never commit)
   SUPABASE_URL = "https://ktcsdocrzgeqplmiphfa.supabase.co"
   SUPABASE_SERVICE_ROLE_KEY = "your_service_role_key"
   STRIPE_SECRET_KEY = "sk_live_or_test_key"
   STRIPE_WEBHOOK_SECRET = "whsec_from_stripe_webhook"
+  ADMIN_SECRET_KEY = "Admin_Secret_1976"
   ADMIN_VERIFICATION_KEY = "set_a_long_random_secret"
   ADMIN_NOTIFICATION_WEBHOOK_URL = "https://your-admin-webhook-endpoint.example.com"

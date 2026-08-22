@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 /**
  * Accordion component to wrap pricing/input cards.
  */
 export default function AccordionCard({ title, children, defaultOpen = false, bgColor = 'white', icon, onReset }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    setIsOpen(defaultOpen)
+  }, [defaultOpen])
 
   return (
     <div className={`android-card overflow-hidden mb-6 shadow-xl border border-slate-300`} style={{ backgroundColor: bgColor }}>

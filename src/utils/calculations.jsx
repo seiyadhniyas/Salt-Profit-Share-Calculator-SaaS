@@ -181,38 +181,12 @@ export function computeAll(inputs, options = {}) {
   finalInayaRaw -= ownerAdvanceInaya
   if (ownerCount === 2) finalShakiraRaw -= ownerAdvanceShakira
 
-  // Special handling for "Contractor Pays Expenses" only (not for 50/50 split)
-  if (expensePayment === 'contractor' && !is5050) {
-    if (ownerCount === 2) {
-      finalInayaRaw += loanShakira
-      finalShakiraRaw += loanInaya
-    }
-  }
-
+  // Each owner keeps their own loan balance and share. Any remaining balance is
+  // already captured in the owners' pool calculation, so reassigning the entire
+  // leftover amount to a single owner creates skewed zeros and distorts the split.
   // Prevent negative values: if result < 0 -> show 0 (we'll clamp)
   let finalInaya = Math.max(0, finalInayaRaw)
   let finalShakira = ownerCount === 2 ? Math.max(0, finalShakiraRaw) : 0
-
-  // Validation: ensure sum of distributions equals available funds
-  // For "Contractor Pays Expenses" (non-50/50): finalInaya + finalShakira + contractorShare should equal (grandTotalReceived + totalLoan)
-  // For 50/50 or other modes: finalInaya + finalShakira + contractorShare should equal grandTotalReceived
-  const sumAll = finalInaya + (ownerCount === 2 ? finalShakira : 0) + contractorNetShare
-  const expectedTotal = (expensePayment === 'contractor' && !is5050) ? (grandTotalReceived + totalLoan) : grandTotalReceived
-  const totalDiff = expectedTotal - sumAll
-
-  if (Math.abs(totalDiff) > 0.0001) {
-    // Distribute the difference to the owner with LOWER loan
-    const aLoan = loanInaya
-    const bLoan = ownerCount === 2 ? loanShakira : Number.POSITIVE_INFINITY
-    if (aLoan <= bLoan || ownerCount === 1) {
-      finalInaya += totalDiff
-    } else {
-      finalShakira += totalDiff
-    }
-    // Clamp to prevent negative final shares
-    finalInaya = Math.max(0, finalInaya)
-    finalShakira = ownerCount === 2 ? Math.max(0, finalShakira) : 0
-  }
 
   // Zakat: 5% of each final share (before zakat)
   const zakatInaya = finalInaya * 0.05
