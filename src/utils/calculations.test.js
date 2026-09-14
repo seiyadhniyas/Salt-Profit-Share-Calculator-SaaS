@@ -126,6 +126,13 @@ describe('computeAll basic scenarios (no formula changes)', () => {
     expect(next.owner2NetBags).toBe(30)
   })
 
+  it('recalculates Owner 2 when Owner 1 changes', () => {
+    const next = deriveOwnerNetBags(100, 0, 25, 50, 2)
+
+    expect(next.owner1NetBags).toBe(25)
+    expect(next.owner2NetBags).toBe(75)
+  })
+
   it('reserved stock deduction (kg -> bags conversion)', () => {
     const inputs = { packedBags: 20, deductedBags: 0, pricePerBag: 500, reservedAmount: 0 }
     const stockReserved = { stockLevel: 100, stockUnit: 'kg' } // 100 kg -> 2 bags (50kg per bag)

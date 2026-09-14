@@ -22,18 +22,18 @@ export function deriveOwnerNetBags(packedBags, deductedBags, owner1NetBags, owne
   const hasOwner1Value = owner1NetBags !== '' && owner1NetBags !== null && typeof owner1NetBags !== 'undefined'
   const hasOwner2Value = owner2NetBags !== '' && owner2NetBags !== null && typeof owner2NetBags !== 'undefined'
 
-  let nextOwner1 = hasOwner1Value ? Math.max(0, Math.min(Math.floor(safeNum(owner1NetBags)), netBags)) : 0
-  let nextOwner2 = hasOwner2Value ? Math.max(0, Math.min(Math.floor(safeNum(owner2NetBags)), netBags)) : 0
+  let nextOwner1
+  let nextOwner2
 
-  if (hasOwner1Value && !hasOwner2Value) {
+  if (hasOwner1Value) {
+    nextOwner1 = Math.max(0, Math.min(Math.floor(safeNum(owner1NetBags)), netBags))
     nextOwner2 = Math.max(0, netBags - nextOwner1)
-  } else if (!hasOwner1Value && hasOwner2Value) {
+  } else if (hasOwner2Value) {
+    nextOwner2 = Math.max(0, Math.min(Math.floor(safeNum(owner2NetBags)), netBags))
     nextOwner1 = Math.max(0, netBags - nextOwner2)
-  } else if (!hasOwner1Value && !hasOwner2Value) {
-    nextOwner1 = netBags / 2
-    nextOwner2 = netBags / 2
-  } else if (nextOwner1 + nextOwner2 > netBags) {
-    nextOwner2 = Math.max(0, netBags - nextOwner1)
+  } else {
+    nextOwner1 = Math.floor(netBags / 2)
+    nextOwner2 = netBags - nextOwner1
   }
 
   return {

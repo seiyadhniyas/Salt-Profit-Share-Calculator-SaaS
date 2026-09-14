@@ -78,23 +78,17 @@ export default function InputSection({
       return
     }
 
-    if (name === 'owner1NetBags' || name === 'owner2NetBags') {
+    if (name === 'owner1NetBags') {
       const nextValues = deriveOwnerNetBags(
         inputs?.packedBags ?? 0,
         inputs?.deductedBags ?? 0,
-        name === 'owner1NetBags' ? val : inputs?.owner1NetBags ?? 0,
-        name === 'owner1NetBags' ? val : inputs?.owner2NetBags ?? 0,
+        val,
+        null,
         ownerCount,
       )
 
-      try { console.debug('[deriveOwnerNetBags:onChange]', { name, val, packedBags: inputs?.packedBags, deductedBags: inputs?.deductedBags, nextValues }) } catch (e) {}
-
       if (typeof setInput === 'function') {
-        if (name === 'owner1NetBags') {
-          setInput(prev => ({ ...prev, owner1NetBags: val, owner2NetBags: nextValues.owner2NetBags }))
-        } else {
-          setInput(prev => ({ ...prev, owner2NetBags: val, owner1NetBags: nextValues.owner1NetBags }))
-        }
+        setInput(prev => ({ ...prev, owner1NetBags: val, owner2NetBags: nextValues.owner2NetBags }))
       }
       return
     }
@@ -114,7 +108,7 @@ export default function InputSection({
       inputs?.packedBags ?? 0,
       inputs?.deductedBags ?? 0,
       inputs?.owner1NetBags ?? 0,
-      inputs?.owner2NetBags ?? 0,
+      null,
       ownerCount,
     )
 
@@ -137,13 +131,14 @@ export default function InputSection({
   // Normalize owner net bag values on blur (convert typed string to rounded number and recompute)
   const onOwnerBlur = (name) => {
     if (ownerCount !== 2 || typeof setInput !== 'function') return
+    if (name !== 'owner1NetBags') return
     const raw = inputs?.[name]
     const parsed = Number(raw)
     const nextValues = deriveOwnerNetBags(
       inputs?.packedBags ?? 0,
       inputs?.deductedBags ?? 0,
       name === 'owner1NetBags' ? parsed : inputs?.owner1NetBags ?? 0,
-      name === 'owner2NetBags' ? parsed : inputs?.owner2NetBags ?? 0,
+      null,
       ownerCount,
     )
     setInput(prev => ({ ...prev, owner1NetBags: nextValues.owner1NetBags, owner2NetBags: nextValues.owner2NetBags }))
