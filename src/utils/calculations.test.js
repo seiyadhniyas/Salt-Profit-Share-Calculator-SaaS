@@ -91,9 +91,11 @@ describe('computeAll basic scenarios (no formula changes)', () => {
 
     const res = computeAll(inputs, { contractorSharePercentage: 50, ownerCount: 2 })
 
-    expect(res.generalSharePerOwner).toBeCloseTo(17500)
-    expect(res.finalInaya).toBeCloseTo(14500)
-    expect(res.finalShakira).toBeCloseTo(10500)
+    expect(res.grandTotalReceived).toBeCloseTo(90000)
+    expect(res.generalSharePerOwner).toBeCloseTo(22500)
+    expect(res.finalInaya).toBeCloseTo(19500)
+    expect(res.finalShakira).toBeCloseTo(15500)
+    expect(res.finalInaya + res.finalShakira).toBeCloseTo(res.grandTotalReceived - res.contractorNetShare)
   })
 
   it('calculates society service from each owner net bag reading', () => {

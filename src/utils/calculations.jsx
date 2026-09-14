@@ -198,13 +198,14 @@ export function computeAll(inputs, options = {}) {
   const contractorNetShareRaw = contractorShare - advancesTotal
   const contractorNetShare = Math.max(0, contractorNetShareRaw)
 
-  // owner_pool (Owners Group Amount)
-  // If owners pay expenses: ownerPool = grandTotalReceived - contractorShare
+  // owner_pool (Owners Group Amount before owner-specific loan deductions)
+  // If owners pay expenses: restore total loans before allocating the owner pool.
+  // Grand Total Received remains the loan-reduced amount shown in the breakdown.
   // If contractor pays expenses: ownerPool = (grandTotalReceived + totalLoan) * ownerShareFactor
   // If 50/50: ownerPool = (InitialPrice - contractorTotalSpent) / 2 (equals contractorShare)
   let ownerPool = 0
   if (expensePayment === 'owners') {
-    ownerPool = grandTotalReceived - contractorNetShare
+    ownerPool = grandTotalReceived + totalLoan - contractorNetShare
   } else if (expensePayment === 'contractor') {
     ownerPool = (grandTotalReceived + totalLoan) * ownerShareFactor
   } else if (is5050) {
@@ -214,10 +215,8 @@ export function computeAll(inputs, options = {}) {
   // general_share_per_owner
   const generalSharePerOwner = ownerPool / ownerCount
 
-  // raw final shares
-  // The owners-pay mode still uses an equal split between owners, but each owner's
-  // own loan amount should reduce their final share. Advances already paid to the
-  // contractor are deducted from the matching owner's share as well.
+  // Raw final shares. Loans are applied once here to the pre-loan owner pool;
+  // Grand Total Received is a separate loan-reduced breakdown value.
   let finalInayaRaw = generalSharePerOwner - loanInaya
   let finalShakiraRaw = ownerCount === 2 ? (generalSharePerOwner - loanShakira) : 0
 
