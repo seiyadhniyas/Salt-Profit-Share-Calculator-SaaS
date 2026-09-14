@@ -280,7 +280,11 @@ export default function App(){
   }, [stockReserved])
 
   // Stock source selection (for stock rotation system)
-  const [stockSource, setStockSource] = useState('freshly-harvested')
+  const [stockSource, setStockSource] = useState(() => localStorage.getItem('stockSource') || 'freshly-harvested')
+
+  useEffect(() => {
+    try { localStorage.setItem('stockSource', stockSource) } catch (e) {}
+  }, [stockSource])
 
   // Ref for scrolling to input section
   const inputSectionRef = useRef(null)
@@ -396,8 +400,8 @@ export default function App(){
       grandTotalContractorFormula: 'InitialPrice - Spent - TotalLoan',
       grandTotalShared5050Formula: 'InitialPrice - Spent/2 - TotalLoan',
       ownerPool: 'Owners Group Amount',
-      ownerPoolOwnersFormula: 'GrandTotal - ContractorShare',
-      ownerPoolContractorFormula: '(GrandTotal + TotalLoan)/2',
+      ownerPoolOwnersFormula: 'GrandTotal + TotalLoan - ContractorShare',
+      ownerPoolContractorFormula: '(GrandTotal + TotalLoan) x OwnerShareFactor',
       ownerPoolShared5050Formula: '(InitialPrice - Spent)/2',
       societyServiceCharge: 'Society Service Charge',
       societyServiceReserved30: 'Society Service Reserved 30%',
@@ -698,8 +702,8 @@ export default function App(){
       grandTotalContractorFormula: 'ஆரம்பவிலை - செலவு - மொத்தகடன்',
       grandTotalShared5050Formula: 'ஆரம்பவிலை - செலவு/2 - மொத்தகடன்',
       ownerPool: 'உரிமையாளர்களின் மொத்த தொகை',
-      ownerPoolOwnersFormula: 'மொத்தம் - ஒப்பந்ததாரர் பங்கு',
-      ownerPoolContractorFormula: '(மொத்தம் + மொத்தகடன்)/2',
+      ownerPoolOwnersFormula: 'மொத்தம் + மொத்தகடன் - ஒப்பந்ததாரர் பங்கு',
+      ownerPoolContractorFormula: '(மொத்தம் + மொத்தகடன்) x உரிமையாளர் பங்கு காரணி',
       ownerPoolShared5050Formula: '(ஆரம்பவிலை - செலவு)/2',
       societyServiceCharge: 'சங்க சேவை கட்டணம்',
       societyServiceReserved30: 'சங்க சேவை ஒதுக்கீடு 30%',
@@ -1003,8 +1007,8 @@ export default function App(){
       grandTotalContractorFormula: 'මූලික මිල - වියදම - මුළු ණය',
       grandTotalShared5050Formula: 'මූලික මිල - වියදම/2 - මුළු ණය',
       ownerPool: 'අයිතිකරුවන්ගේ සමූහ මුදල',
-      ownerPoolOwnersFormula: 'මුළු ලැබීම් - කොන්ත්‍රාත්කරුගේ කොටස',
-      ownerPoolContractorFormula: '(මුළු ලැබීම් + මුළු ණය)/2',
+      ownerPoolOwnersFormula: 'මුළු ලැබීම් + මුළු ණය - කොන්ත්‍රාත්කරුගේ කොටස',
+      ownerPoolContractorFormula: '(මුළු ලැබීම් + මුළු ණය) x හිමිකරු කොටස් සාධකය',
       ownerPoolShared5050Formula: '(මූලික මිල - වියදම)/2',
       perOwnerShare: 'අයිතිකරුවෙකුට ලැබෙන කොටස',
       societyServiceCharge: 'සංගම් සේවා ගාස්තුව',
@@ -1536,13 +1540,13 @@ Message: ${contactFormData.message || 'N/A'}
   // compute on every input change or when contractor share percentage changes
   useEffect(()=>{
     try {
-      const res = computeAll(inputs, { contractorSharePercentage, ownerCount, stockSource, stockReserved })
+      const res = computeAll(inputs, { contractorSharePercentage, ownerCount, stockSource, stockReserved, disasterRecovery })
       setResults(res)
       localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs))
     } catch (e) {
       console.error('Error in computeAll or localStorage:', e)
     }
-  }, [inputs, contractorSharePercentage, ownerCount, stockSource, stockReserved])
+  }, [inputs, contractorSharePercentage, ownerCount, stockSource, stockReserved, disasterRecovery])
 
   // Single-owner mode: ensure second owner loan does not affect persisted inputs/reports.
   useEffect(() => {
@@ -1568,8 +1572,16 @@ Message: ${contactFormData.message || 'N/A'}
       buyerName: '',
       billNumber: '',
     }))
+    setStockSource('freshly-harvested')
+    setStockReserved({ stockLevel: '', stockUnit: 'bags', estimatedPrice: '', selectedLocations: [], fromDate: '', toDate: '' })
+    setDisasterRecovery({ lossQuantity: '', lossUnit: 'bags', pondsReconstruction: '', hutReconstruction: '', electricityBills: '', compensationReceived: '', donationsReceived: '' })
     setResults(null)
-    try { localStorage.removeItem(STORAGE_KEY) } catch(e){}
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem('stockSource')
+      localStorage.removeItem('stockReserved')
+      localStorage.removeItem('disasterRecovery')
+    } catch(e){}
   }
 
   const toggleLoans = (val) => {

@@ -43,6 +43,35 @@ export function deriveOwnerNetBags(packedBags, deductedBags, owner1NetBags, owne
   }
 }
 
+export function deriveSaleBags(packedBags, deductedBags, stockSource = 'freshly-harvested', stockReserved = {}, inputs = {}) {
+  let normalizedPackedBags = Math.max(0, Math.floor(safeNum(packedBags)))
+  const normalizedDeductedBags = Math.max(0, Math.floor(safeNum(deductedBags)))
+  let reservedStockDeducted = 0
+
+  if (stockSource === 'sold-reserved' && stockReserved?.stockLevel) {
+    const reservedQty = stockReserved.stockUnit === 'kg'
+      ? safeNum(stockReserved.stockLevel) / 50
+      : safeNum(stockReserved.stockLevel)
+    reservedStockDeducted = Math.min(normalizedPackedBags, Math.max(0, reservedQty))
+    normalizedPackedBags = Math.max(0, normalizedPackedBags - reservedStockDeducted)
+  } else if (stockSource === 'mixed') {
+    const freshAmount = Math.max(0, Math.floor(safeNum(inputs?.freshAmount)))
+    const enteredReservedAmount = Math.max(0, Math.floor(safeNum(inputs?.reservedAmount)))
+    const availableReserved = stockReserved?.stockLevel
+      ? (stockReserved.stockUnit === 'kg' ? safeNum(stockReserved.stockLevel) / 50 : safeNum(stockReserved.stockLevel))
+      : enteredReservedAmount
+    const reservedAmount = Math.min(enteredReservedAmount, Math.max(0, availableReserved))
+    normalizedPackedBags = freshAmount + Math.floor(reservedAmount)
+  }
+
+  return {
+    packedBags: normalizedPackedBags,
+    deductedBags: normalizedDeductedBags,
+    reservedStockDeducted: Math.round(reservedStockDeducted),
+    netBags: Math.max(0, normalizedPackedBags - normalizedDeductedBags),
+  }
+}
+
 // Primary compute function. Takes an inputs object and options, returns an object
 // with all intermediate and final values. Keeps raw values for
 // highlighting and applies validation rules described in spec.
@@ -68,25 +97,9 @@ export function computeAll(inputs, options = {}) {
   const otherExpenses = safeNum(inputs.otherExpenses)
   
   // Stock source tracking - deduct from reserved if applicable
-  let reservedStockDeducted = 0
-  if (stockSource === 'sold-reserved' && stockReserved.stockLevel) {
-    const reservedQty = stockReserved.stockUnit === 'kg' 
-      ? (Number(stockReserved.stockLevel) || 0) / 50 
-      : (Number(stockReserved.stockLevel) || 0)
-    reservedStockDeducted = Math.min(packedBags, reservedQty)
-    packedBags = Math.max(0, packedBags - reservedStockDeducted)
-  } else if (stockSource === 'mixed' && stockReserved.stockLevel) {
-    // For mixed, deduct the specific reserved amount entered by the user
-    const userReservedAmount = safeNum(inputs.reservedAmount)
-    const reservedQty = stockReserved.stockUnit === 'kg' 
-      ? (Number(stockReserved.stockLevel) || 0) / 50 
-      : (Number(stockReserved.stockLevel) || 0)
-    
-    // Ensure we don't deduct more than what's available in the reserved stock record
-    // and not more than the total packed bags
-    reservedStockDeducted = Math.min(packedBags, userReservedAmount, reservedQty)
-    packedBags = Math.max(0, packedBags - reservedStockDeducted)
-  }
+  const saleBags = deriveSaleBags(packedBags, deductedBags, stockSource, stockReserved, inputs)
+  packedBags = saleBags.packedBags
+  const reservedStockDeducted = saleBags.reservedStockDeducted
   
   // extra expenses array: [{id, label, amount}]
   const extraExpenses = Array.isArray(inputs.extraExpenses) ? inputs.extraExpenses : []
@@ -120,7 +133,7 @@ export function computeAll(inputs, options = {}) {
     // use that value directly (treats contractor expenses as strictly user-controlled).
     // Otherwise compute from per-bag rates and other expenses as before.
     // IMPORTANT: Labour costs are ALWAYS added to contractor expenses (regardless of expense payment mode)
-    contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + (expensePayment === 'owners' ? totalOtherExpenses : 0) + (is5050 ? totalOtherExpenses : 0) + labourCostsTotal
+    contractorTotalSpent = (packingFeePerBag * packedBags) + (bagCostPerUnit * packedBags) + totalOtherExpenses + labourCostsTotal
   }
 
   // total loan (sum of both owners' loans)
@@ -212,6 +225,14 @@ export function computeAll(inputs, options = {}) {
     ownerPool = (initialPrice - contractorTotalSpent) / 2
   }
 
+  const disasterRecovery = options?.disasterRecovery || {}
+  const disasterExpenses = safeNum(disasterRecovery.pondsReconstruction) + safeNum(disasterRecovery.hutReconstruction) + safeNum(disasterRecovery.electricityBills)
+  const disasterIncome = safeNum(disasterRecovery.compensationReceived) + safeNum(disasterRecovery.donationsReceived)
+  const lossBags = disasterRecovery.lossUnit === 'kg' ? safeNum(disasterRecovery.lossQuantity) / 50 : safeNum(disasterRecovery.lossQuantity)
+  const disasterLossValue = lossBags * pricePerBag
+  const disasterNetAdjustment = disasterIncome - disasterExpenses - disasterLossValue
+  ownerPool += disasterNetAdjustment
+
   // general_share_per_owner
   const generalSharePerOwner = ownerPool / ownerCount
 
@@ -298,7 +319,11 @@ export function computeAll(inputs, options = {}) {
     societyServiceReserved30Owner2: round2(societyServiceReserved30Owner2),
     highlights,
     stockSource,
-    reservedStockDeducted: Math.round(reservedStockDeducted),
+    reservedStockDeducted,
+    disasterExpenses: round2(disasterExpenses),
+    disasterIncome: round2(disasterIncome),
+    disasterLossValue: round2(disasterLossValue),
+    disasterNetAdjustment: round2(disasterNetAdjustment),
   }
 }
 

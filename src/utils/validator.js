@@ -54,11 +54,15 @@ export function validateModule(module, state = {}) {
         if (!freshOk || !reservedOk) {
           issues.push({ type: 'error', messageKey: 'missing_mixed_amounts', fallback: 'Provide both Fresh and Reserved amounts for Mixed stock.', fields: ['freshAmount', 'reservedAmount'] })
         } else {
-          if (netBags > 0 && (fresh + reservedAmt) !== netBags) {
+          const availableReserved = toNumber(stockReserved?.stockLevel)
+          const availableReservedBags = Number.isFinite(availableReserved)
+            ? (stockReserved?.stockUnit === 'kg' ? availableReserved / 50 : availableReserved)
+            : reservedAmt
+          const normalizedReserved = Math.min(reservedAmt, Math.max(0, availableReservedBags))
+          if (netBags > 0 && (fresh + normalizedReserved) !== netBags) {
             issues.push({ type: 'warning', messageKey: 'mixed_sum_mismatch', fallback: 'Sum of Fresh + Reserved does not match Packed Bags.', fields: ['freshAmount', 'reservedAmount', 'packedBags'] })
           }
-          const available = toNumber(stockReserved?.stockLevel)
-          if (Number.isFinite(available) && reservedAmt > available) {
+          if (Number.isFinite(availableReservedBags) && reservedAmt > availableReservedBags) {
             issues.push({ type: 'warning', messageKey: 'reserved_exceeds_available', fallback: 'Reserved amount exceeds available reserved stock.', fields: ['reservedAmount'] })
           }
         }

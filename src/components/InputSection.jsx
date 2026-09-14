@@ -2,7 +2,7 @@
 import AccordionCard from './AccordionCard'
 import StockReservedCard from './StockReservedCard'
 import DisasterRecoveryCard from './DisasterRecoveryCard'
-import { deriveOwnerNetBags } from '../utils/calculations.jsx'
+import { deriveOwnerNetBags, deriveSaleBags } from '../utils/calculations.jsx'
 
 function NumberInput({ label, value, onChange, min = 0, step = 'any', name, decimals = 2, tooltip, disabled = false, onBlur }) {
   const displayValue = value === '' || value === 0 ? '' : (decimals !== null && typeof value === 'number' ? value.toFixed(decimals) : value)
@@ -107,7 +107,7 @@ export default function InputSection({
     const nextValues = deriveOwnerNetBags(
       inputs?.packedBags ?? 0,
       inputs?.deductedBags ?? 0,
-      inputs?.owner1NetBags ?? 0,
+      inputs?.owner1NetBags ?? '',
       null,
       ownerCount,
     )
@@ -152,14 +152,14 @@ export default function InputSection({
       const chequeReceived = Number(inputs?.chequeReceived) || 0
 
       if (packedBags > 0 && pricePerBag > 0) {
-        const netBags = Math.max(0, packedBags - deductedBags)
+        const { netBags } = deriveSaleBags(packedBags, deductedBags, stockSource, stockReserved, inputs)
         const initialPrice = netBags * pricePerBag
         const calculatedCash = initialPrice - chequeReceived
         const roundedCash = Math.round(Math.max(0, calculatedCash) * 100) / 100
         setInput(prev => ({ ...prev, cashReceived: roundedCash }))
       }
     }
-  }, [inputs?.packedBags, inputs?.deductedBags, inputs?.pricePerBag, inputs?.chequeReceived, cashReceivedManuallySet, setInput])
+  }, [inputs?.packedBags, inputs?.deductedBags, inputs?.pricePerBag, inputs?.chequeReceived, inputs?.freshAmount, inputs?.reservedAmount, cashReceivedManuallySet, stockSource, stockReserved, setInput])
 
   const addExpense = () => {
     const id = Date.now()

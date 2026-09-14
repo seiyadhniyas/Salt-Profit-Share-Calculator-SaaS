@@ -71,8 +71,8 @@ describe('computeAll basic scenarios (no formula changes)', () => {
 
     const res = computeAll(inputs, { contractorSharePercentage: 50, ownerCount: 2 })
 
-    expect(res.finalInaya).toBeCloseTo(21250)
-    expect(res.finalShakira).toBeCloseTo(17250)
+    expect(res.finalInaya).toBeCloseTo(20750)
+    expect(res.finalShakira).toBeCloseTo(16750)
   })
 
   it('deducts each owner loan from their share in the owners-pay mode', () => {
@@ -146,5 +146,37 @@ describe('computeAll basic scenarios (no formula changes)', () => {
     expect(res.reservedStockDeducted).toBe(2)
     expect(res.netBags).toBe(18)
     expect(res.initialPrice).toBeCloseTo(18 * 500)
+  })
+
+  it('uses fresh plus reserved quantities once in mixed stock mode', () => {
+    const res = computeAll(
+      { packedBags: 100, deductedBags: 0, freshAmount: 60, reservedAmount: 40, pricePerBag: 500 },
+      { stockSource: 'mixed', stockReserved: { stockLevel: 40, stockUnit: 'bags' }, ownerCount: 2 },
+    )
+
+    expect(res.netBags).toBe(100)
+    expect(res.initialPrice).toBe(50000)
+  })
+
+  it('applies disaster recovery net adjustment to the owner pool', () => {
+    const res = computeAll(
+      { packedBags: 100, deductedBags: 0, pricePerBag: 1000 },
+      {
+        contractorSharePercentage: 50,
+        ownerCount: 2,
+        disasterRecovery: {
+          pondsReconstruction: 1000,
+          hutReconstruction: 0,
+          electricityBills: 0,
+          compensationReceived: 300,
+          donationsReceived: 200,
+          lossQuantity: 1,
+          lossUnit: 'bags',
+        },
+      },
+    )
+
+    expect(res.disasterNetAdjustment).toBe(-1500)
+    expect(res.ownerPool).toBe(48500)
   })
 })

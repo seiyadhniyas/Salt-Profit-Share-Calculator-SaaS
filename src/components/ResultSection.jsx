@@ -101,7 +101,7 @@ export default function ResultSection({results, t, ownerNames = ['', ''], ownerC
               isNegative={false}
             />
             <StatRow
-              label={(t ? t('ownerPool') : 'Owners Group Amount') + (results.expensePayment === 'owners' ? ` (${t ? t('ownerPoolOwnersFormula') : 'GrandTotal - ContractorShare'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('ownerPoolShared5050Formula') : '(InitialPrice - Spent)/2'})` : ` (${t ? t('ownerPoolContractorFormula') : '(GrandTotal + TotalLoan)/2'})`)}
+              label={(t ? t('ownerPool') : 'Owners Group Amount') + (results.expensePayment === 'owners' ? ` (${t ? t('ownerPoolOwnersFormula') : 'GrandTotal + TotalLoan - ContractorShare'})` : results.expensePayment === 'shared5050' ? ` (${t ? t('ownerPoolShared5050Formula') : '(InitialPrice - Spent)/2'})` : ` (${t ? t('ownerPoolContractorFormula') : '(GrandTotal + TotalLoan) x OwnerShareFactor'})`)}
               value={formatLKR(results.ownerPool)}
               isNegative={results.highlights.ownerPoolNegative}
             />
